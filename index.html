@@ -3,87 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumanth Udupi - Business Analyst</title>
+    <title>Sumanth Udupi - Senior UI/UX Designer & Developer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Using a wider range of font weights for more typographic control -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Swiper.js CSS for Carousel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
-        /* * Custom Styles for a "Dark & Gold" inspired classy feel.
-         * We use CSS variables for a consistent and easily maintainable theme.
-        */
         :root {
-            --brand-dark-bg: #121212;      /* A deep, rich black for the main background */
-            --brand-light-dark-bg: #1a1a1a; /* A slightly lighter black for section backgrounds */
-            --brand-gold: #D4AF37;         /* A classy, rich gold for accents and primary actions */
-            --brand-light-gold: #e6c75e;   /* A lighter gold for hover effects */
-            --text-primary: #e0e0e0;       /* A soft white for primary text, easy on the eyes */
-            --text-secondary: #a0a0a0;     /* A muted gray for secondary text */
-            --border-color: rgba(212, 175, 55, 0.2); /* A subtle gold border color */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --brand-gold: #f5cb5c;
+            --brand-gold-darker: #e4b94c;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --border-color: rgba(245, 203, 92, 0.15);
+            --shadow-color: rgba(245, 203, 92, 0.05);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--brand-dark-bg);
+            background-color: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Refined typography for headings */
-        h1, h2, h3 {
-            color: var(--brand-gold);
-            letter-spacing: -0.025em;
+        .gradient-text {
+            background: linear-gradient(90deg, #ffffff, var(--brand-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        h1 {
-             color: #ffffff; /* Make main hero heading white for max impact */
-        }
-
-        /* Smoother and slightly slower fade-in animation */
-        .section-fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .section-fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        /* Elegant button styling */
         .btn {
             display: inline-block;
             font-weight: 600;
-            padding: 14px 32px;
+            padding: 14px 36px;
             border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
 
         .btn-primary {
             background-color: var(--brand-gold);
             color: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s;
+            z-index: -1;
         }
 
         .btn-primary:hover {
-            background-color: var(--brand-light-gold);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.15);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px var(--shadow-color), 0 5px 15px rgba(245, 203, 92, 0.2);
         }
         
-        .btn-outline {
-            background-color: transparent;
-            color: var(--brand-gold);
+        .btn-primary:hover:before {
+            left: 100%;
+        }
+
+        .glass-effect {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
         }
 
-        .btn-outline:hover {
-            background-color: var(--brand-gold);
-            color: #000;
-            border-color: var(--brand-gold);
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* --- Carousel Styles --- */
+        .portfolio-carousel {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 400px; /* Adjust width as needed */
+            height: 520px; /* Adjust height as needed */
+            transition: transform 0.4s ease-in-out;
+        }
+        
+        .swiper-slide .project-card {
+             height: 100%;
+             display: flex;
+             flex-direction: column;
+        }
+        
+        .swiper-slide .project-image-container {
+            flex-shrink: 0;
+        }
+        
+        .swiper-slide .p-8 {
+            flex-grow: 1;
+        }
+
+        .swiper-slide-shadow-left,
+        .swiper-slide-shadow-right {
+            background-image: none; /* Optional: remove default shadows if you want cleaner look */
+        }
+        
+        .swiper-3d .swiper-slide-shadow-left, .swiper-3d .swiper-slide-shadow-right {
+            background-image: none;
+        }
+        
+        /* Customizing Swiper Navigation Arrows and Pagination */
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--brand-gold);
+            transition: transform 0.2s ease;
+        }
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            transform: scale(1.2);
+        }
+        
+        .swiper-pagination-bullet {
+            background: rgba(255,255,255,0.5);
+            width: 10px;
+            height: 10px;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: var(--brand-gold);
+            transform: scale(1.2);
+            opacity: 1;
         }
 
     </style>
@@ -91,95 +160,189 @@
 <body class="antialiased">
 
     <!-- Header & Navigation -->
-    <header class="bg-black/70 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-800">
-        <nav class="container mx-auto px-6 py-5 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-white tracking-tight">Sumanth Udupi</a>
-            <div class="hidden md:flex items-center space-x-10">
-                <a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300">Portfolio</a>
-                <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300">About</a>
-                <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
+    <header class="glass-effect sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white tracking-tight hover:text-brand-gold transition-colors duration-300">Sumanth Udupi</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Work</a>
+                <a href="#process" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Process</a>
+                <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">About</a>
+                <a href="#contact" class="btn btn-primary text-sm py-2 px-6">Let's Talk</a>
             </div>
-            <a href="#contact" class="hidden md:inline-block btn btn-outline">Hire Me</a>
+            <div class="md:hidden">
+                <!-- Mobile menu button can be added here -->
+            </div>
         </nav>
     </header>
 
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
-        <section class="bg-brand-dark-bg">
-            <div class="container mx-auto px-6 py-32 md:py-48 text-center">
+        <section class="relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-bg-primary z-10"></div>
+            <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+            
+            <div class="container mx-auto px-6 py-32 md:py-48 text-center relative z-20">
                 <div class="max-w-4xl mx-auto">
-                    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">Designing intuitive digital experiences that delight users.</h1>
-                    <p class="text-lg md:text-xl text-text-secondary mb-12">I'm Sumanth Udupi, a UI/UX designer focused on creating human-centered products that are both beautiful and functional.</p>
-                    <a href="#portfolio" class="btn btn-primary text-lg">View My Work</a>
+                    <p class="text-lg font-semibold text-brand-gold mb-4 fade-in-up">SUMANTH UDUPI - SENIOR UI/UX DEVELOPER</p>
+                    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 fade-in-up" style="animation-delay: 100ms;">
+                        <span class="gradient-text">Crafting Seamless User Journeys From Concept to Code.</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-text-secondary mb-12 max-w-2xl mx-auto fade-in-up" style="animation-delay: 200ms;">
+                        I architect and build human-centric digital products that solve complex problems, drive business growth, and deliver exceptional user experiences.
+                    </p>
+                    <div class="fade-in-up" style="animation-delay: 300ms;">
+                        <a href="#portfolio" class="btn btn-primary text-lg">Explore My Work</a>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Portfolio Section -->
-        <section id="portfolio" class="py-24 md:py-32 bg-brand-light-dark-bg section-fade-in">
+        <section id="portfolio" class="py-24 md:py-32 bg-bg-secondary overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Featured Projects</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">A selection of my work, demonstrating expertise in data visualization, enterprise software, and consumer-facing applications.</p>
+                </div>
+            </div>
+             <!-- Swiper Carousel -->
+            <div class="swiper-container portfolio-carousel fade-in-up">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1 -->
+                    <div class="swiper-slide">
+                        <a href="Automobile Dashboard.html" target="_blank" class="block h-full">
+                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
+                                <div class="project-image-container rounded-t-xl h-48">
+                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=Automobile+Analytics" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-8">
+                                    <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS</p>
+                                    <h3 class="text-2xl font-bold mb-4">Interactive Automobile Dashboard</h3>
+                                    <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations to uncover deep insights from automobile data.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="swiper-slide">
+                        <a href="#" target="_blank" class="block h-full">
+                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
+                                <div class="project-image-container rounded-t-xl h-48">
+                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=Fintech+Mobile+App" alt="Fintech Mobile App" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-8">
+                                    <p class="text-sm font-semibold text-brand-gold mb-2">MOBILE UI/UX • FINTECH</p>
+                                    <h3 class="text-2xl font-bold mb-4">Challenger Bank Mobile App</h3>
+                                    <p class="text-text-secondary">End-to-end design and prototyping for a next-gen mobile banking app, focusing on security and personalized financial insights.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="swiper-slide">
+                         <a href="#" target="_blank" class="block h-full">
+                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
+                                <div class="project-image-container rounded-t-xl h-48">
+                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=SaaS+Platform" alt="SaaS Platform" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-8">
+                                    <p class="text-sm font-semibold text-brand-gold mb-2">ENTERPRISE SOFTWARE • B2B</p>
+                                    <h3 class="text-2xl font-bold mb-3">Enterprise SaaS Platform</h3>
+                                    <p class="text-text-secondary">Redesigned a complex logistics platform, improving workflow efficiency by 35% through user research and a new design system.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="swiper-slide">
+                        <a href="#" target="_blank" class="block h-full">
+                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
+                                <div class="project-image-container rounded-t-xl h-48">
+                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=AI+Content+Tool" alt="AI Content Tool" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-8">
+                                    <p class="text-sm font-semibold text-brand-gold mb-2">GENERATIVE AI • UI DESIGN</p>
+                                    <h3 class="text-2xl font-bold mb-3">AI-Powered Content Generator</h3>
+                                    <p class="text-text-secondary">Designed the UI for an AI tool, focusing on a clean, intuitive interface to simplify complex content creation workflows.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Slide 5 -->
+                     <div class="swiper-slide">
+                        <a href="#" target="_blank" class="block h-full">
+                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
+                                <div class="project-image-container rounded-t-xl h-48">
+                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=E-commerce" alt="E-commerce Experience" class="w-full h-full object-cover">
+                                </div>
+                                <div class="p-8">
+                                    <p class="text-sm font-semibold text-brand-gold mb-2">E-COMMERCE • UX OPTIMIZATION</p>
+                                    <h3 class="text-2xl font-bold mb-3">E-commerce Checkout Flow</h3>
+                                    <p class="text-text-secondary">Overhauled the checkout process for a major online retailer, resulting in a 15% reduction in cart abandonment.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Add more slides as needed -->
+                </div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+                <!-- Add Navigation -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </section>
+
+        <!-- My Process Section -->
+        <section id="process" class="py-24 md:py-32 bg-bg-primary">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-20">
-                    <h2 class="text-4xl md:text-5xl font-bold">Selected Projects</h2>
-                    <p class="text-lg text-text-secondary mt-4">Here are a few projects I've worked on recently.</p>
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">My Design & Development Process</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">I follow a structured, iterative process to ensure every project is a success.</p>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    <!-- Project Card with refined styling -->
-                    <div class="bg-brand-dark-bg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-900/10 hover:-translate-y-2 group border border-gray-800">
-                        <img src="https://placehold.co/600x400/1a1a1a/d4af37?text=Automobile+Dashboard" alt="Automobile Data Dashboard Screenshot" class="w-full h-64 object-cover">
-                            <div class="p-8">
-                                <h3 class="text-2xl font-bold mb-3">Interactive Automobile Dashboard</h3>
-                                <p class="text-text-secondary mb-6">A comprehensive, multi-tabbed dashboard built with D3.js. It features interactive filters, dynamic KPIs, and a range of visualizations including histograms, scatter plots, box plots, and a correlation heatmap to uncover deep insights from automobile data.</p>
-                                <a href="Automobile Dashboard.html" target="_blank" class="font-semibold text-brand-gold group-hover:underline">View Live Dashboard &rarr;</a>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <!-- Process Step 1 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">01</div>
+                        <h3 class="text-2xl font-bold mb-3">Discover & Define</h3>
+                        <p class="text-text-secondary">I start with deep research into user needs, business goals, and technical constraints. This phase includes stakeholder interviews, user personas, and competitive analysis.</p>
                     </div>
-                    <div class="bg-brand-dark-bg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-900/10 hover:-translate-y-2 group border border-gray-800">
-                        <img src="https://placehold.co/600x400/1a1a1a/d4af37?text=Project+Two" alt="Project 2 Screenshot" class="w-full h-64 object-cover">
-                        <div class="p-8">
-                            <h3 class="text-2xl font-bold mb-3">SaaS Dashboard UI</h3>
-                            <p class="text-text-secondary mb-6">Designed a data-rich dashboard for a B2B software, prioritizing clarity and ease of use.</p>
-                            <a href="#" class="font-semibold text-brand-gold group-hover:underline">View Case Study &rarr;</a>
-                        </div>
+                    <!-- Process Step 2 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 150ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">02</div>
+                        <h3 class="text-2xl font-bold mb-3">Ideate & Design</h3>
+                        <p class="text-text-secondary">From low-fidelity wireframes to high-fidelity, interactive prototypes. I focus on creating intuitive information architecture and visually stunning interfaces in Figma.</p>
                     </div>
-                    <div class="bg-brand-dark-bg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-900/10 hover:-translate-y-2 group border border-gray-800">
-                        <img src="https://placehold.co/600x400/1a1a1a/d4af37?text=Project+Three" alt="Project 3 Screenshot" class="w-full h-64 object-cover">
-                        <div class="p-8">
-                            <h3 class="text-2xl font-bold mb-3">Mobile Banking App</h3>
-                            <p class="text-text-secondary mb-6">Created a secure and user-friendly mobile app for a new challenger bank.</p>
-                            <a href="#" class="font-semibold text-brand-gold group-hover:underline">View Case Study &rarr;</a>
-                        </div>
+                    <!-- Process Step 3 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 300ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">03</div>
+                        <h3 class="text-2xl font-bold mb-3">Build & Develop</h3>
+                        <p class="text-text-secondary">I translate designs into clean, efficient, and responsive code using modern frameworks, ensuring a seamless handoff from design to a live, pixel-perfect product.</p>
+                    </div>
+                    <!-- Process Step 4 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 450ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">04</div>
+                        <h3 class="text-2xl font-bold mb-3">Test & Iterate</h3>
+                        <p class="text-text-secondary">Continuous usability testing and feedback loops allow me to refine the product. I analyze user behavior to make data-driven improvements for optimal performance.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- About Me & Skills Section -->
-        <section id="about" class="py-24 md:py-32 bg-brand-dark-bg section-fade-in">
+        <section id="about" class="py-24 md:py-32 bg-bg-secondary">
             <div class="container mx-auto px-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-                    <div>
-                        <h2 class="text-4xl md:text-5xl font-bold mb-6">About Me</h2>
-                        <div class="space-y-6 text-lg text-text-secondary">
-                            <p>
-                                I'm a passionate and detail-oriented UI/UX designer with over 5 years of experience. My design philosophy is rooted in empathy; I strive to understand user needs to create solutions that are not only aesthetically pleasing but also genuinely useful.
-                            </p>
-                            <p>
-                                From initial research and wireframing to high-fidelity prototyping and user testing, I love every part of the design process. I'm always eager to learn and take on challenging projects.
-                            </p>
-                        </div>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
+                    <div class="lg:col-span-2 fade-in-up">
+                        <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="rounded-xl w-full object-cover shadow-2xl">
                     </div>
-                    <div>
-                        <h3 class="text-3xl font-bold mb-8">My Skillset</h3>
-                        <div class="flex flex-wrap gap-3">
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">User Research</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Wireframing</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Prototyping</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">UI Design</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">UX Writing</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Figma</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Adobe XD</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">HTML & CSS</span>
+                    <div class="lg:col-span-3 fade-in-up" style="animation-delay: 150ms;">
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6">Driven by a Passion for Problem-Solving.</h2>
+                        <div class="space-y-6 text-lg text-text-secondary">
+                            <p>With over a decade of experience in the digital product space, I've honed a deep understanding of the entire product lifecycle. My philosophy is simple: great design is invisible. It guides users effortlessly toward their goals, blending aesthetic appeal with flawless functionality.</p>
+                            <p>I thrive in collaborative environments, working alongside engineers, product managers, and stakeholders to transform complex challenges into elegant solutions. My expertise lies at the intersection of user empathy and technical implementation, allowing me to not only design beautiful experiences but also to build them.</p>
+                            <p>When I'm not designing or coding, you can find me exploring new technologies, contributing to open-source projects, or mentoring aspiring designers.</p>
                         </div>
                     </div>
                 </div>
@@ -187,49 +350,92 @@
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="py-24 md:py-32 bg-brand-light-dark-bg section-fade-in">
+        <section id="contact" class="py-24 md:py-32 bg-bg-primary">
             <div class="container mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl md:text-5xl font-bold">Let's build something great.</h2>
-                    <p class="text-lg text-text-secondary mt-5 mb-10">Have a project in mind or just want to connect? My inbox is always open.</p>
-                    <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-lg">sumanthudupi858@gmail.com</a>
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Have a project in mind?</h2>
+                    <p class="text-lg text-text-secondary mt-5 mb-10 fade-in-up" style="animation-delay: 100ms;">I'm currently available for freelance opportunities and full-time roles. Let's connect and build something remarkable together.</p>
+                    <div class="fade-in-up" style="animation-delay: 200ms;">
+                        <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-xl">sumanthudupi858@gmail.com</a>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-black text-white">
+    <footer class="bg-black text-white border-t border-gray-900">
         <div class="container mx-auto px-6 py-12">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-500 mb-6 md:mb-0">&copy; 2025 Sumanth Udupi. All rights reserved.</p>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">LinkedIn</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Dribbble</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Twitter</a>
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <div>
+                    <p class="text-lg font-bold">Sumanth Udupi</p>
+                    <p class="text-gray-500">&copy; 2025 All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6 mt-6 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">LinkedIn</a>
+                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">GitHub</a>
+                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">Dribbble</a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <!-- Swiper.js for Carousel -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
-        // Simple fade-in animation for sections on scroll
-        const sections = document.querySelectorAll('.section-fade-in');
+        // Staggered fade-in animation for sections on scroll
+        const animatedElements = document.querySelectorAll('.fade-in-up');
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    // Optional: Unobserve after it has become visible to save resources
-                    // observer.unobserve(entry.target); 
                 }
             });
         }, {
             threshold: 0.1 // Triggers when 10% of the element is visible
         });
 
-        sections.forEach(section => {
-            observer.observe(section);
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Initialize Swiper Carousel
+        const swiper = new Swiper('.portfolio-carousel', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            loop: true,
+            coverflowEffect: {
+                rotate: 30,
+                stretch: 0,
+                depth: 200,
+                modifier: 1,
+                slideShadows: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            breakpoints: {
+                // when window width is >= 768px
+                768: {
+                    slidesPerView: 2,
+                },
+                // when window width is >= 1024px
+                1024: {
+                    slidesPerView: 3,
+                }
+            }
         });
     </script>
 
