@@ -85,7 +85,8 @@
         .view-content.active { display: block; }
         .clickable { cursor: pointer; }
         .clickable:hover { opacity: 0.8; }
-        .cross-filter-dim { opacity: 0.3; }
+        .cross-filter-dim { opacity: 0.3; transition: opacity 0.3s ease; }
+        .legend-item.hidden { opacity: 0.4; text-decoration: line-through; }
     </style>
 </head>
 <body class="antialiased">
@@ -93,7 +94,7 @@
     <div class="flex h-screen bg-slate-900">
         <!-- Sidebar -->
         <aside class="w-64 flex-shrink-0 bg-slate-800 p-6 flex flex-col">
-            <h1 class="text-2xl font-bold mb-10 text-white">Automobile Analysis</h1>
+            <h1 class="text-2xl font-bold mb-10 text-white">Automobile Insights</h1>
             <nav id="sidebar-nav" class="flex-grow">
                 <ul>
                     <li><a href="#" class="sidebar-item flex items-center px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200 active" data-view="overview">
@@ -106,7 +107,7 @@
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         Performance</a></li>
                     <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="engine_fuel">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m2 10.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM12 8V5m0 14v-3"></path></svg>
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
                         Engine & Fuel</a></li>
                      <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="risk_safety">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
@@ -121,8 +122,8 @@
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-8 overflow-y-auto">
             <header class="mb-8">
-                <h2 class="text-3xl font-bold text-white">Automobile Insights Dashboard</h2>
-                <p class="text-lg text-slate-400 mt-1">An interactive data science portfolio project.</p>
+                <h2 id="dashboard-title" class="text-3xl font-bold text-white">Automobile Insights Dashboard</h2>
+                <p class="text-lg text-slate-400 mt-1">An interactive exploration of automobile data.</p>
             </header>
 
             <!-- Filters -->
@@ -149,19 +150,19 @@
             <!-- View Content Area -->
             <div id="view-container">
                 <div id="overview-view" class="view-content active"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="chart-container lg:col-span-3"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-5"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Average Price by Make (vs. Overall Average)</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price vs. Horsepower</h2><svg id="price-vs-horsepower-scatter" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="performance-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower vs. Price</h2><svg id="horsepower-vs-price" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower Distribution by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">City MPG vs. Highway MPG</h2><svg id="mpg-scatter" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
@@ -180,45 +181,41 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-
-        // --- IMPORTANT ---
-        // Replace this URL with the raw URL of your CSV file on GitHub.
-        // Example: 'https://raw.githubusercontent.com/your-username/your-repo/main/Automobile_data.csv'
-        const csvUrl = 'Rawdata/Automobile_data.csv';
+        // Data source
+        const csvUrl = 'Automobile_data.csv';
 
         // --- Global State ---
         let fullDataset = [];
         let activeView = 'overview';
-        let crossFilter = null; // { key: 'make', value: 'toyota' }
+        let crossFilter = { key: null, value: null };
+        let hiddenLegendItems = new Set();
+        
         const tooltip = d3.select("body").append("div").attr("class", "tooltip");
         const margin = {top: 30, right: 30, bottom: 60, left: 70};
         const marginRotated = {top: 30, right: 30, bottom: 100, left: 70};
 
         // --- Data Loading and Initialization ---
         d3.csv(csvUrl, (d) => {
-            // This function is applied to each row of the CSV
+            // This function is applied to each row of the CSV to parse and clean it.
             const newRow = {};
             for (const key in d) {
                 const val = d[key].trim();
+                // Replace '?' with undefined for missing numerical values
                 if (val === '?') {
                     newRow[key.trim()] = undefined;
                 } else {
-                    const numVal = +val;
+                    const numVal = +val; // Attempt to convert to number
                     newRow[key.trim()] = isNaN(numVal) ? val : numVal;
                 }
             }
             return newRow;
         }).then(data => {
-            // This block runs after all data is loaded and parsed
+            // This block runs after all data is loaded and parsed.
+            // Filter out rows with essential missing data for a cleaner dataset
             fullDataset = data.filter(d => d.price && d.horsepower && d['city-mpg'] && d['highway-mpg'] && d['curb-weight'] && d.symboling);
             
             // Populate dropdown filters
-            const makeFilter = d3.select('#make-filter');
-            const bodyStyleFilter = d3.select('#body-style-filter');
-            const makes = ['All', ...new Set(fullDataset.map(d => d.make))].sort();
-            const bodyStyles = ['All', ...new Set(fullDataset.map(d => d['body-style']))].sort();
-            makeFilter.selectAll('option').data(makes).enter().append('option').text(d => d).attr('value', d => d);
-            bodyStyleFilter.selectAll('option').data(bodyStyles).enter().append('option').text(d => d).attr('value', d => d);
+            populateFilters();
 
             // Initial dashboard render
             updateDashboard();
@@ -226,15 +223,26 @@
             console.error('Error loading or parsing data:', error);
             document.getElementById('view-container').innerHTML = `<div class="text-red-400 text-center p-8 text-xl">
                 <h2 class="text-3xl font-bold mb-4">Error Loading Data</h2>
-                <p>Could not load data from the specified URL. Please check the 'csvUrl' variable in the script and ensure it points to a valid raw CSV file.</p>
+                <p>Could not load data from the specified URL. Please ensure 'Automobile_data.csv' is accessible and correctly formatted.</p>
             </div>`;
         });
+        
+        function populateFilters() {
+            const makeFilter = d3.select('#make-filter');
+            const bodyStyleFilter = d3.select('#body-style-filter');
+            // Using Set to get unique values, then sorting
+            const makes = ['All', ...new Set(fullDataset.map(d => d.make))].sort();
+            const bodyStyles = ['All', ...new Set(fullDataset.map(d => d['body-style']))].sort();
+            
+            makeFilter.selectAll('option').data(makes).enter().append('option').text(d => d).attr('value', d => d);
+            bodyStyleFilter.selectAll('option').data(bodyStyles).enter().append('option').text(d => d).attr('value', d => d);
+        }
 
         // --- Event Listeners ---
         d3.select('#make-filter').on('change', () => updateDashboard());
         d3.select('#body-style-filter').on('change', () => updateDashboard());
         d3.select('#reset-filter-btn').on('click', () => {
-            crossFilter = null;
+            crossFilter = { key: null, value: null };
             updateDashboard();
         });
         d3.select('#sidebar-nav').selectAll('.sidebar-item').on('click', function(event) {
@@ -265,18 +273,24 @@
             }
             
             // Apply cross-filter if it exists
-            if (crossFilter) {
+            if (crossFilter.key && crossFilter.value) {
                 filteredData = filteredData.filter(d => d[crossFilter.key] === crossFilter.value);
+            }
+            
+            // Apply legend filter
+            if (hiddenLegendItems.size > 0) {
+                 filteredData = filteredData.filter(d => !hiddenLegendItems.has(d.make));
             }
 
             updateKPIs(filteredData);
+            updateDynamicTitles(selectedMake, selectedBodyStyle);
             drawActiveViewCharts(filteredData, animate);
         }
         
         function setCrossFilter(key, value) {
             // If clicking the same filter, disable it. Otherwise, set the new one.
             if (crossFilter && crossFilter.key === key && crossFilter.value === value) {
-                crossFilter = null;
+                crossFilter = { key: null, value: null };
             } else {
                 crossFilter = { key, value };
             }
@@ -291,6 +305,20 @@
             d3.select('#avg-horsepower').text(avgHorsepower ? d3.format(".0f")(avgHorsepower) : 'N/A');
             const avgMpg = d3.mean(data, d => d['city-mpg']);
             d3.select('#avg-mpg').text(avgMpg ? d3.format(".1f")(avgMpg) : 'N/A');
+        }
+        
+        function updateDynamicTitles(make, bodyStyle) {
+            let title = "Automobile Insights Dashboard";
+            if (make !== 'All') title += ` | ${make}`;
+            if (bodyStyle !== 'All') title += ` | ${bodyStyle}`;
+            if (crossFilter.value) title += ` | Cross-Filter: ${crossFilter.value}`;
+            d3.select('#dashboard-title').text(title);
+
+            // Update individual chart titles
+            d3.select('#price-dist-title').text(`Price Distribution` + (make !== 'All' ? ` for ${make}` : ''));
+            d3.select('#body-style-title').text(`Vehicles by Body Style` + (make !== 'All' ? ` for ${make}` : ''));
+            d3.select('#make-count-title').text(`Count of Vehicles by Make`);
+            d3.select('#avg-price-make-title').text(`Average Price by Make` + (bodyStyle !== 'All' ? ` for ${bodyStyle}s` : ''));
         }
 
         function drawActiveViewCharts(data, animate) {
@@ -308,16 +336,16 @@
                 case 'pricing_market':
                     drawAvgPriceByMake(data, animate);
                     drawBoxPlot(data, '#price-by-body-style-box', 'body-style', 'price', 'Body Style', 'Price ($)', animate);
-                    drawViolinPlot(data, '#hp-by-drive-wheels-violin', 'drive-wheels', 'horsepower', 'Drive Wheels', 'Horsepower', animate);
+                    drawScatterPlot(data, '#price-vs-horsepower-scatter', 'horsepower', 'price', 'Horsepower', 'Price ($)', animate, 'make');
                     break;
                 case 'performance':
-                    drawScatterPlot(data, '#horsepower-vs-price', 'horsepower', 'price', 'Horsepower', 'Price ($)', animate);
-                    drawScatterPlot(data, '#curb-weight-vs-price', 'curb-weight', 'price', 'Curb Weight (lbs)', 'Price ($)', animate);
-                    drawScatterPlot(data, '#mpg-scatter', 'city-mpg', 'highway-mpg', 'City MPG', 'Highway MPG', animate);
+                    drawViolinPlot(data, '#hp-by-drive-wheels-violin', 'drive-wheels', 'horsepower', 'Drive Wheels', 'Horsepower', animate);
+                    drawScatterPlot(data, '#curb-weight-vs-price', 'curb-weight', 'price', 'Curb Weight (lbs)', 'Price ($)', animate, 'make');
+                    drawScatterPlot(data, '#mpg-scatter', 'city-mpg', 'highway-mpg', 'City MPG', 'Highway MPG', animate, 'make', '#mpg-scatter-legend');
                     break;
                 case 'engine_fuel':
                     drawGroupedBoxPlot(data, '#hp-by-aspiration', 'fuel-type', 'aspiration', 'horsepower', 'Fuel Type', 'Horsepower', animate);
-                    drawScatterPlot(data, '#engine-vs-hp', 'engine-size', 'horsepower', 'Engine Size', 'Horsepower', animate);
+                    drawScatterPlot(data, '#engine-vs-hp', 'engine-size', 'horsepower', 'Engine Size', 'Horsepower', animate, 'fuel-type');
                     break;
                 case 'risk_safety':
                     drawSymbolingDistribution(data, animate);
@@ -330,6 +358,7 @@
         }
         
         // --- Chart Drawing Functions ---
+        // Note: Many functions are generalized to be reusable (e.g., drawScatterPlot, drawBoxPlot)
 
         function drawPriceDistribution(data, animate) {
             const svg = d3.select("#price-distribution");
@@ -386,7 +415,7 @@
                 .attr('fill', d => color(d.data.type))
                 .attr("stroke", "var(--bg-secondary)").style("stroke-width", "3px")
                 .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'body-style' && crossFilter.value !== d.data.type)
+                .classed("cross-filter-dim", d => crossFilter.key === 'body-style' && crossFilter.value && crossFilter.value !== d.data.type)
                 .on("click", (event, d) => setCrossFilter('body-style', d.data.type))
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1);
@@ -427,7 +456,7 @@
                 .attr("x", d => x(d.make)).attr("width", x.bandwidth())
                 .attr("fill", "var(--accent-secondary)")
                 .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'make' && crossFilter.value !== d.make)
+                .classed("cross-filter-dim", d => crossFilter.key === 'make' && crossFilter.value && crossFilter.value !== d.make)
                 .on("click", (event, d) => setCrossFilter('make', d.make))
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1);
@@ -447,7 +476,7 @@
             const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
             const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
 
-            const overallAvgPrice = d3.mean(data, d => d.price);
+            const overallAvgPrice = d3.mean(fullDataset, d => d.price); // Use full dataset for overall average
             const avgPriceData = d3.rollup(data, v => d3.mean(v, d => d.price), d => d.make);
             const avgPriceArray = Array.from(avgPriceData, ([key, value]) => ({make: key, price: value}))
                 .sort((a,b) => d3.descending(a.price, b.price));
@@ -463,13 +492,13 @@
                 .attr("x", d => x(d.make)).attr("width", x.bandwidth())
                 .attr("fill", d => d.price > overallAvgPrice ? "var(--accent-positive)" : "var(--accent-negative)")
                 .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'make' && crossFilter.value !== d.make)
+                .classed("cross-filter-dim", d => crossFilter.key === 'make' && crossFilter.value && crossFilter.value !== d.make)
                 .on("click", (event, d) => setCrossFilter('make', d.make))
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1);
                     const priceDiff = d.price - overallAvgPrice;
                     const diffText = priceDiff > 0 ? `+$${d3.format(",.0f")(Math.abs(priceDiff))}` : `-$${d3.format(",.0f")(Math.abs(priceDiff))}`;
-                    tooltip.html(`<b>${d.make}</b><br>Avg Price: $${d3.format(",.0f")(d.price)}<br>Difference from Avg: ${diffText}`)
+                    tooltip.html(`<b>${d.make}</b><br>Avg Price: $${d3.format(",.0f")(d.price)}<br>Difference from Overall Avg: ${diffText}`)
                         .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
                 }).on("mouseout", () => tooltip.style("opacity", 0))
                 .attr("y", y(0)).attr("height", 0)
@@ -510,7 +539,7 @@
                 .attr("x", d => x(d.symbol)).attr("width", x.bandwidth())
                 .attr("fill", d => colorScale(d.symbol))
                 .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'symboling' && crossFilter.value !== d.symbol)
+                .classed("cross-filter-dim", d => crossFilter.key === 'symboling' && crossFilter.value && crossFilter.value !== d.symbol)
                 .on("click", (event, d) => setCrossFilter('symboling', d.symbol))
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1);
@@ -584,13 +613,16 @@
             legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d);
         }
 
-        // --- Utility and other chart functions (re-used from previous version, with minor tweaks) ---
-        function drawScatterPlot(data, selector, xVar, yVar, xLabel, yLabel, animate) {
+        function drawScatterPlot(data, selector, xVar, yVar, xLabel, yLabel, animate, hueVar, legendSelector) {
             const svg = d3.select(selector);
             svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            const hasLegend = legendSelector && hueVar;
+            const currentMargin = hasLegend ? {top: 10, right: 30, bottom: 60, left: 70} : margin;
+
+            const width = svg.node().getBoundingClientRect().width - currentMargin.left - currentMargin.right;
+            const height = svg.node().getBoundingClientRect().height - currentMargin.top - currentMargin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${currentMargin.left},${currentMargin.top})`);
 
             const x = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).nice().range([0, width]);
             g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
@@ -600,11 +632,11 @@
             g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
                 .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
             
-            const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+            const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))].sort());
 
             g.append('g').selectAll("dot").data(data).join("circle")
                 .attr("cx", d => x(d[xVar])).attr("cy", d => y(d[yVar]))
-                .style("fill", d => colorScale(d.make)).style("opacity", 0.7)
+                .style("fill", d => colorScale(d[hueVar])).style("opacity", 0.7)
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1);
                     tooltip.html(`<b>${d.make} (${d['body-style']})</b><br>${xLabel}: ${d[xVar]}<br>${yLabel}: ${d[yVar].toLocaleString()}`)
@@ -613,13 +645,42 @@
                 .attr("r", 0)
                 .transition().duration(animate ? 500 : 0)
                 .attr("r", 5);
+
+            if(hasLegend) {
+                const legendContainer = d3.select(legendSelector);
+                legendContainer.html(""); // Clear previous legend
+                const legendItems = legendContainer.selectAll(".legend-item")
+                    .data(colorScale.domain())
+                    .enter().append("div")
+                    .attr("class", "legend-item flex items-center space-x-2 clickable")
+                    .classed("hidden", d => hiddenLegendItems.has(d))
+                    .on("click", function(event, d) {
+                        if (hiddenLegendItems.has(d)) {
+                            hiddenLegendItems.delete(d);
+                        } else {
+                            hiddenLegendItems.add(d);
+                        }
+                        updateDashboard();
+                    });
+
+                legendItems.append("div")
+                    .style("width", "12px")
+                    .style("height", "12px")
+                    .style("background-color", d => colorScale(d))
+                    .style("border-radius", "50%");
+
+                legendItems.append("span")
+                    .text(d => d);
+            }
         }
         
         function drawBoxPlot(data, selector, catVar, numVar, xLabel, yLabel, animate) {
             const svg = d3.select(selector);
             svg.selectAll("*").remove();
-            const useRotatedMargin = ['body-style', 'drive-wheels'].includes(catVar);
-            const currentMargin = useRotatedMargin ? margin : marginRotated;
+            
+            const isRotated = ['body-style', 'drive-wheels', 'symboling'].includes(catVar);
+            const currentMargin = isRotated ? marginRotated : margin;
+
             const width = svg.node().getBoundingClientRect().width - currentMargin.left - currentMargin.right;
             const height = svg.node().getBoundingClientRect().height - currentMargin.top - currentMargin.bottom;
             const g = svg.append("g").attr("transform", `translate(${currentMargin.left},${currentMargin.top})`);
@@ -628,8 +689,12 @@
             const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.4);
             const xAxis = g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
             
-            if (useRotatedMargin) {
+            if (isRotated) {
                 xAxis.selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+            }
+            if (catVar === 'symboling') {
+                const symbolingMap = {'-2': 'V. Safe', '-1': 'Safe', '0': 'Neutral', '1': 'Risky', '2': 'V. Risky', '3': 'Most Risky'};
+                xAxis.selectAll("text").text(d => symbolingMap[d] || d);
             }
 
             const y = d3.scaleLinear().domain([0, d3.max(data, d => d[numVar])]).nice().range([height, 0]);
@@ -651,7 +716,7 @@
                     .attr("x", 0).attr("width", x.bandwidth())
                     .style("fill", "var(--accent-primary)").attr("stroke", "var(--border-color)")
                     .on("mouseover", (event) => {
-                        tooltip.style("opacity", 1).html(`<b>${key}</b><br>Median: $${median.toLocaleString()}<br>Q1: $${q1.toLocaleString()}<br>Q3: $${q3.toLocaleString()}`)
+                        tooltip.style("opacity", 1).html(`<b>${key}</b><br>Median: ${d3.format("$,.0f")(median)}<br>Q1: ${d3.format("$,.0f")(q1)}<br>Q3: ${d3.format("$,.0f")(q3)}`)
                             .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
                     }).on("mouseout", () => tooltip.style("opacity", 0))
                     .transition().duration(animate ? 800 : 0)
@@ -674,10 +739,12 @@
 
             const categories = [...new Set(data.map(d => d[catVar]))].sort();
             const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.1);
-            g.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x));
+            g.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x))
+                .append("text").attr("y", 45).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
 
             const y = d3.scaleLinear().domain(d3.extent(data, d => d[numVar])).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y));
+            g.append("g").call(d3.axisLeft(y))
+                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
 
             const histogram = d3.histogram().domain(y.domain()).thresholds(y.ticks(15)).value(d => d[numVar]);
             const sumstat = d3.group(data, d => d[catVar]);
