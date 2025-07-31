@@ -95,6 +95,10 @@
         }
         
         /* --- Carousel Styles --- */
+        .portfolio-carousel-section {
+            background-color: var(--bg-secondary);
+        }
+        
         .portfolio-carousel {
             width: 100%;
             padding-top: 50px;
@@ -104,31 +108,42 @@
         .swiper-slide {
             background-position: center;
             background-size: cover;
-            width: 400px; /* Adjust width as needed */
-            height: 520px; /* Adjust height as needed */
-            transition: transform 0.4s ease-in-out;
+            width: 400px;
+            height: 520px;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            opacity: 0.5; /* Fade out non-active slides */
+        }
+        
+        .swiper-slide-active {
+            opacity: 1; /* Ensure active slide is fully visible */
         }
         
         .swiper-slide .project-card {
              height: 100%;
              display: flex;
              flex-direction: column;
+             background-color: var(--bg-tertiary);
+             border: 1px solid var(--border-color);
+             border-radius: 0.75rem;
+             overflow: hidden;
+             transition: all 0.3s ease;
+        }
+        
+        .swiper-slide-active .project-card {
+             box-shadow: 0 10px 30px var(--shadow-color);
         }
         
         .swiper-slide .project-image-container {
             flex-shrink: 0;
+            height: 220px; /* Increased image height */
         }
         
         .swiper-slide .p-8 {
             flex-grow: 1;
         }
 
-        .swiper-slide-shadow-left,
-        .swiper-slide-shadow-right {
-            background-image: none; /* Optional: remove default shadows if you want cleaner look */
-        }
-        
-        .swiper-3d .swiper-slide-shadow-left, .swiper-3d .swiper-slide-shadow-right {
+        .swiper-3d .swiper-slide-shadow-left, 
+        .swiper-3d .swiper-slide-shadow-right {
             background-image: none;
         }
         
@@ -136,9 +151,15 @@
         .swiper-button-next, .swiper-button-prev {
             color: var(--brand-gold);
             transition: transform 0.2s ease;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .swiper-button-next:hover, .swiper-button-prev:hover {
-            transform: scale(1.2);
+            transform: translateY(-50%) scale(1.2);
+        }
+        
+        .swiper-pagination {
+            bottom: 10px !important;
         }
         
         .swiper-pagination-bullet {
@@ -199,7 +220,7 @@
         </section>
 
         <!-- Portfolio Section -->
-        <section id="portfolio" class="py-24 md:py-32 bg-bg-secondary overflow-hidden">
+        <section id="portfolio" class="portfolio-carousel-section py-24 md:py-32">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Featured Projects</h2>
@@ -212,9 +233,9 @@
                     <!-- Slide 1 -->
                     <div class="swiper-slide">
                         <a href="Automobile Dashboard.html" target="_blank" class="block h-full">
-                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
-                                <div class="project-image-container rounded-t-xl h-48">
-                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=Automobile+Analytics" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-8">
                                     <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS</p>
@@ -227,9 +248,9 @@
                     <!-- Slide 2 -->
                     <div class="swiper-slide">
                         <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
-                                <div class="project-image-container rounded-t-xl h-48">
-                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=Fintech+Mobile+App" alt="Fintech Mobile App" class="w-full h-full object-cover">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Fintech%0AMobile+App&font=inter" alt="Fintech Mobile App" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-8">
                                     <p class="text-sm font-semibold text-brand-gold mb-2">MOBILE UI/UX • FINTECH</p>
@@ -242,9 +263,9 @@
                     <!-- Slide 3 -->
                     <div class="swiper-slide">
                          <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
-                                <div class="project-image-container rounded-t-xl h-48">
-                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=SaaS+Platform" alt="SaaS Platform" class="w-full h-full object-cover">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Enterprise%0ASaaS+Platform&font=inter" alt="SaaS Platform" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-8">
                                     <p class="text-sm font-semibold text-brand-gold mb-2">ENTERPRISE SOFTWARE • B2B</p>
@@ -257,9 +278,9 @@
                     <!-- Slide 4 -->
                     <div class="swiper-slide">
                         <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
-                                <div class="project-image-container rounded-t-xl h-48">
-                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=AI+Content+Tool" alt="AI Content Tool" class="w-full h-full object-cover">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Generative%0AAI+Tool&font=inter" alt="AI Content Tool" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-8">
                                     <p class="text-sm font-semibold text-brand-gold mb-2">GENERATIVE AI • UI DESIGN</p>
@@ -272,9 +293,9 @@
                     <!-- Slide 5 -->
                      <div class="swiper-slide">
                         <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card bg-bg-tertiary rounded-xl overflow-hidden border border-border-color h-full">
-                                <div class="project-image-container rounded-t-xl h-48">
-                                    <img src="https://placehold.co/400x250/111111/f5cb5c?text=E-commerce" alt="E-commerce Experience" class="w-full h-full object-cover">
+                            <div class="project-card">
+                                <div class="project-image-container">
+                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=E-commerce%0ACheckout+Flow&font=inter" alt="E-commerce Experience" class="w-full h-full object-cover">
                                 </div>
                                 <div class="p-8">
                                     <p class="text-sm font-semibold text-brand-gold mb-2">E-COMMERCE • UX OPTIMIZATION</p>
@@ -284,7 +305,21 @@
                             </div>
                         </a>
                     </div>
-                    <!-- Add more slides as needed -->
+                    <!-- Slide 6 -->
+                    <div class="swiper-slide">
+                        <a href="#" target="_blank" class="block h-full">
+                           <div class="project-card">
+                               <div class="project-image-container">
+                                   <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Healthcare%0APatient+Portal&font=inter" alt="Healthcare Patient Portal" class="w-full h-full object-cover">
+                               </div>
+                               <div class="p-8">
+                                   <p class="text-sm font-semibold text-brand-gold mb-2">HEALTHCARE • ACCESSIBILITY</p>
+                                   <h3 class="text-2xl font-bold mb-3">Healthcare Patient Portal</h3>
+                                   <p class="text-text-secondary">Created a secure, accessible patient portal for a hospital network, enabling users to easily manage appointments and records.</p>
+                               </div>
+                           </div>
+                       </a>
+                   </div>
                 </div>
                 <!-- Add Pagination -->
                 <div class="swiper-pagination"></div>
@@ -408,9 +443,9 @@
             slidesPerView: 'auto',
             loop: true,
             coverflowEffect: {
-                rotate: 30,
+                rotate: 25,
                 stretch: 0,
-                depth: 200,
+                depth: 150,
                 modifier: 1,
                 slideShadows: false,
             },
