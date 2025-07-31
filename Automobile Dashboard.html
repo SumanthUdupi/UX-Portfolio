@@ -3,674 +3,776 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automobile Data Dashboard</title>
+    <title>Professional Automobile Insights Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-dark-bg: #121212;
-            --brand-light-dark-bg: #1a1a1a;
-            --brand-gold: #D4AF37;
-            --brand-light-gold: #e6c75e;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --border-color: rgba(212, 175, 55, 0.2);
+            --bg-primary: #0F172A; /* slate-900 */
+            --bg-secondary: #1E293B; /* slate-800 */
+            --bg-tertiary: #334155; /* slate-700 */
+            --border-color: #475569; /* slate-600 */
+            --text-primary: #F1F5F9; /* slate-100 */
+            --text-secondary: #CBD5E1; /* slate-300 */
+            --accent-primary: #22D3EE; /* cyan-400 */
+            --accent-secondary: #A78BFA; /* violet-400 */
+            --accent-positive: #34D399; /* green-400 */
+            --accent-negative: #F87171; /* red-400 */
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--brand-dark-bg);
+            background-color: var(--bg-primary);
             color: var(--text-primary);
         }
+        .sidebar-item.active {
+            background-color: var(--accent-primary);
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
         .chart-container {
-            background-color: var(--brand-light-dark-bg);
+            background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
             padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .chart-container:hover {
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.1);
+            border-color: var(--accent-primary);
         }
         .kpi-card {
-            background-color: var(--brand-light-dark-bg);
+            background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
         }
-        .filter-select {
-            background-color: #2a2a2a;
+        .filter-select, .reset-button {
+            background-color: var(--bg-tertiary);
             border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        .reset-button:hover {
+            background-color: var(--accent-negative);
+            border-color: var(--accent-negative);
             color: var(--text-primary);
         }
         .tooltip {
             position: absolute;
-            text-align: center;
-            padding: 8px;
-            font: 12px sans-serif;
-            background: #2a2a2a;
-            border: 1px solid var(--border-color);
+            text-align: left;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--accent-primary);
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
             color: var(--text-primary);
-            transition: opacity 0.3s;
+            transition: opacity 0.2s;
+            z-index: 10;
         }
         .axis path,
         .axis line {
-            stroke: var(--text-secondary);
+            stroke: var(--border-color);
         }
         .axis text {
             fill: var(--text-secondary);
+            font-size: 12px;
         }
-        /* Tab styling */
-        .tab {
-            cursor: pointer;
-            padding: 10px 20px;
-            border-bottom: 3px solid transparent;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-        .tab.active {
-            color: var(--brand-gold);
-            border-bottom-color: var(--brand-gold);
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .view-content { display: none; }
+        .view-content.active { display: block; }
+        .clickable { cursor: pointer; }
+        .clickable:hover { opacity: 0.8; }
+        .cross-filter-dim { opacity: 0.3; }
     </style>
 </head>
 <body class="antialiased">
 
-    <div id="dashboard-container" class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white">Automobile Insights Dashboard</h1>
-            <p class="text-lg text-text-secondary mt-2">An interactive analysis of automobile data.</p>
-        </header>
-
-        <!-- Filters -->
-        <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
-            <div>
-                <label for="make-filter" class="text-text-secondary mr-2">Filter by Make:</label>
-                <select id="make-filter" class="filter-select p-2 rounded-md"></select>
-            </div>
-            <div>
-                <label for="body-style-filter" class="text-text-secondary mr-2">Filter by Body Style:</label>
-                <select id="body-style-filter" class="filter-select p-2 rounded-md"></select>
-            </div>
-        </div>
-
-        <!-- KPIs -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="kpi-card p-6 rounded-lg text-center">
-                <h3 class="text-text-secondary text-lg">Total Cars</h3>
-                <p id="total-cars" class="text-4xl font-bold text-brand-gold mt-2">0</p>
-            </div>
-            <div class="kpi-card p-6 rounded-lg text-center">
-                <h3 class="text-text-secondary text-lg">Average Price</h3>
-                <p id="avg-price" class="text-4xl font-bold text-brand-gold mt-2">$0</p>
-            </div>
-            <div class="kpi-card p-6 rounded-lg text-center">
-                <h3 class="text-text-secondary text-lg">Average Horsepower</h3>
-                <p id="avg-horsepower" class="text-4xl font-bold text-brand-gold mt-2">0</p>
-            </div>
-            <div class="kpi-card p-6 rounded-lg text-center">
-                <h3 class="text-text-secondary text-lg">Average MPG (City)</h3>
-                <p id="avg-mpg" class="text-4xl font-bold text-brand-gold mt-2">0</p>
-            </div>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="border-b border-gray-800 mb-8">
-            <nav id="tabs" class="flex justify-center -mb-px">
-                <button class="tab active" data-tab="overview">Overview</button>
-                <button class="tab" data-tab="performance">Performance Analysis</button>
-                <button class="tab" data-tab="body_drive">Body & Drive Insights</button>
-                <button class="tab" data-tab="engine_fuel">Engine & Fuel</button>
-                <button class="tab" data-tab="correlation">Correlation Matrix</button>
+    <div class="flex h-screen bg-slate-900">
+        <!-- Sidebar -->
+        <aside class="w-64 flex-shrink-0 bg-slate-800 p-6 flex flex-col">
+            <h1 class="text-2xl font-bold mb-10 text-white">Automobile Analysis</h1>
+            <nav id="sidebar-nav" class="flex-grow">
+                <ul>
+                    <li><a href="#" class="sidebar-item flex items-center px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200 active" data-view="overview">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Overview</a></li>
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="pricing_market">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Pricing & Market</a></li>
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="performance">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Performance</a></li>
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="engine_fuel">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m2 10.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM12 8V5m0 14v-3"></path></svg>
+                        Engine & Fuel</a></li>
+                     <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="risk_safety">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
+                        Risk & Safety</a></li>
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="correlation">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        Correlations</a></li>
+                </ul>
             </nav>
-        </div>
+        </aside>
 
-        <!-- Tab Content -->
-        <div id="tab-contents">
-            <div id="overview-content" class="tab-content active">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Price Distribution</h2>
-                        <svg id="price-distribution" width="100%" height="400"></svg>
-                    </div>
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Cars by Make</h2>
-                        <svg id="cars-by-make" width="100%" height="400"></svg>
-                    </div>
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-white">Automobile Insights Dashboard</h2>
+                <p class="text-lg text-slate-400 mt-1">An interactive data science portfolio project.</p>
+            </header>
+
+            <!-- Filters -->
+            <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
+                <div>
+                    <label for="make-filter" class="text-slate-400 mr-2">Filter by Make:</label>
+                    <select id="make-filter" class="filter-select p-2 rounded-md w-48"></select>
                 </div>
+                <div>
+                    <label for="body-style-filter" class="text-slate-400 mr-2">Filter by Body Style:</label>
+                    <select id="body-style-filter" class="filter-select p-2 rounded-md w-48"></select>
+                </div>
+                <button id="reset-filter-btn" class="reset-button p-2 rounded-md">Reset Cross-Filter</button>
             </div>
 
-            <div id="performance-content" class="tab-content">
-                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Horsepower vs. Price</h2>
-                        <svg id="horsepower-vs-price" width="100%" height="400"></svg>
-                    </div>
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Curb Weight vs. Price</h2>
-                        <svg id="curb-weight-vs-price" width="100%" height="400"></svg>
-                    </div>
-                </div>
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Total Cars</h3><p id="total-cars" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average Price</h3><p id="avg-price" class="text-4xl font-bold text-cyan-400 mt-2">$0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average Horsepower</h3><p id="avg-horsepower" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average MPG (City)</h3><p id="avg-mpg" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
             </div>
 
-            <div id="body_drive-content" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Price by Body Style (Box Plot)</h2>
-                        <svg id="price-by-body-style" width="100%" height="400"></svg>
-                    </div>
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Horsepower by Fuel Type (Violin Plot)</h2>
-                        <svg id="horsepower-by-fuel-type" width="100%" height="400"></svg>
-                    </div>
-                </div>
+            <!-- View Content Area -->
+            <div id="view-container">
+                <div id="overview-view" class="view-content active"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="chart-container lg:col-span-3"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-5"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
+                </div></div>
+                <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Average Price by Make (vs. Overall Average)</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
+                </div></div>
+                <div id="performance-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower vs. Price</h2><svg id="horsepower-vs-price" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">City MPG vs. Highway MPG</h2><svg id="mpg-scatter" class="w-full h-96"></svg></div>
+                </div></div>
+                <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Engine Size vs. Horsepower</h2><svg id="engine-vs-hp" class="w-full h-96"></svg></div>
+                </div></div>
+                <div id="risk_safety-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Insurance Risk Rating Distribution</h2><svg id="symboling-dist" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price by Insurance Risk Rating</h2><svg id="price-by-symboling" class="w-full h-96"></svg></div>
+                </div></div>
+                <div id="correlation-view" class="view-content"><div class="chart-container">
+                    <h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Feature Correlation Matrix</h2><svg id="correlation-heatmap" class="w-full h-[36rem]"></svg>
+                </div></div>
             </div>
-
-            <div id="engine_fuel-content" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Horsepower by Engine Type</h2>
-                        <svg id="horsepower-by-engine" width="100%" height="400"></svg>
-                    </div>
-                    <div class="chart-container">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Number of Cylinders</h2>
-                        <svg id="num-cylinders" width="100%" height="400"></svg>
-                    </div>
-                     <div class="chart-container lg:col-span-2">
-                        <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Fuel System Distribution</h2>
-                        <svg id="fuel-system" width="100%" height="400"></svg>
-                    </div>
-                </div>
-            </div>
-
-            <div id="correlation-content" class="tab-content">
-                <div class="chart-container">
-                    <h2 class="text-2xl font-bold text-brand-gold mb-4 text-center">Feature Correlation Matrix</h2>
-                    <svg id="correlation-heatmap" width="100%" height="500"></svg>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // IMPORTANT: Replace this URL with the raw URL of your CSV file on GitHub.
-        // For example: https://raw.githubusercontent.com/your-username/your-repo/main/Rawdata/Automobile_data.csv
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- IMPORTANT ---
+        // Replace this URL with the raw URL of your CSV file on GitHub.
+        // Example: 'https://raw.githubusercontent.com/your-username/your-repo/main/Automobile_data.csv'
         const csvUrl = 'Rawdata/Automobile_data.csv';
 
-        d3.csv(csvUrl).then(data => {
-            // Data cleaning
-            data.forEach(d => {
-                Object.keys(d).forEach(key => {
-                    const numVal = +d[key];
-                    if (!isNaN(numVal) && d[key] !== '' && d[key] !== null) {
-                        d[key] = numVal;
-                    } else if (d[key] === '?') {
-                        d[key] = NaN;
-                    }
-                });
-            });
+        // --- Global State ---
+        let fullDataset = [];
+        let activeView = 'overview';
+        let crossFilter = null; // { key: 'make', value: 'toyota' }
+        const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+        const margin = {top: 30, right: 30, bottom: 60, left: 70};
+        const marginRotated = {top: 30, right: 30, bottom: 100, left: 70};
 
-            let cleanData = data.filter(d => !isNaN(d.price) && !isNaN(d.horsepower) && !isNaN(d['city-mpg']));
+        // --- Data Loading and Initialization ---
+        d3.csv(csvUrl, (d) => {
+            // This function is applied to each row of the CSV
+            const newRow = {};
+            for (const key in d) {
+                const val = d[key].trim();
+                if (val === '?') {
+                    newRow[key.trim()] = undefined;
+                } else {
+                    const numVal = +val;
+                    newRow[key.trim()] = isNaN(numVal) ? val : numVal;
+                }
+            }
+            return newRow;
+        }).then(data => {
+            // This block runs after all data is loaded and parsed
+            fullDataset = data.filter(d => d.price && d.horsepower && d['city-mpg'] && d['highway-mpg'] && d['curb-weight'] && d.symboling);
             
-            // Populate filters
-            const makes = ['All', ...new Set(cleanData.map(d => d.make))].sort();
-            const bodyStyles = ['All', ...new Set(cleanData.map(d => d['body-style']))].sort();
-
+            // Populate dropdown filters
             const makeFilter = d3.select('#make-filter');
-            makeFilter.selectAll('option').data(makes).enter().append('option').text(d => d);
-
             const bodyStyleFilter = d3.select('#body-style-filter');
-            bodyStyleFilter.selectAll('option').data(bodyStyles).enter().append('option').text(d => d);
+            const makes = ['All', ...new Set(fullDataset.map(d => d.make))].sort();
+            const bodyStyles = ['All', ...new Set(fullDataset.map(d => d['body-style']))].sort();
+            makeFilter.selectAll('option').data(makes).enter().append('option').text(d => d).attr('value', d => d);
+            bodyStyleFilter.selectAll('option').data(bodyStyles).enter().append('option').text(d => d).attr('value', d => d);
 
-            const tooltip = d3.select("body").append("div").attr("class", "tooltip");
-            const margin = {top: 40, right: 30, bottom: 80, left: 60};
-            let activeTab = 'overview';
-
-            function updateDashboard() {
-                const selectedMake = makeFilter.property('value');
-                const selectedBodyStyle = bodyStyleFilter.property('value');
-
-                let filteredData = cleanData;
-                if (selectedMake !== 'All') {
-                    filteredData = filteredData.filter(d => d.make === selectedMake);
-                }
-                if (selectedBodyStyle !== 'All') {
-                    filteredData = filteredData.filter(d => d['body-style'] === selectedBodyStyle);
-                }
-
-                updateKPIs(filteredData);
-                drawActiveTabCharts(filteredData);
-            }
-
-            function drawActiveTabCharts(data) {
-                switch(activeTab) {
-                    case 'overview':
-                        drawPriceDistribution(data);
-                        drawCarsByMake(data, cleanData);
-                        break;
-                    case 'performance':
-                        drawHorsepowerVsPrice(data);
-                        drawCurbWeightVsPrice(data);
-                        break;
-                    case 'body_drive':
-                        drawPriceByBodyStyle(data);
-                        drawHorsepowerByFuelType(data);
-                        break;
-                    case 'engine_fuel':
-                        drawHorsepowerByEngine(data);
-                        drawNumCylinders(data);
-                        drawFuelSystem(data);
-                        break;
-                    case 'correlation':
-                        drawCorrelationHeatmap(data);
-                        break;
-                }
-            }
-
-            function updateKPIs(data) {
-                d3.select('#total-cars').text(data.length);
-                const avgPrice = d3.mean(data, d => d.price);
-                d3.select('#avg-price').text(avgPrice ? `$${d3.format(",.0f")(avgPrice)}` : 'N/A');
-                const avgHorsepower = d3.mean(data, d => d.horsepower);
-                d3.select('#avg-horsepower').text(avgHorsepower ? d3.format(".0f")(avgHorsepower) : 'N/A');
-                const avgMpg = d3.mean(data, d => d['city-mpg']);
-                d3.select('#avg-mpg').text(avgMpg ? d3.format(".1f")(avgMpg) : 'N/A');
-            }
-
-            // --- CHART DRAWING FUNCTIONS ---
-            
-            function drawPriceDistribution(data) {
-                const svg = d3.select("#price-distribution");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleLinear().domain(d3.extent(data, d => d.price)).range([0, width]);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
-
-                const histogram = d3.histogram().value(d => d.price).domain(x.domain()).thresholds(x.ticks(20));
-                const bins = histogram(data);
-
-                const y = d3.scaleLinear().range([height, 0]).domain([0, d3.max(bins, d => d.length)]);
-                g.append("g").call(d3.axisLeft(y));
-
-                g.selectAll("rect").data(bins).join("rect")
-                    .attr("x", 1).attr("transform", d => `translate(${x(d.x0)},${y(d.length)})`)
-                    .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1)).attr("height", d => height - y(d.length))
-                    .style("fill", "var(--brand-gold)")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Price: $${d.x0}-$${d.x1}<br/>Count: ${d.length}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawCarsByMake(data, allData) {
-                 const svg = d3.select("#cars-by-make");
-                svg.selectAll("*").remove();
-                
-                const dataToUse = makeFilter.property('value') === 'All' ? allData : data;
-                const counts = d3.rollup(dataToUse, v => v.length, d => d.make);
-                const countsArray = Array.from(counts, ([key, value]) => ({make: key, count: value}))
-                    .sort((a, b) => d3.descending(a.count, b.count));
-
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.make)).padding(0.2);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
-                    .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
-
-                const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).range([height, 0]);
-                g.append("g").call(d3.axisLeft(y));
-
-                g.selectAll("rect").data(countsArray).join("rect")
-                    .attr("x", d => x(d.make)).attr("y", d => y(d.count))
-                    .attr("width", x.bandwidth()).attr("height", d => height - y(d.count))
-                    .attr("fill", "var(--brand-gold)")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Make: ${d.make}<br/>Count: ${d.count}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawHorsepowerVsPrice(data) {
-                const svg = d3.select("#horsepower-vs-price");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleLinear().domain(d3.extent(data, d => d.horsepower)).nice().range([0, width]);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).append("text")
-                    .attr("y", 40).attr("x", width / 2).attr("text-anchor", "middle").attr("fill", "var(--text-primary)").text("Horsepower");
-
-                const y = d3.scaleLinear().domain(d3.extent(data, d => d.price)).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y)).append("text")
-                    .attr("transform", "rotate(-90)").attr("y", -50).attr("x", -height / 2).attr("text-anchor", "middle").attr("fill", "var(--text-primary)").text("Price ($)");
-
-                g.append('g').selectAll("dot").data(data).join("circle")
-                    .attr("cx", d => x(d.horsepower)).attr("cy", d => y(d.price)).attr("r", 5)
-                    .style("fill", "var(--brand-gold)").style("opacity", 0.7)
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Make: ${d.make}<br/>HP: ${d.horsepower}<br/>Price: $${d.price}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-            
-            function drawCurbWeightVsPrice(data) {
-                const svg = d3.select("#curb-weight-vs-price");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleLinear().domain(d3.extent(data, d => d['curb-weight'])).nice().range([0, width]);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).append("text")
-                    .attr("y", 40).attr("x", width / 2).attr("text-anchor", "middle").attr("fill", "var(--text-primary)").text("Curb Weight");
-
-                const y = d3.scaleLinear().domain(d3.extent(data, d => d.price)).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y)).append("text")
-                    .attr("transform", "rotate(-90)").attr("y", -50).attr("x", -height / 2).attr("text-anchor", "middle").attr("fill", "var(--text-primary)").text("Price ($)");
-
-                g.append('g').selectAll("dot").data(data).join("circle")
-                    .attr("cx", d => x(d['curb-weight'])).attr("cy", d => y(d.price)).attr("r", 5)
-                    .style("fill", "var(--brand-gold)").style("opacity", 0.7)
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Make: ${d.make}<br/>Weight: ${d['curb-weight']}<br/>Price: $${d.price}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawPriceByBodyStyle(data) {
-                const svg = d3.select("#price-by-body-style");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const categories = [...new Set(data.map(d => d['body-style']))].sort();
-                const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.1);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
-
-                const y = d3.scaleLinear().domain([0, d3.max(data, d => d.price)]).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y));
-
-                const groupedData = d3.group(data, d => d['body-style']);
-                
-                g.selectAll("myBox")
-                    .data(groupedData)
-                    .enter()
-                    .append("g")
-                    .attr("transform", d => `translate(${x(d[0])}, 0)`)
-                    .each(function(d) {
-                        const values = d[1].map(v => v.price).sort(d3.ascending);
-                        const q1 = d3.quantile(values, .25);
-                        const median = d3.quantile(values, .5);
-                        const q3 = d3.quantile(values, .75);
-                        if (q1 === undefined || median === undefined || q3 === undefined) return;
-                        const interQuantileRange = q3 - q1;
-                        const min = q1 - 1.5 * interQuantileRange;
-                        const max = q3 + 1.5 * interQuantileRange;
-
-                        const boxWidth = x.bandwidth() * 0.8;
-                        const center = x.bandwidth() / 2;
-                        
-                        const boxG = d3.select(this);
-
-                        boxG.append("line")
-                            .attr("x1", center).attr("x2", center)
-                            .attr("y1", y(min)).attr("y2", y(max))
-                            .attr("stroke", "var(--text-secondary)");
-
-                        boxG.append("rect")
-                            .attr("x", center - boxWidth / 2).attr("y", y(q3))
-                            .attr("height", y(q1) - y(q3))
-                            .attr("width", boxWidth)
-                            .attr("stroke", "var(--brand-gold)")
-                            .style("fill", "var(--brand-gold)");
-
-                        boxG.append("line")
-                            .attr("x1", center - boxWidth / 2).attr("x2", center + boxWidth / 2)
-                            .attr("y1", y(median)).attr("y2", y(median))
-                            .attr("stroke", "#121212").style("stroke-width", "2px");
-                    });
-            }
-
-            function drawHorsepowerByFuelType(data) {
-                 const svg = d3.select("#horsepower-by-fuel-type");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const categories = ['gas', 'diesel'];
-                const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.05);
-                g.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x));
-
-                const y = d3.scaleLinear().domain([30, d3.max(data, d => d.horsepower)]).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y));
-
-                const histogram = d3.histogram()
-                    .domain(y.domain()).thresholds(y.ticks(20)).value(d => d.horsepower);
-
-                const sumstat = d3.group(data, d => d['fuel-type']);
-                
-                let maxNum = 0;
-                for (let i in categories) {
-                    let cat = categories[i];
-                    let catData = sumstat.get(cat);
-                    if (!catData) continue;
-                    let catBins = histogram(catData);
-                    let max = d3.max(catBins, d => d.length);
-                    if (max > maxNum) { maxNum = max; }
-                }
-                const xNum = d3.scaleLinear().range([0, x.bandwidth()]).domain([-maxNum, maxNum]);
-
-                g.selectAll("myViolin")
-                    .data(sumstat)
-                    .join("g")
-                    .attr("transform", d => `translate(${x(d[0])}, 0)`)
-                    .append("path")
-                    .datum(d => histogram(d[1] || []))
-                    .style("stroke", "none")
-                    .style("fill", "var(--brand-gold)")
-                    .attr("d", d3.area()
-                        .x0(d => xNum(-d.length))
-                        .x1(d => xNum(d.length))
-                        .y(d => y(d.x0))
-                        .curve(d3.curveCatmullRom)
-                    );
-            }
-            
-            function drawHorsepowerByEngine(data) {
-                const svg = d3.select("#horsepower-by-engine");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const engineData = d3.rollup(data, v => d3.mean(v, d => d.horsepower), d => d['engine-type']);
-                const engineArray = Array.from(engineData, ([key, value]) => ({type: key, horsepower: value}))
-                    .sort((a, b) => d3.descending(a.horsepower, b.horsepower));
-                
-                const x = d3.scaleBand().range([0, width]).domain(engineArray.map(d => d.type)).padding(0.2);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
-
-                const y = d3.scaleLinear().domain([0, d3.max(engineArray, d => d.horsepower)]).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y));
-
-                g.selectAll("rect").data(engineArray).join("rect")
-                    .attr("x", d => x(d.type)).attr("y", d => y(d.horsepower))
-                    .attr("width", x.bandwidth()).attr("height", d => height - y(d.horsepower))
-                    .attr("fill", "var(--brand-gold)")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Engine: ${d.type}<br/>Avg HP: ${d.horsepower.toFixed(0)}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawNumCylinders(data) {
-                const svg = d3.select("#num-cylinders");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width;
-                const height = svg.node().getBoundingClientRect().height;
-                const radius = Math.min(width, height) / 2 - 20;
-                
-                const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-                const counts = d3.rollup(data, v => v.length, d => d['num-of-cylinders']);
-                const countsArray = Array.from(counts, ([key, value]) => ({type: key, count: value}));
-                
-                const pie = d3.pie().value(d => d.count).sort(null);
-                const data_ready = pie(countsArray);
-
-                const color = d3.scaleOrdinal(d3.schemeGoldenrod);
-
-                const arc = d3.arc().innerRadius(0).outerRadius(radius);
-
-                g.selectAll('path').data(data_ready).join('path')
-                    .attr('d', arc)
-                    .attr('fill', d => color(d.data.type))
-                    .attr("stroke", "var(--brand-dark-bg)")
-                    .style("stroke-width", "2px")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Cylinders: ${d.data.type}<br/>Count: ${d.data.count}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawFuelSystem(data) {
-                const svg = d3.select("#fuel-system");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const counts = d3.rollup(data, v => v.length, d => d['fuel-system']);
-                const countsArray = Array.from(counts, ([key, value]) => ({system: key, count: value}))
-                    .sort((a, b) => d3.descending(a.count, b.count));
-                
-                const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.system)).padding(0.2);
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
-
-                const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).nice().range([height, 0]);
-                g.append("g").call(d3.axisLeft(y));
-
-                g.selectAll("rect").data(countsArray).join("rect")
-                    .attr("x", d => x(d.system)).attr("y", d => y(d.count))
-                    .attr("width", x.bandwidth()).attr("height", d => height - y(d.count))
-                    .attr("fill", "var(--brand-gold)")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`System: ${d.system}<br/>Count: ${d.count}`)
-                            .style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function drawCorrelationHeatmap(data) {
-                const svg = d3.select("#correlation-heatmap");
-                svg.selectAll("*").remove();
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const columns = ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg'];
-                const matrix = calculateCorrelationMatrix(data, columns);
-
-                const x = d3.scaleBand().range([0, width]).domain(columns).padding(0.05);
-                g.append("g").style("font-size", 10).attr("transform", `translate(0, ${height})`)
-                    .call(d3.axisBottom(x).tickSize(0)).select(".domain").remove();
-
-                const y = d3.scaleBand().range([height, 0]).domain(columns).padding(0.05);
-                g.append("g").style("font-size", 10).call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
-
-                const color = d3.scaleSequential(d3.interpolateRdYlBu).domain([-1, 1]);
-
-                const heatmapData = [];
-                for (let i = 0; i < columns.length; i++) {
-                    for (let j = 0; j < columns.length; j++) {
-                        heatmapData.push({ x: columns[i], y: columns[j], value: matrix[i][j] });
-                    }
-                }
-
-                g.selectAll().data(heatmapData, d => d.x+':'+d.y).join("rect")
-                    .attr("x", d => x(d.x)).attr("y", d => y(d.y))
-                    .attr("rx", 4).attr("ry", 4)
-                    .attr("width", x.bandwidth()).attr("height", y.bandwidth())
-                    .style("fill", d => color(d.value))
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        tooltip.html(`Correlation(${d.x}, ${d.y}):<br>${d.value.toFixed(2)}`)
-                            .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 20) + "px");
-                    }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            }
-
-            function calculateCorrelationMatrix(data, columns) {
-                const n = columns.length;
-                const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
-                for (let i = 0; i < n; i++) {
-                    for (let j = i; j < n; j++) {
-                        const col1 = columns[i];
-                        const col2 = columns[j];
-                        const validData = data.filter(d => !isNaN(d[col1]) && !isNaN(d[col2]));
-                        const mean1 = d3.mean(validData, d => d[col1]);
-                        const mean2 = d3.mean(validData, d => d[col2]);
-                        const dev1 = d3.deviation(validData, d => d[col1]);
-                        const dev2 = d3.deviation(validData, d => d[col2]);
-                        if (dev1 === 0 || dev2 === 0) {
-                            matrix[i][j] = matrix[j][i] = 0;
-                            continue;
-                        }
-                        const correlation = d3.mean(validData, d => (d[col1] - mean1) * (d[col2] - mean2)) / (dev1 * dev2);
-                        matrix[i][j] = isNaN(correlation) ? 0 : correlation;
-                        matrix[j][i] = isNaN(correlation) ? 0 : correlation;
-                    }
-                }
-                return matrix;
-            }
-
-            // --- Tab Handling ---
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(item => item.classList.remove('active'));
-                    tab.classList.add('active');
-                    activeTab = tab.dataset.tab;
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    document.getElementById(`${activeTab}-content`).classList.add('active');
-                    updateDashboard();
-                });
-            });
-
-            // Initial call
+            // Initial dashboard render
             updateDashboard();
-
-            // Event listeners
-            makeFilter.on('change', updateDashboard);
-            bodyStyleFilter.on('change', updateDashboard);
         }).catch(error => {
-            console.error('Error loading the CSV file:', error);
-            const container = document.getElementById('dashboard-container');
-            container.innerHTML = `<div class="text-red-500 text-center p-8">
-                <h1 class="text-3xl font-bold mb-4">Failed to Load Data</h1>
-                <p class="text-lg">Please check the CSV file URL in the script and make sure it's a valid raw GitHub URL.</p>
-                <p class="mt-4 text-gray-400">The expected URL format is: <br> <code class="bg-gray-800 p-1 rounded">https://raw.githubusercontent.com/your-username/your-repo/main/Rawdata/Automobile_data.csv</code></p>
+            console.error('Error loading or parsing data:', error);
+            document.getElementById('view-container').innerHTML = `<div class="text-red-400 text-center p-8 text-xl">
+                <h2 class="text-3xl font-bold mb-4">Error Loading Data</h2>
+                <p>Could not load data from the specified URL. Please check the 'csvUrl' variable in the script and ensure it points to a valid raw CSV file.</p>
             </div>`;
         });
+
+        // --- Event Listeners ---
+        d3.select('#make-filter').on('change', () => updateDashboard());
+        d3.select('#body-style-filter').on('change', () => updateDashboard());
+        d3.select('#reset-filter-btn').on('click', () => {
+            crossFilter = null;
+            updateDashboard();
+        });
+        d3.select('#sidebar-nav').selectAll('.sidebar-item').on('click', function(event) {
+            event.preventDefault();
+            d3.selectAll('.sidebar-item').classed('active', false);
+            d3.select(this).classed('active', true);
+            activeView = d3.select(this).attr('data-view');
+            
+            d3.selectAll('.view-content').classed('active', false);
+            d3.select(`#${activeView}-view`).classed('active', true);
+            
+            updateDashboard();
+        });
+        window.addEventListener('resize', () => updateDashboard(false));
+
+        // --- Core Update Function ---
+        function updateDashboard(animate = true) {
+            const selectedMake = d3.select('#make-filter').property('value');
+            const selectedBodyStyle = d3.select('#body-style-filter').property('value');
+
+            let filteredData = fullDataset;
+            // Apply dropdown filters
+            if (selectedMake !== 'All') {
+                filteredData = filteredData.filter(d => d.make === selectedMake);
+            }
+            if (selectedBodyStyle !== 'All') {
+                filteredData = filteredData.filter(d => d['body-style'] === selectedBodyStyle);
+            }
+            
+            // Apply cross-filter if it exists
+            if (crossFilter) {
+                filteredData = filteredData.filter(d => d[crossFilter.key] === crossFilter.value);
+            }
+
+            updateKPIs(filteredData);
+            drawActiveViewCharts(filteredData, animate);
+        }
+        
+        function setCrossFilter(key, value) {
+            // If clicking the same filter, disable it. Otherwise, set the new one.
+            if (crossFilter && crossFilter.key === key && crossFilter.value === value) {
+                crossFilter = null;
+            } else {
+                crossFilter = { key, value };
+            }
+            updateDashboard();
+        }
+
+        function updateKPIs(data) {
+            d3.select('#total-cars').text(data.length);
+            const avgPrice = d3.mean(data, d => d.price);
+            d3.select('#avg-price').text(avgPrice ? `$${d3.format(",.0f")(avgPrice)}` : 'N/A');
+            const avgHorsepower = d3.mean(data, d => d.horsepower);
+            d3.select('#avg-horsepower').text(avgHorsepower ? d3.format(".0f")(avgHorsepower) : 'N/A');
+            const avgMpg = d3.mean(data, d => d['city-mpg']);
+            d3.select('#avg-mpg').text(avgMpg ? d3.format(".1f")(avgMpg) : 'N/A');
+        }
+
+        function drawActiveViewCharts(data, animate) {
+            if (data.length === 0) {
+                d3.selectAll('.chart-container svg').html('<text x="50%" y="50%" text-anchor="middle" fill="#CBD5E1">No data for selected filters.</text>');
+                return;
+            }
+
+            switch(activeView) {
+                case 'overview':
+                    drawPriceDistribution(data, animate);
+                    drawCarsByBodyStyle(data, animate);
+                    drawCarsByMake(data, animate);
+                    break;
+                case 'pricing_market':
+                    drawAvgPriceByMake(data, animate);
+                    drawBoxPlot(data, '#price-by-body-style-box', 'body-style', 'price', 'Body Style', 'Price ($)', animate);
+                    drawViolinPlot(data, '#hp-by-drive-wheels-violin', 'drive-wheels', 'horsepower', 'Drive Wheels', 'Horsepower', animate);
+                    break;
+                case 'performance':
+                    drawScatterPlot(data, '#horsepower-vs-price', 'horsepower', 'price', 'Horsepower', 'Price ($)', animate);
+                    drawScatterPlot(data, '#curb-weight-vs-price', 'curb-weight', 'price', 'Curb Weight (lbs)', 'Price ($)', animate);
+                    drawScatterPlot(data, '#mpg-scatter', 'city-mpg', 'highway-mpg', 'City MPG', 'Highway MPG', animate);
+                    break;
+                case 'engine_fuel':
+                    drawGroupedBoxPlot(data, '#hp-by-aspiration', 'fuel-type', 'aspiration', 'horsepower', 'Fuel Type', 'Horsepower', animate);
+                    drawScatterPlot(data, '#engine-vs-hp', 'engine-size', 'horsepower', 'Engine Size', 'Horsepower', animate);
+                    break;
+                case 'risk_safety':
+                    drawSymbolingDistribution(data, animate);
+                    drawBoxPlot(data, '#price-by-symboling', 'symboling', 'price', 'Insurance Risk Rating (Symboling)', 'Price ($)', animate);
+                    break;
+                case 'correlation':
+                    drawCorrelationHeatmap(data, animate);
+                    break;
+            }
+        }
+        
+        // --- Chart Drawing Functions ---
+
+        function drawPriceDistribution(data, animate) {
+            const svg = d3.select("#price-distribution");
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear().domain(d3.extent(data, d => d.price)).nice().range([0, width]);
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("~s")))
+                .append("text").attr("y", 40).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text("Price ($)");
+
+            const histogram = d3.histogram().value(d => d.price).domain(x.domain()).thresholds(x.ticks(20));
+            const bins = histogram(data);
+
+            const y = d3.scaleLinear().range([height, 0]).domain([0, d3.max(bins, d => d.length)]).nice();
+            g.append("g").call(d3.axisLeft(y));
+
+            g.selectAll("rect").data(bins).join("rect")
+                .attr("x", 1).attr("transform", d => `translate(${x(d.x0)},${y(d.length)})`)
+                .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+                .attr("fill", "var(--accent-primary)")
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`<b>Price Range:</b> $${d.x0.toLocaleString()} - $${d.x1.toLocaleString()}<br><b>Count:</b> ${d.length}`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .attr("y", y(0))
+                .attr("height", 0)
+                .transition().duration(animate ? 800 : 0)
+                .attr("y", d => y(d.length))
+                .attr("height", d => height - y(d.length));
+        }
+        
+        function drawCarsByBodyStyle(data, animate) {
+            const svg = d3.select("#cars-by-body-style");
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width;
+            const height = svg.node().getBoundingClientRect().height;
+            const radius = Math.min(width, height) / 2 - 20;
+            const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+            const counts = d3.rollup(data, v => v.length, d => d['body-style']);
+            const countsArray = Array.from(counts, ([key, value]) => ({type: key, count: value}));
+            
+            const color = d3.scaleOrdinal(d3.schemeTableau10).domain(countsArray.map(d=>d.type));
+            const pie = d3.pie().value(d => d.count).sort(null);
+            const data_ready = pie(countsArray);
+
+            const arc = d3.arc().innerRadius(radius * 0.5).outerRadius(radius);
+
+            g.selectAll("path").data(data_ready).join("path")
+                .attr('d', arc)
+                .attr('fill', d => color(d.data.type))
+                .attr("stroke", "var(--bg-secondary)").style("stroke-width", "3px")
+                .attr("class", "clickable")
+                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'body-style' && crossFilter.value !== d.data.type)
+                .on("click", (event, d) => setCrossFilter('body-style', d.data.type))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`<b>${d.data.type}</b><br>Count: ${d.data.count} (${d3.format(".1%")(d.data.count / data.length)})`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                    d3.select(event.currentTarget).transition().duration(200).attr('transform', 'scale(1.05)');
+                }).on("mouseout", (event) => {
+                    tooltip.style("opacity", 0);
+                    d3.select(event.currentTarget).transition().duration(200).attr('transform', 'scale(1)');
+                })
+                .transition().duration(animate ? 1000 : 0)
+                .attrTween('d', function(d) {
+                    const i = d3.interpolate(this._current || {startAngle: 0, endAngle: 0}, d);
+                    this._current = i(0);
+                    return t => arc(i(t));
+                });
+        }
+
+        function drawCarsByMake(data, animate) {
+            const svg = d3.select("#cars-by-make");
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - marginRotated.left - marginRotated.right;
+            const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
+            const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
+
+            const counts = d3.rollup(data, v => v.length, d => d.make);
+            const countsArray = Array.from(counts, ([key, value]) => ({make: key, count: value}))
+                .sort((a, b) => d3.descending(a.count, b.count));
+
+            const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.make)).padding(0.2);
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
+                .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+
+            const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y));
+
+            g.selectAll("rect").data(countsArray).join("rect")
+                .attr("x", d => x(d.make)).attr("width", x.bandwidth())
+                .attr("fill", "var(--accent-secondary)")
+                .attr("class", "clickable")
+                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'make' && crossFilter.value !== d.make)
+                .on("click", (event, d) => setCrossFilter('make', d.make))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`<b>${d.make}</b><br>Count: ${d.count}`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .attr("y", y(0)).attr("height", 0)
+                .transition().duration(animate ? 800 : 0)
+                .attr("y", d => y(d.count))
+                .attr("height", d => height - y(d.count));
+        }
+
+        function drawAvgPriceByMake(data, animate) {
+            const svg = d3.select("#avg-price-by-make");
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - marginRotated.left - marginRotated.right;
+            const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
+            const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
+
+            const overallAvgPrice = d3.mean(data, d => d.price);
+            const avgPriceData = d3.rollup(data, v => d3.mean(v, d => d.price), d => d.make);
+            const avgPriceArray = Array.from(avgPriceData, ([key, value]) => ({make: key, price: value}))
+                .sort((a,b) => d3.descending(a.price, b.price));
+
+            const x = d3.scaleBand().range([0, width]).domain(avgPriceArray.map(d => d.make)).padding(0.2);
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
+                .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+
+            const y = d3.scaleLinear().domain([0, d3.max(avgPriceArray, d => d.price)]).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")));
+
+            g.selectAll("rect").data(avgPriceArray).join("rect")
+                .attr("x", d => x(d.make)).attr("width", x.bandwidth())
+                .attr("fill", d => d.price > overallAvgPrice ? "var(--accent-positive)" : "var(--accent-negative)")
+                .attr("class", "clickable")
+                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'make' && crossFilter.value !== d.make)
+                .on("click", (event, d) => setCrossFilter('make', d.make))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    const priceDiff = d.price - overallAvgPrice;
+                    const diffText = priceDiff > 0 ? `+$${d3.format(",.0f")(Math.abs(priceDiff))}` : `-$${d3.format(",.0f")(Math.abs(priceDiff))}`;
+                    tooltip.html(`<b>${d.make}</b><br>Avg Price: $${d3.format(",.0f")(d.price)}<br>Difference from Avg: ${diffText}`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .attr("y", y(0)).attr("height", 0)
+                .transition().duration(animate ? 800 : 0)
+                .attr("y", d => y(d.price))
+                .attr("height", d => height - y(d.price));
+            
+            // Add average line
+            g.append("line")
+                .attr("x1", 0).attr("x2", width)
+                .attr("y1", y(overallAvgPrice)).attr("y2", y(overallAvgPrice))
+                .attr("stroke", "var(--accent-primary)").attr("stroke-width", 2).attr("stroke-dasharray", "5,5");
+            g.append("text").attr("x", width).attr("y", y(overallAvgPrice) - 5).attr("text-anchor", "end").attr("fill", "var(--accent-primary)").text("Overall Avg");
+        }
+        
+        function drawSymbolingDistribution(data, animate) {
+            const svg = d3.select("#symboling-dist");
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const symbolingMap = {'-2': 'Very Safe', '-1': 'Safe', '0': 'Neutral', '1': 'Risky', '2': 'Very Risky', '3': 'Most Risky'};
+            const counts = d3.rollup(data, v => v.length, d => d.symboling);
+            const countsArray = Array.from(counts, ([key, value]) => ({symbol: key, name: symbolingMap[key] || key, count: value}))
+                .sort((a,b) => d3.ascending(a.symbol, b.symbol));
+
+            const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.symbol)).padding(0.3);
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).tickFormat(d => symbolingMap[d] || d));
+
+            const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y));
+            
+            const colorScale = d3.scaleOrdinal().domain(['-2','-1','0','1','2','3'])
+                .range(['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444', '#b91c1c']); // green to red
+
+            g.selectAll("rect").data(countsArray).join("rect")
+                .attr("x", d => x(d.symbol)).attr("width", x.bandwidth())
+                .attr("fill", d => colorScale(d.symbol))
+                .attr("class", "clickable")
+                .classed("cross-filter-dim", d => crossFilter && crossFilter.key === 'symboling' && crossFilter.value !== d.symbol)
+                .on("click", (event, d) => setCrossFilter('symboling', d.symbol))
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`<b>${d.name} (Rating: ${d.symbol})</b><br>Count: ${d.count}`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .attr("y", y(0)).attr("height", 0)
+                .transition().duration(animate ? 800 : 0)
+                .attr("y", d => y(d.count))
+                .attr("height", d => height - y(d.count));
+        }
+
+        function drawGroupedBoxPlot(data, selector, primaryCat, secondaryCat, numVar, xLabel, yLabel, animate) {
+            const svg = d3.select(selector);
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const primaryCategories = [...new Set(data.map(d => d[primaryCat]))].sort();
+            const secondaryCategories = [...new Set(data.map(d => d[secondaryCat]))].sort();
+
+            const x0 = d3.scaleBand().range([0, width]).domain(primaryCategories).paddingInner(0.2);
+            const x1 = d3.scaleBand().domain(secondaryCategories).range([0, x0.bandwidth()]).padding(0.1);
+            
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x0))
+                .append("text").attr("y", 45).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
+
+            const y = d3.scaleLinear().domain([0, d3.max(data, d => d[numVar])]).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
+                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
+
+            const color = d3.scaleOrdinal().domain(secondaryCategories).range(["var(--accent-primary)", "var(--accent-secondary)"]);
+
+            const groupedData = d3.group(data, d => d[primaryCat], d => d[secondaryCat]);
+            
+            groupedData.forEach((secondaryGroup, primaryKey) => {
+                secondaryGroup.forEach((values, secondaryKey) => {
+                    const sortedValues = values.map(d => d[numVar]).sort(d3.ascending);
+                    const q1 = d3.quantile(sortedValues, .25);
+                    const median = d3.quantile(sortedValues, .5);
+                    const q3 = d3.quantile(sortedValues, .75);
+                    if (q1 === undefined || median === undefined || q3 === undefined) return;
+                    
+                    const boxG = g.append("g").attr("transform", `translate(${x0(primaryKey)}, 0)`);
+                    
+                    boxG.append("rect")
+                        .attr("x", x1(secondaryKey))
+                        .attr("width", x1.bandwidth())
+                        .attr("fill", color(secondaryKey))
+                        .on("mouseover", (event) => {
+                            tooltip.style("opacity", 1).html(`<b>${primaryKey} - ${secondaryKey}</b><br>Median: ${median.toLocaleString()}<br>Q1: ${q1.toLocaleString()}<br>Q3: ${q3.toLocaleString()}`)
+                                .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                        }).on("mouseout", () => tooltip.style("opacity", 0))
+                        .transition().duration(animate ? 800 : 0)
+                        .attr("y", y(q3))
+                        .attr("height", y(q1) - y(q3));
+                        
+                    boxG.append("line")
+                        .attr("x1", x1(secondaryKey)).attr("x2", x1(secondaryKey) + x1.bandwidth())
+                        .attr("stroke", "var(--bg-primary)").style("stroke-width", "2px")
+                        .transition().duration(animate ? 800 : 0)
+                        .attr("y1", y(median)).attr("y2", y(median));
+                });
+            });
+
+            // Legend
+            const legend = g.selectAll(".legend").data(secondaryCategories).enter().append("g")
+                .attr("class", "legend").attr("transform", (d, i) => `translate(${width - 100},${i * 20})`);
+            legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).style("fill", color);
+            legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d);
+        }
+
+        // --- Utility and other chart functions (re-used from previous version, with minor tweaks) ---
+        function drawScatterPlot(data, selector, xVar, yVar, xLabel, yLabel, animate) {
+            const svg = d3.select(selector);
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).nice().range([0, width]);
+            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
+                .append("text").attr("y", 45).attr("x", width / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
+
+            const y = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
+                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
+            
+            const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
+            g.append('g').selectAll("dot").data(data).join("circle")
+                .attr("cx", d => x(d[xVar])).attr("cy", d => y(d[yVar]))
+                .style("fill", d => colorScale(d.make)).style("opacity", 0.7)
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`<b>${d.make} (${d['body-style']})</b><br>${xLabel}: ${d[xVar]}<br>${yLabel}: ${d[yVar].toLocaleString()}`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .attr("r", 0)
+                .transition().duration(animate ? 500 : 0)
+                .attr("r", 5);
+        }
+        
+        function drawBoxPlot(data, selector, catVar, numVar, xLabel, yLabel, animate) {
+            const svg = d3.select(selector);
+            svg.selectAll("*").remove();
+            const useRotatedMargin = ['body-style', 'drive-wheels'].includes(catVar);
+            const currentMargin = useRotatedMargin ? margin : marginRotated;
+            const width = svg.node().getBoundingClientRect().width - currentMargin.left - currentMargin.right;
+            const height = svg.node().getBoundingClientRect().height - currentMargin.top - currentMargin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${currentMargin.left},${currentMargin.top})`);
+
+            const categories = [...new Set(data.map(d => d[catVar]))].sort((a,b) => d3.ascending(a,b));
+            const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.4);
+            const xAxis = g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+            
+            if (useRotatedMargin) {
+                xAxis.selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+            }
+
+            const y = d3.scaleLinear().domain([0, d3.max(data, d => d[numVar])]).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
+                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
+
+            const groupedData = d3.group(data, d => d[catVar]);
+            
+            groupedData.forEach((group, key) => {
+                const values = group.map(d => d[numVar]).sort(d3.ascending);
+                const q1 = d3.quantile(values, .25);
+                const median = d3.quantile(values, .5);
+                const q3 = d3.quantile(values, .75);
+                if (q1 === undefined || median === undefined || q3 === undefined) return;
+                
+                const boxG = g.append("g").attr("transform", `translate(${x(key)}, 0)`);
+                
+                boxG.append("rect")
+                    .attr("x", 0).attr("width", x.bandwidth())
+                    .style("fill", "var(--accent-primary)").attr("stroke", "var(--border-color)")
+                    .on("mouseover", (event) => {
+                        tooltip.style("opacity", 1).html(`<b>${key}</b><br>Median: $${median.toLocaleString()}<br>Q1: $${q1.toLocaleString()}<br>Q3: $${q3.toLocaleString()}`)
+                            .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+                    }).on("mouseout", () => tooltip.style("opacity", 0))
+                    .transition().duration(animate ? 800 : 0)
+                    .attr("y", y(q3)).attr("height", y(q1) - y(q3));
+
+                boxG.append("line")
+                    .attr("x1", 0).attr("x2", x.bandwidth())
+                    .attr("stroke", "var(--bg-primary)").style("stroke-width", "2px")
+                    .transition().duration(animate ? 800 : 0)
+                    .attr("y1", y(median)).attr("y2", y(median));
+            });
+        }
+
+        function drawViolinPlot(data, selector, catVar, numVar, xLabel, yLabel, animate) {
+            const svg = d3.select(selector);
+            svg.selectAll("*").remove();
+            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const categories = [...new Set(data.map(d => d[catVar]))].sort();
+            const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.1);
+            g.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x));
+
+            const y = d3.scaleLinear().domain(d3.extent(data, d => d[numVar])).nice().range([height, 0]);
+            g.append("g").call(d3.axisLeft(y));
+
+            const histogram = d3.histogram().domain(y.domain()).thresholds(y.ticks(15)).value(d => d[numVar]);
+            const sumstat = d3.group(data, d => d[catVar]);
+            
+            let maxNum = 0;
+            sumstat.forEach(group => {
+                let catBins = histogram(group);
+                let max = d3.max(catBins, d => d.length);
+                if (max > maxNum) maxNum = max;
+            });
+            const xNum = d3.scaleLinear().range([0, x.bandwidth()]).domain([-maxNum, maxNum]);
+
+            g.selectAll("myViolin").data(sumstat).join("g")
+                .attr("transform", d => `translate(${x(d[0])}, 0)`)
+                .append("path")
+                .datum(d => histogram(d[1] || []))
+                .style("stroke", "none").style("fill", "var(--accent-secondary)")
+                .attr("d", d3.area().x0(d => xNum(-d.length)).x1(d => xNum(d.length)).y(d => y(d.x0)).curve(d3.curveCatmullRom))
+                .style("opacity", 0)
+                .transition().duration(animate ? 800 : 0)
+                .style("opacity", 0.7);
+        }
+
+        function drawCorrelationHeatmap(data, animate) {
+            const svg = d3.select("#correlation-heatmap");
+            svg.selectAll("*").remove();
+            const localMargin = { top: 30, right: 30, bottom: 100, left: 100 };
+            const width = svg.node().getBoundingClientRect().width - localMargin.left - localMargin.right;
+            const height = svg.node().getBoundingClientRect().height - localMargin.top - localMargin.bottom;
+            const g = svg.append("g").attr("transform", `translate(${localMargin.left},${localMargin.top})`);
+
+            const columns = ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'length', 'width', 'symboling'];
+            const matrix = calculateCorrelationMatrix(data, columns);
+
+            const x = d3.scaleBand().range([0, width]).domain(columns).padding(0.05);
+            g.append("g").style("font-size", 10).attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x).tickSize(0))
+               .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+
+            const y = d3.scaleBand().range([height, 0]).domain(columns).padding(0.05);
+            g.append("g").style("font-size", 10).call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
+
+            const color = d3.scaleSequential(d3.interpolateRdBu).domain([-1, 1]);
+
+            const heatmapData = [];
+            for (let i = 0; i < columns.length; i++) {
+                for (let j = 0; j < columns.length; j++) {
+                    heatmapData.push({ x: columns[i], y: columns[j], value: matrix[i][j] });
+                }
+            }
+
+            g.selectAll(".corr-rect").data(heatmapData, d => d.x+':'+d.y).join("rect")
+                .attr("x", d => x(d.x)).attr("y", d => y(d.y))
+                .attr("rx", 4).attr("ry", 4)
+                .attr("width", x.bandwidth()).attr("height", y.bandwidth())
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`Corr(${d.x}, ${d.y}):<br><b>${d.value.toFixed(2)}</b>`)
+                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 20) + "px");
+                }).on("mouseout", () => tooltip.style("opacity", 0))
+                .style("fill", d => color(d.value === undefined ? 0 : d.value))
+                .style("opacity", 0)
+                .transition().duration(animate ? 800 : 0)
+                .style("opacity", 1);
+            
+            g.selectAll(".corr-text").data(heatmapData).join("text")
+                .attr("x", d => x(d.x) + x.bandwidth() / 2)
+                .attr("y", d => y(d.y) + y.bandwidth() / 2)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .style("font-size", "10px")
+                .style("fill", d => Math.abs(d.value) > 0.7 ? "white" : "black")
+                .text(d => d.value.toFixed(1))
+                .style("opacity", 0)
+                .transition().duration(animate ? 800 : 0)
+                .style("opacity", 1);
+        }
+
+        function calculateCorrelationMatrix(data, columns) {
+            const n = columns.length;
+            const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = i; j < n; j++) {
+                    const col1 = columns[i];
+                    const col2 = columns[j];
+                    const validData = data.filter(d => d[col1] !== undefined && d[col2] !== undefined);
+                    const xSeries = validData.map(d => d[col1]);
+                    const ySeries = validData.map(d => d[col2]);
+                    const correlation = d3.mean(xSeries.map((x_i, k) => (x_i - d3.mean(xSeries)) * (ySeries[k] - d3.mean(ySeries)))) / (d3.deviation(xSeries) * d3.deviation(ySeries));
+                    matrix[i][j] = isNaN(correlation) ? 0 : correlation;
+                    matrix[j][i] = isNaN(correlation) ? 0 : correlation;
+                }
+            }
+            return matrix;
+        }
+    });
     </script>
 </body>
 </html>
