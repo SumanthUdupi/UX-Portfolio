@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumanth Udupi - Senior UI/UX Designer & Developer</title>
+    <title>Sumanth Udupi - Senior Business Analyst</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +80,7 @@
             background: rgba(17, 17, 17, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .fade-in-up {
@@ -97,25 +97,27 @@
         /* --- Carousel Styles --- */
         .portfolio-carousel-section {
             background-color: var(--bg-secondary);
+            overflow: hidden;
         }
         
         .portfolio-carousel {
             width: 100%;
             padding-top: 50px;
-            padding-bottom: 50px;
+            padding-bottom: 80px; /* Extra space for pagination */
         }
 
         .swiper-slide {
-            background-position: center;
-            background-size: cover;
-            width: 400px;
-            height: 520px;
+            width: 90%; /* Responsive width for mobile */
+            max-width: 400px; /* Max width for larger screens */
+            height: 500px;
             transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
-            opacity: 0.5; /* Fade out non-active slides */
+            opacity: 0.4;
+            transform: scale(0.9);
         }
         
         .swiper-slide-active {
-            opacity: 1; /* Ensure active slide is fully visible */
+            opacity: 1;
+            transform: scale(1);
         }
         
         .swiper-slide .project-card {
@@ -135,31 +137,36 @@
         
         .swiper-slide .project-image-container {
             flex-shrink: 0;
-            height: 220px; /* Increased image height */
+            height: 200px;
         }
         
         .swiper-slide .p-8 {
             flex-grow: 1;
         }
 
-        .swiper-3d .swiper-slide-shadow-left, 
-        .swiper-3d .swiper-slide-shadow-right {
-            background-image: none;
+        .swiper-3d .swiper-slide-shadow {
+            background-image: none !important;
         }
         
-        /* Customizing Swiper Navigation Arrows and Pagination */
         .swiper-button-next, .swiper-button-prev {
             color: var(--brand-gold);
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease;
             top: 50%;
             transform: translateY(-50%);
         }
+        
         .swiper-button-next:hover, .swiper-button-prev:hover {
             transform: translateY(-50%) scale(1.2);
         }
         
+        @media (max-width: 767px) {
+            .swiper-button-next, .swiper-button-prev {
+                display: none;
+            }
+        }
+        
         .swiper-pagination {
-            bottom: 10px !important;
+            bottom: 20px !important;
         }
         
         .swiper-pagination-bullet {
@@ -176,6 +183,58 @@
             opacity: 1;
         }
 
+        /* --- Tab Component Styles --- */
+        .tabs-container {
+            display: flex;
+            gap: 2rem;
+        }
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            width: 250px;
+        }
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: var(--bg-tertiary);
+            color: var(--brand-gold);
+            border-color: var(--border-color);
+        }
+        .tab-content {
+            display: none;
+            background-color: var(--bg-tertiary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            flex-grow: 1;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @media (max-width: 767px) {
+            .tabs-container {
+                flex-direction: column;
+            }
+            .tab-buttons {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 1rem;
+                white-space: nowrap;
+            }
+        }
+
     </style>
 </head>
 <body class="antialiased">
@@ -183,15 +242,15 @@
     <!-- Header & Navigation -->
     <header class="glass-effect sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-white tracking-tight hover:text-brand-gold transition-colors duration-300">Sumanth Udupi</a>
+            <a href="#" class="text-xl md:text-2xl font-bold text-white tracking-tight hover:text-brand-gold transition-colors duration-300">Sumanth Udupi</a>
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Work</a>
+                <a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Projects</a>
                 <a href="#process" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Process</a>
                 <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">About</a>
-                <a href="#contact" class="btn btn-primary text-sm py-2 px-6">Let's Talk</a>
+                <a href="#contact" class="btn btn-primary text-sm py-2 px-6">Contact Me</a>
             </div>
             <div class="md:hidden">
-                <!-- Mobile menu button can be added here -->
+                 <a href="#contact" class="btn btn-primary text-sm py-2 px-4">Contact</a>
             </div>
         </nav>
     </header>
@@ -199,21 +258,20 @@
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
-        <section class="relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/50 to-bg-primary z-10"></div>
+        <section class="relative overflow-hidden bg-bg-primary">
             <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
             
-            <div class="container mx-auto px-6 py-32 md:py-48 text-center relative z-20">
+            <div class="container mx-auto px-6 py-24 md:py-40 text-center relative z-20">
                 <div class="max-w-4xl mx-auto">
-                    <p class="text-lg font-semibold text-brand-gold mb-4 fade-in-up">SUMANTH UDUPI - SENIOR UI/UX DEVELOPER</p>
-                    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 fade-in-up" style="animation-delay: 100ms;">
-                        <span class="gradient-text">Crafting Seamless User Journeys From Concept to Code.</span>
+                    <p class="text-lg font-semibold text-brand-gold mb-4 fade-in-up">SUMANTH UDUPI - SENIOR BUSINESS ANALYST</p>
+                    <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 fade-in-up" style="animation-delay: 100ms;">
+                        <span class="gradient-text">Bridging Business & Technology with Data-Driven Insights.</span>
                     </h1>
-                    <p class="text-lg md:text-xl text-text-secondary mb-12 max-w-2xl mx-auto fade-in-up" style="animation-delay: 200ms;">
-                        I architect and build human-centric digital products that solve complex problems, drive business growth, and deliver exceptional user experiences.
+                    <p class="text-lg md:text-xl text-text-secondary mb-12 max-w-3xl mx-auto fade-in-up" style="animation-delay: 200ms;">
+                        A strategic analyst with a foundation in Systems Engineering and Data Science, skilled in translating complex business needs into technical solutions for global enterprise clients.
                     </p>
                     <div class="fade-in-up" style="animation-delay: 300ms;">
-                        <a href="#portfolio" class="btn btn-primary text-lg">Explore My Work</a>
+                        <a href="#portfolio" class="btn btn-primary text-lg">View My Projects</a>
                     </div>
                 </div>
             </div>
@@ -222,15 +280,15 @@
         <!-- Portfolio Section -->
         <section id="portfolio" class="portfolio-carousel-section py-24 md:py-32">
             <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Featured Projects</h2>
-                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">A selection of my work, demonstrating expertise in data visualization, enterprise software, and consumer-facing applications.</p>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Data Science & Analytics Dashboards</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">Interactive dashboards and analytical models designed to turn data into actionable insights.</p>
                 </div>
-            </div>
-             <!-- Swiper Carousel -->
-            <div class="swiper-container portfolio-carousel fade-in-up">
-                <div class="swiper-wrapper">
-                    <!-- Slide 1 -->
+            
+                 <!-- Swiper Carousel for Data Science Projects -->
+                <div class="swiper-container portfolio-carousel fade-in-up">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
                     <div class="swiper-slide">
                         <a href="Automobile Dashboard.html" target="_blank" class="block h-full">
                             <div class="project-card">
@@ -245,151 +303,173 @@
                             </div>
                         </a>
                     </div>
-                    <!-- Slide 2 -->
-                    <div class="swiper-slide">
-                        <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Fintech%0AMobile+App&font=inter" alt="Fintech Mobile App" class="w-full h-full object-cover">
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Predictive+Analytics%0Afor+Compliance+Risk&font=inter" alt="Predictive Analytics for Compliance Risk" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">AI/ML INTEGRATION ANALYSIS</p>
+                                        <h3 class="text-2xl font-bold mb-4">Predictive Analytics for Compliance Risk</h3>
+                                        <p class="text-text-secondary">Spearheaded the business analysis for integrating predictive AI/ML models into compliance modules, improving early risk detection accuracy by 20%.</p>
+                                    </div>
                                 </div>
-                                <div class="p-8">
-                                    <p class="text-sm font-semibold text-brand-gold mb-2">MOBILE UI/UX • FINTECH</p>
-                                    <h3 class="text-2xl font-bold mb-4">Challenger Bank Mobile App</h3>
-                                    <p class="text-text-secondary">End-to-end design and prototyping for a next-gen mobile banking app, focusing on security and personalized financial insights.</p>
+                            </a>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Process+Performance%0AMetrics+Dashboard&font=inter" alt="Process Performance Metrics Dashboard" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">INTERACTIVE DASHBOARDS</p>
+                                        <h3 class="text-2xl font-bold mb-3">Process Performance Dashboards</h3>
+                                        <p class="text-text-secondary">Developed a suite of dashboards in Power BI and Superset to track metrics across ESG, CAPA, and risk modules, improving executive reporting accuracy.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
-                    <!-- Slide 3 -->
-                    <div class="swiper-slide">
-                         <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Enterprise%0ASaaS+Platform&font=inter" alt="SaaS Platform" class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-8">
-                                    <p class="text-sm font-semibold text-brand-gold mb-2">ENTERPRISE SOFTWARE • B2B</p>
-                                    <h3 class="text-2xl font-bold mb-3">Enterprise SaaS Platform</h3>
-                                    <p class="text-text-secondary">Redesigned a complex logistics platform, improving workflow efficiency by 35% through user research and a new design system.</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <!-- Slide 4 -->
-                    <div class="swiper-slide">
-                        <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Generative%0AAI+Tool&font=inter" alt="AI Content Tool" class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-8">
-                                    <p class="text-sm font-semibold text-brand-gold mb-2">GENERATIVE AI • UI DESIGN</p>
-                                    <h3 class="text-2xl font-bold mb-3">AI-Powered Content Generator</h3>
-                                    <p class="text-text-secondary">Designed the UI for an AI tool, focusing on a clean, intuitive interface to simplify complex content creation workflows.</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <!-- Slide 5 -->
-                     <div class="swiper-slide">
-                        <a href="#" target="_blank" class="block h-full">
-                            <div class="project-card">
-                                <div class="project-image-container">
-                                    <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=E-commerce%0ACheckout+Flow&font=inter" alt="E-commerce Experience" class="w-full h-full object-cover">
-                                </div>
-                                <div class="p-8">
-                                    <p class="text-sm font-semibold text-brand-gold mb-2">E-COMMERCE • UX OPTIMIZATION</p>
-                                    <h3 class="text-2xl font-bold mb-3">E-commerce Checkout Flow</h3>
-                                    <p class="text-text-secondary">Overhauled the checkout process for a major online retailer, resulting in a 15% reduction in cart abandonment.</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <!-- Slide 6 -->
-                    <div class="swiper-slide">
-                        <a href="#" target="_blank" class="block h-full">
-                           <div class="project-card">
-                               <div class="project-image-container">
-                                   <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Healthcare%0APatient+Portal&font=inter" alt="Healthcare Patient Portal" class="w-full h-full object-cover">
-                               </div>
-                               <div class="p-8">
-                                   <p class="text-sm font-semibold text-brand-gold mb-2">HEALTHCARE • ACCESSIBILITY</p>
-                                   <h3 class="text-2xl font-bold mb-3">Healthcare Patient Portal</h3>
-                                   <p class="text-text-secondary">Created a secure, accessible patient portal for a hospital network, enabling users to easily manage appointments and records.</p>
-                               </div>
-                           </div>
-                       </a>
-                   </div>
-                </div>
-                <!-- Add Pagination -->
-                <div class="swiper-pagination"></div>
-                <!-- Add Navigation -->
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </section>
-
-        <!-- My Process Section -->
-        <section id="process" class="py-24 md:py-32 bg-bg-primary">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-20">
-                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">My Design & Development Process</h2>
-                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">I follow a structured, iterative process to ensure every project is a success.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-                    <!-- Process Step 1 -->
-                    <div class="border border-border-color p-8 rounded-xl fade-in-up">
-                        <div class="text-4xl font-bold text-brand-gold mb-4">01</div>
-                        <h3 class="text-2xl font-bold mb-3">Discover & Define</h3>
-                        <p class="text-text-secondary">I start with deep research into user needs, business goals, and technical constraints. This phase includes stakeholder interviews, user personas, and competitive analysis.</p>
-                    </div>
-                    <!-- Process Step 2 -->
-                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 150ms;">
-                        <div class="text-4xl font-bold text-brand-gold mb-4">02</div>
-                        <h3 class="text-2xl font-bold mb-3">Ideate & Design</h3>
-                        <p class="text-text-secondary">From low-fidelity wireframes to high-fidelity, interactive prototypes. I focus on creating intuitive information architecture and visually stunning interfaces in Figma.</p>
-                    </div>
-                    <!-- Process Step 3 -->
-                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 300ms;">
-                        <div class="text-4xl font-bold text-brand-gold mb-4">03</div>
-                        <h3 class="text-2xl font-bold mb-3">Build & Develop</h3>
-                        <p class="text-text-secondary">I translate designs into clean, efficient, and responsive code using modern frameworks, ensuring a seamless handoff from design to a live, pixel-perfect product.</p>
-                    </div>
-                    <!-- Process Step 4 -->
-                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 450ms;">
-                        <div class="text-4xl font-bold text-brand-gold mb-4">04</div>
-                        <h3 class="text-2xl font-bold mb-3">Test & Iterate</h3>
-                        <p class="text-text-secondary">Continuous usability testing and feedback loops allow me to refine the product. I analyze user behavior to make data-driven improvements for optimal performance.</p>
-                    </div>
+                    <!-- Add Pagination -->
+                    <div class="swiper-pagination"></div>
+                    <!-- Add Navigation -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
                 </div>
             </div>
         </section>
 
-        <!-- About Me & Skills Section -->
-        <section id="about" class="py-24 md:py-32 bg-bg-secondary">
+        <!-- Business Initiatives Section -->
+        <section id="business-initiatives" class="py-24 md:py-32 bg-bg-primary">
             <div class="container mx-auto px-6">
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-16 items-center">
-                    <div class="lg:col-span-2 fade-in-up">
-                        <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="rounded-xl w-full object-cover shadow-2xl">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Strategic Business Initiatives</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">A selection of projects where I applied analytical rigor to solve key business challenges.</p>
+                </div>
+
+                <div class="tabs-container fade-in-up" style="animation-delay: 200ms;">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="openTab(event, 'esg-platform')">ESG & EHS Platform</button>
+                        <button class="tab-button" onclick="openTab(event, 'qms-modernization')">Automotive QMS</button>
+                        <button class="tab-button" onclick="openTab(event, 'agile-delivery')">Agile Delivery</button>
+                        <button class="tab-button" onclick="openTab(event, 'api-strategy')">API Integration</button>
                     </div>
-                    <div class="lg:col-span-3 fade-in-up" style="animation-delay: 150ms;">
-                        <h2 class="text-4xl md:text-5xl font-bold mb-6">Driven by a Passion for Problem-Solving.</h2>
-                        <div class="space-y-6 text-lg text-text-secondary">
-                            <p>With over a decade of experience in the digital product space, I've honed a deep understanding of the entire product lifecycle. My philosophy is simple: great design is invisible. It guides users effortlessly toward their goals, blending aesthetic appeal with flawless functionality.</p>
-                            <p>I thrive in collaborative environments, working alongside engineers, product managers, and stakeholders to transform complex challenges into elegant solutions. My expertise lies at the intersection of user empathy and technical implementation, allowing me to not only design beautiful experiences but also to build them.</p>
-                            <p>When I'm not designing or coding, you can find me exploring new technologies, contributing to open-source projects, or mentoring aspiring designers.</p>
+                    <div id="esg-platform" class="tab-content active">
+                        <h3 class="text-3xl font-bold mb-4">Enterprise ESG & EHS Compliance Platform</h3>
+                        <p class="text-text-secondary mb-6">Led the end-to-end business analysis for a comprehensive Environmental, Health, and Safety (EHS) platform. My role involved conducting global discovery sessions, defining the product roadmap, and authoring over 200 Gherkin-based user stories for modules like Risk Assessment and Incident Management. This initiative ensured the platform met stringent GRI and SASB standards, ultimately reducing client audit preparation time by 40%.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">End-to-End Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">GRI & SASB</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Product Roadmap</span>
+                        </div>
+                    </div>
+                    <div id="qms-modernization" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Automotive QMS Modernization</h3>
+                        <p class="text-text-secondary mb-6">Drove the requirements engineering process for modernizing critical Quality Management System (QMS) modules for major automotive OEMs. I facilitated workshops to gather requirements for Production Part Approval Process (PPAP) and Non-Conformity tracking. By creating detailed process models and user stories, we streamlined complex lab test data workflows and enhanced supplier compliance reporting capabilities.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Requirements Engineering</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">PPAP</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Process Modeling</span>
+                        </div>
+                    </div>
+                    <div id="agile-delivery" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Agile Delivery Acceleration</h3>
+                        <p class="text-text-secondary mb-6">Championed Agile methodologies by leading all ceremonies (sprint planning, backlog grooming, sprint reviews) for a 7-member cross-functional squad. Through meticulous backlog management in Azure DevOps and Jira and clear communication, I helped accelerate feature delivery by 15%. My focus on writing clear, unambiguous user stories reduced requirement-related queries from the development team by 30%.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Agile Leadership</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Azure DevOps</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Backlog Grooming</span>
+                        </div>
+                    </div>
+                     <div id="api-strategy" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Third-Party API Integration Strategy</h3>
+                        <p class="text-text-secondary mb-6">Authored detailed API requirements and system integration plans to automate data synchronization between core enterprise platforms and third-party systems. Using Postman and Swagger, I validated and documented REST API endpoints for features like Supplier Management and PLM, reducing API defects by 25% and enabling seamless data exchange for major industrial clients.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">API & Systems Analysis</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Postman & Swagger</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">REST API</span>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- My Process Section -->
+        <section id="process" class="py-24 md:py-32 bg-bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">My Analytical Process</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">I employ a structured, iterative approach to deliver impactful business outcomes.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <!-- Process Step 1 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">01</div>
+                        <h3 class="text-2xl font-bold mb-3">Discovery & Elicitation</h3>
+                        <p class="text-text-secondary">Engaging with stakeholders to understand business objectives and elicit detailed requirements through interviews, workshops, and documentation analysis.</p>
+                    </div>
+                    <!-- Process Step 2 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 150ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">02</div>
+                        <h3 class="text-2xl font-bold mb-3">Analysis & Modeling</h3>
+                        <p class="text-text-secondary">Analyzing information, modeling processes (BPMN), and creating data models to define the current state and conceptualize the future state solution.</p>
+                    </div>
+                    <!-- Process Step 3 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 300ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">03</div>
+                        <h3 class="text-2xl font-bold mb-3">Specification & Validation</h3>
+                        <p class="text-text-secondary">Documenting clear, concise functional requirements and user stories in Gherkin syntax, ensuring alignment with all stakeholders before development.</p>
+                    </div>
+                    <!-- Process Step 4 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 450ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">04</div>
+                        <h3 class="text-2xl font-bold mb-3">Support & UAT</h3>
+                        <p class="text-text-secondary">Collaborating with development teams, validating solutions using Postman/Swagger, and facilitating User Acceptance Testing (UAT) to ensure the solution meets business needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me & Skills Section -->
+        <section id="about" class="py-24 md:py-32 bg-bg-primary">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 md:gap-16 items-center">
+                    <div class="lg:col-span-2 fade-in-up">
+                        <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="rounded-xl w-full object-cover shadow-2xl">
+                    </div>
+                    <div class="lg:col-span-3 fade-in-up" style="animation-delay: 150ms;">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6">A Passion for Solving Complex Business Puzzles.</h2>
+                        <div class="space-y-6 text-lg text-text-secondary">
+                            <p>As a strategic Business Analyst with a unique foundation in Systems Engineering and Data Science, I thrive on dissecting complex business challenges and translating them into clear, actionable strategies. My goal is to serve as the critical link between business stakeholders and technical teams, ensuring that technology investments deliver tangible value.</p>
+                            <p>I am adept at managing product roadmaps, writing detailed user stories in Gherkin syntax, and leading Agile ceremonies. My experience includes collaborating with UX teams on Figma-based prototypes and using Postman and Swagger to validate and document REST API endpoints.</p>
+                        </div>
+                         <h3 class="text-2xl font-bold mt-12 mb-6">Core Competencies</h3>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Agile & Scrum</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Gherkin User Stories</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Azure DevOps & Jira</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">SQL</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Power BI & Tableau</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Process Modeling (BPMN)</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">REST API Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Postman & Swagger</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">UAT Planning</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Contact Section -->
-        <section id="contact" class="py-24 md:py-32 bg-bg-primary">
+        <section id="contact" class="py-24 md:py-32 bg-bg-secondary">
             <div class="container mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Have a project in mind?</h2>
-                    <p class="text-lg text-text-secondary mt-5 mb-10 fade-in-up" style="animation-delay: 100ms;">I'm currently available for freelance opportunities and full-time roles. Let's connect and build something remarkable together.</p>
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Let's Discuss Your Next Project.</h2>
+                    <p class="text-lg text-text-secondary mt-5 mb-10 fade-in-up" style="animation-delay: 100ms;">I'm available for new opportunities. If you're looking for a dedicated analyst to help drive your business forward, I'd love to connect.</p>
                     <div class="fade-in-up" style="animation-delay: 200ms;">
                         <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-xl">sumanthudupi858@gmail.com</a>
                     </div>
@@ -407,9 +487,8 @@
                     <p class="text-gray-500">&copy; 2025 All rights reserved.</p>
                 </div>
                 <div class="flex space-x-6 mt-6 md:mt-0">
-                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">LinkedIn</a>
-                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">GitHub</a>
-                    <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">Dribbble</a>
+                    <a href="https://linkedin.com/in/sumanth-udupi" target="_blank" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">LinkedIn</a>
+                    <a href="https://github.com/SumanthUdupi" target="_blank" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">GitHub</a>
                 </div>
             </div>
         </div>
@@ -443,7 +522,7 @@
             slidesPerView: 'auto',
             loop: true,
             coverflowEffect: {
-                rotate: 25,
+                rotate: 0,
                 stretch: 0,
                 depth: 150,
                 modifier: 1,
@@ -464,14 +543,28 @@
             breakpoints: {
                 // when window width is >= 768px
                 768: {
-                    slidesPerView: 2,
-                },
-                // when window width is >= 1024px
-                1024: {
-                    slidesPerView: 3,
+                   coverflowEffect: {
+                        rotate: 25,
+                        depth: 150,
+                    },
                 }
             }
         });
+
+        // Tab functionality
+        function openTab(event, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            event.currentTarget.className += " active";
+        }
     </script>
 
 </body>
