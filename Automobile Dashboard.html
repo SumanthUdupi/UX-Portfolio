@@ -11,25 +11,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0F172A; /* slate-900 */
-            --bg-secondary: #1E293B; /* slate-800 */
-            --bg-tertiary: #334155; /* slate-700 */
-            --border-color: #475569; /* slate-600 */
-            --text-primary: #F1F5F9; /* slate-100 */
-            --text-secondary: #CBD5E1; /* slate-300 */
-            --accent-primary: #22D3EE; /* cyan-400 */
-            --accent-secondary: #A78BFA; /* violet-400 */
-            --accent-positive: #34D399; /* green-400 */
-            --accent-negative: #F87171; /* red-400 */
+            --bg-primary: #F1F5F9; /* slate-100 */
+            --bg-secondary: #FFFFFF; /* white */
+            --bg-tertiary: #E2E8F0; /* slate-200 */
+            --border-color: #CBD5E1; /* slate-300 */
+            --text-primary: #1E293B; /* slate-800 */
+            --text-secondary: #475569; /* slate-600 */
+            --accent-primary: #0EA5E9; /* sky-500 */
+            --accent-secondary: #6366F1; /* indigo-500 */
+            --accent-positive: #10B981; /* emerald-500 */
+            --accent-negative: #EF4444; /* red-500 */
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
         }
+        .sidebar {
+            background-color: #0F172A; /* slate-900 */
+            color: var(--bg-primary);
+        }
+        .sidebar-item {
+            color: #94A3B8; /* slate-400 */
+        }
+        .sidebar-item:hover {
+            background-color: #1E293B; /* slate-800 */
+            color: #F1F5F9; /* slate-100 */
+        }
         .sidebar-item.active {
             background-color: var(--accent-primary);
-            color: var(--bg-primary);
+            color: white;
             font-weight: 600;
         }
         .chart-container {
@@ -38,25 +49,33 @@
             border-radius: 0.75rem;
             padding: 1.5rem;
             transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
         .chart-container:hover {
-            box-shadow: 0 0 25px rgba(34, 211, 238, 0.1);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             border-color: var(--accent-primary);
         }
         .kpi-card {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
         .filter-select, .reset-button {
-            background-color: var(--bg-tertiary);
+            background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             transition: all 0.2s ease;
         }
+        .filter-select:hover, .reset-button:hover {
+            border-color: var(--accent-primary);
+        }
+        .reset-button {
+             background-color: var(--accent-negative);
+             color: white;
+             border-color: var(--accent-negative);
+        }
         .reset-button:hover {
-            background-color: var(--accent-negative);
-            border-color: var(--accent-negative);
-            color: var(--text-primary);
+            opacity: 0.8;
         }
         .tooltip {
             position: absolute;
@@ -69,7 +88,7 @@
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
-            color: var(--text-primary);
+            color: white;
             transition: opacity 0.2s;
             z-index: 10;
         }
@@ -91,28 +110,28 @@
 </head>
 <body class="antialiased">
 
-    <div class="flex h-screen bg-slate-900">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 bg-slate-800 p-6 flex flex-col">
-            <h1 class="text-2xl font-bold mb-10 text-white">Automobile Insights</h1>
+        <aside class="w-64 flex-shrink-0 p-6 flex flex-col sidebar">
+            <h1 class="text-2xl font-bold mb-10">Automobile Insights</h1>
             <nav id="sidebar-nav" class="flex-grow">
                 <ul>
-                    <li><a href="#" class="sidebar-item flex items-center px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200 active" data-view="overview">
+                    <li><a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg transition-colors duration-200 active" data-view="overview">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Overview</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="pricing_market">
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="pricing_market">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         Pricing & Market</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="performance">
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="performance">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         Performance</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="engine_fuel">
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="engine_fuel">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
                         Engine & Fuel</a></li>
-                     <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="risk_safety">
+                     <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="risk_safety">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
                         Risk & Safety</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 text-slate-300 hover:bg-cyan-400 hover:text-slate-900 rounded-lg transition-colors duration-200" data-view="correlation">
+                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="correlation">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                         Correlations</a></li>
                 </ul>
@@ -122,58 +141,58 @@
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-8 overflow-y-auto">
             <header class="mb-8">
-                <h2 id="dashboard-title" class="text-3xl font-bold text-white">Automobile Insights Dashboard</h2>
-                <p class="text-lg text-slate-400 mt-1">An interactive exploration of automobile data.</p>
+                <h2 id="dashboard-title" class="text-3xl font-bold text-slate-800">Automobile Insights Dashboard</h2>
+                <p class="text-lg text-slate-500 mt-1">An interactive exploration of automobile data.</p>
             </header>
 
             <!-- Filters -->
             <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
                 <div>
-                    <label for="make-filter" class="text-slate-400 mr-2">Filter by Make:</label>
+                    <label for="make-filter" class="text-slate-600 mr-2 font-medium">Filter by Make:</label>
                     <select id="make-filter" class="filter-select p-2 rounded-md w-48"></select>
                 </div>
                 <div>
-                    <label for="body-style-filter" class="text-slate-400 mr-2">Filter by Body Style:</label>
+                    <label for="body-style-filter" class="text-slate-600 mr-2 font-medium">Filter by Body Style:</label>
                     <select id="body-style-filter" class="filter-select p-2 rounded-md w-48"></select>
                 </div>
-                <button id="reset-filter-btn" class="reset-button p-2 rounded-md">Reset Cross-Filter</button>
+                <button id="reset-filter-btn" class="reset-button p-2 rounded-md font-semibold">Reset Cross-Filter</button>
             </div>
 
             <!-- KPIs -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Total Cars</h3><p id="total-cars" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average Price</h3><p id="avg-price" class="text-4xl font-bold text-cyan-400 mt-2">$0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average Horsepower</h3><p id="avg-horsepower" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-400 text-lg">Average MPG (City)</h3><p id="avg-mpg" class="text-4xl font-bold text-cyan-400 mt-2">0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Total Cars</h3><p id="total-cars" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Price</h3><p id="avg-price" class="text-4xl font-bold text-sky-500 mt-2">$0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Horsepower</h3><p id="avg-horsepower" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
+                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average MPG (City)</h3><p id="avg-mpg" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
             </div>
 
             <!-- View Content Area -->
             <div id="view-container">
                 <div id="overview-view" class="view-content active"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="chart-container lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
+                    <div class="chart-container lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container lg:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-cyan-400 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price vs. Horsepower</h2><svg id="price-vs-horsepower-scatter" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price vs. Horsepower</h2><svg id="price-vs-horsepower-scatter" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="performance-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Horsepower Distribution by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Horsepower Distribution by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
+                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Engine Size vs. Horsepower</h2><svg id="engine-vs-hp" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Engine Size vs. Horsepower</h2><svg id="engine-vs-hp" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="risk_safety-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Insurance Risk Rating Distribution</h2><svg id="symboling-dist" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Price by Insurance Risk Rating</h2><svg id="price-by-symboling" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Insurance Risk Rating Distribution</h2><svg id="symboling-dist" class="w-full h-96"></svg></div>
+                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price by Insurance Risk Rating</h2><svg id="price-by-symboling" class="w-full h-96"></svg></div>
                 </div></div>
                 <div id="correlation-view" class="view-content"><div class="chart-container">
-                    <h2 class="text-xl font-bold text-cyan-400 mb-4 text-center">Feature Correlation Matrix</h2><svg id="correlation-heatmap" class="w-full h-[36rem]"></svg>
+                    <h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Feature Correlation Matrix</h2><svg id="correlation-heatmap" class="w-full h-[36rem]"></svg>
                 </div></div>
             </div>
         </main>
@@ -221,7 +240,7 @@
             updateDashboard();
         }).catch(error => {
             console.error('Error loading or parsing data:', error);
-            document.getElementById('view-container').innerHTML = `<div class="text-red-400 text-center p-8 text-xl">
+            document.getElementById('view-container').innerHTML = `<div class="text-red-500 text-center p-8 text-xl">
                 <h2 class="text-3xl font-bold mb-4">Error Loading Data</h2>
                 <p>Could not load data from the specified URL. Please ensure 'Automobile_data.csv' is accessible and correctly formatted.</p>
             </div>`;
@@ -323,7 +342,7 @@
 
         function drawActiveViewCharts(data, animate) {
             if (data.length === 0) {
-                d3.selectAll('.chart-container svg').html('<text x="50%" y="50%" text-anchor="middle" fill="#CBD5E1">No data for selected filters.</text>');
+                d3.selectAll('.chart-container svg').html('<text x="50%" y="50%" text-anchor="middle" fill="#94A3B8">No data for selected filters.</text>');
                 return;
             }
 
@@ -600,7 +619,7 @@
                         
                     boxG.append("line")
                         .attr("x1", x1(secondaryKey)).attr("x2", x1(secondaryKey) + x1.bandwidth())
-                        .attr("stroke", "var(--bg-primary)").style("stroke-width", "2px")
+                        .attr("stroke", "var(--bg-secondary)").style("stroke-width", "2px")
                         .transition().duration(animate ? 800 : 0)
                         .attr("y1", y(median)).attr("y2", y(median));
                 });
@@ -724,7 +743,7 @@
 
                 boxG.append("line")
                     .attr("x1", 0).attr("x2", x.bandwidth())
-                    .attr("stroke", "var(--bg-primary)").style("stroke-width", "2px")
+                    .attr("stroke", "var(--bg-secondary)").style("stroke-width", "2px")
                     .transition().duration(animate ? 800 : 0)
                     .attr("y1", y(median)).attr("y2", y(median));
             });
