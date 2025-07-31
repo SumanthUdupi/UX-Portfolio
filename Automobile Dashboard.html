@@ -90,7 +90,7 @@
             opacity: 0;
             color: white;
             transition: opacity 0.2s;
-            z-index: 10;
+            z-index: 50;
         }
         .axis path,
         .axis line {
@@ -110,56 +110,66 @@
 </head>
 <body class="antialiased">
 
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 p-6 flex flex-col sidebar">
-            <h1 class="text-2xl font-bold mb-10">Automobile Insights</h1>
-            <nav id="sidebar-nav" class="flex-grow">
-                <ul>
-                    <li><a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg transition-colors duration-200 active" data-view="overview">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                        Overview</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="pricing_market">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        Pricing & Market</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="performance">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Performance</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="engine_fuel">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
-                        Engine & Fuel</a></li>
-                     <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="risk_safety">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
-                        Risk & Safety</a></li>
-                    <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="correlation">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                        Correlations</a></li>
-                </ul>
-            </nav>
-        </aside>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 flex-shrink-0 p-6 flex flex-col sidebar fixed inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <h1 class="text-2xl font-bold mb-10">Automobile Insights</h1>
+        <nav id="sidebar-nav" class="flex-grow">
+            <ul>
+                <li><a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg transition-colors duration-200 active" data-view="overview">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Overview</a></li>
+                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="pricing_market">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Pricing & Market</a></li>
+                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="performance">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Performance</a></li>
+                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="engine_fuel">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
+                    Engine & Fuel</a></li>
+                 <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="risk_safety">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
+                    Risk & Safety</a></li>
+                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="correlation">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    Correlations</a></li>
+            </ul>
+        </nav>
+    </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
-            <header class="mb-8">
-                <h2 id="dashboard-title" class="text-3xl font-bold text-slate-800">Automobile Insights Dashboard</h2>
-                <p class="text-lg text-slate-500 mt-1">An interactive exploration of automobile data.</p>
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="md:ml-64 transition-all duration-300 ease-in-out">
+        <main class="flex-1 p-6 md:p-8">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 id="dashboard-title" class="text-2xl sm:text-3xl font-bold text-slate-800">Automobile Insights Dashboard</h2>
+                    <p class="text-md sm:text-lg text-slate-500 mt-1">An interactive exploration of automobile data.</p>
+                </div>
+                <button id="menu-btn" class="md:hidden p-2 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </header>
 
             <!-- Filters -->
-            <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
-                <div>
+            <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
+                <div class="w-full md:w-auto">
                     <label for="make-filter" class="text-slate-600 mr-2 font-medium">Filter by Make:</label>
-                    <select id="make-filter" class="filter-select p-2 rounded-md w-48"></select>
+                    <select id="make-filter" class="filter-select p-2 rounded-md w-full md:w-48"></select>
                 </div>
-                <div>
+                <div class="w-full md:w-auto">
                     <label for="body-style-filter" class="text-slate-600 mr-2 font-medium">Filter by Body Style:</label>
-                    <select id="body-style-filter" class="filter-select p-2 rounded-md w-48"></select>
+                    <select id="body-style-filter" class="filter-select p-2 rounded-md w-full md:w-48"></select>
                 </div>
-                <button id="reset-filter-btn" class="reset-button p-2 rounded-md font-semibold">Reset Cross-Filter</button>
+                <button id="reset-filter-btn" class="reset-button p-2 rounded-md font-semibold w-full md:w-auto">Reset Cross-Filter</button>
             </div>
 
             <!-- KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Total Cars</h3><p id="total-cars" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
                 <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Price</h3><p id="avg-price" class="text-4xl font-bold text-sky-500 mt-2">$0</p></div>
                 <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Horsepower</h3><p id="avg-horsepower" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
@@ -169,25 +179,25 @@
             <!-- View Content Area -->
             <div id="view-container">
                 <div id="overview-view" class="view-content active"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="chart-container lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
-                    <div class="chart-container lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
+                    <div class="chart-container col-span-1 lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
+                    <div class="chart-container col-span-1 lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
+                    <div class="chart-container col-span-1 lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
                 </div></div>
-                <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="chart-container lg:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
+                <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container md:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price vs. Horsepower</h2><svg id="price-vs-horsepower-scatter" class="w-full h-96"></svg></div>
                 </div></div>
-                <div id="performance-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div id="performance-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Horsepower Distribution by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
-                    <div class="chart-container lg:col-span-2"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
+                    <div class="chart-container md:col-span-2"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
                 </div></div>
-                <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Engine Size vs. Horsepower</h2><svg id="engine-vs-hp" class="w-full h-96"></svg></div>
                 </div></div>
-                <div id="risk_safety-view" class="view-content"><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div id="risk_safety-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Insurance Risk Rating Distribution</h2><svg id="symboling-dist" class="w-full h-96"></svg></div>
                     <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price by Insurance Risk Rating</h2><svg id="price-by-symboling" class="w-full h-96"></svg></div>
                 </div></div>
@@ -200,6 +210,19 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- Mobile Sidebar Toggle ---
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
+
+        menuBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
         // Data source
         const csvUrl = 'Rawdata/Automobile_data.csv';
 
@@ -215,28 +238,20 @@
 
         // --- Data Loading and Initialization ---
         d3.csv(csvUrl, (d) => {
-            // This function is applied to each row of the CSV to parse and clean it.
             const newRow = {};
             for (const key in d) {
                 const val = d[key].trim();
-                // Replace '?' with undefined for missing numerical values
                 if (val === '?') {
                     newRow[key.trim()] = undefined;
                 } else {
-                    const numVal = +val; // Attempt to convert to number
+                    const numVal = +val;
                     newRow[key.trim()] = isNaN(numVal) ? val : numVal;
                 }
             }
             return newRow;
         }).then(data => {
-            // This block runs after all data is loaded and parsed.
-            // Filter out rows with essential missing data for a cleaner dataset
             fullDataset = data.filter(d => d.price && d.horsepower && d['city-mpg'] && d['highway-mpg'] && d['curb-weight'] && d.symboling);
-            
-            // Populate dropdown filters
             populateFilters();
-
-            // Initial dashboard render
             updateDashboard();
         }).catch(error => {
             console.error('Error loading or parsing data:', error);
@@ -249,7 +264,6 @@
         function populateFilters() {
             const makeFilter = d3.select('#make-filter');
             const bodyStyleFilter = d3.select('#body-style-filter');
-            // Using Set to get unique values, then sorting
             const makes = ['All', ...new Set(fullDataset.map(d => d.make))].sort();
             const bodyStyles = ['All', ...new Set(fullDataset.map(d => d['body-style']))].sort();
             
@@ -273,6 +287,10 @@
             d3.selectAll('.view-content').classed('active', false);
             d3.select(`#${activeView}-view`).classed('active', true);
             
+            if (window.innerWidth < 768) { // md breakpoint in Tailwind
+                toggleSidebar();
+            }
+            
             updateDashboard();
         });
         window.addEventListener('resize', () => updateDashboard(false));
@@ -283,20 +301,15 @@
             const selectedBodyStyle = d3.select('#body-style-filter').property('value');
 
             let filteredData = fullDataset;
-            // Apply dropdown filters
             if (selectedMake !== 'All') {
                 filteredData = filteredData.filter(d => d.make === selectedMake);
             }
             if (selectedBodyStyle !== 'All') {
                 filteredData = filteredData.filter(d => d['body-style'] === selectedBodyStyle);
             }
-            
-            // Apply cross-filter if it exists
             if (crossFilter.key && crossFilter.value) {
                 filteredData = filteredData.filter(d => d[crossFilter.key] === crossFilter.value);
             }
-            
-            // Apply legend filter
             if (hiddenLegendItems.size > 0) {
                  filteredData = filteredData.filter(d => !hiddenLegendItems.has(d.make));
             }
@@ -307,7 +320,6 @@
         }
         
         function setCrossFilter(key, value) {
-            // If clicking the same filter, disable it. Otherwise, set the new one.
             if (crossFilter && crossFilter.key === key && crossFilter.value === value) {
                 crossFilter = { key: null, value: null };
             } else {
@@ -332,8 +344,6 @@
             if (bodyStyle !== 'All') title += ` | ${bodyStyle}`;
             if (crossFilter.value) title += ` | Cross-Filter: ${crossFilter.value}`;
             d3.select('#dashboard-title').text(title);
-
-            // Update individual chart titles
             d3.select('#price-dist-title').text(`Price Distribution` + (make !== 'All' ? ` for ${make}` : ''));
             d3.select('#body-style-title').text(`Vehicles by Body Style` + (make !== 'All' ? ` for ${make}` : ''));
             d3.select('#make-count-title').text(`Count of Vehicles by Make`);
@@ -376,9 +386,6 @@
             }
         }
         
-        // --- Chart Drawing Functions ---
-        // Note: Many functions are generalized to be reusable (e.g., drawScatterPlot, drawBoxPlot)
-
         function drawPriceDistribution(data, animate) {
             const svg = d3.select("#price-distribution");
             svg.selectAll("*").remove();
@@ -397,7 +404,7 @@
             g.append("g").call(d3.axisLeft(y));
 
             g.selectAll("rect").data(bins).join("rect")
-                .attr("x", 1).attr("transform", d => `translate(${x(d.x0)},${y(d.length)})`)
+                .attr("x", d => x(d.x0) + 1)
                 .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
                 .attr("fill", "var(--accent-primary)")
                 .on("mouseover", (event, d) => {
@@ -495,7 +502,7 @@
             const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
             const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
 
-            const overallAvgPrice = d3.mean(fullDataset, d => d.price); // Use full dataset for overall average
+            const overallAvgPrice = d3.mean(fullDataset, d => d.price);
             const avgPriceData = d3.rollup(data, v => d3.mean(v, d => d.price), d => d.make);
             const avgPriceArray = Array.from(avgPriceData, ([key, value]) => ({make: key, price: value}))
                 .sort((a,b) => d3.descending(a.price, b.price));
@@ -525,7 +532,6 @@
                 .attr("y", d => y(d.price))
                 .attr("height", d => height - y(d.price));
             
-            // Add average line
             g.append("line")
                 .attr("x1", 0).attr("x2", width)
                 .attr("y1", y(overallAvgPrice)).attr("y2", y(overallAvgPrice))
@@ -552,7 +558,7 @@
             g.append("g").call(d3.axisLeft(y));
             
             const colorScale = d3.scaleOrdinal().domain(['-2','-1','0','1','2','3'])
-                .range(['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444', '#b91c1c']); // green to red
+                .range(['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444', '#b91c1c']);
 
             g.selectAll("rect").data(countsArray).join("rect")
                 .attr("x", d => x(d.symbol)).attr("width", x.bandwidth())
@@ -625,7 +631,6 @@
                 });
             });
 
-            // Legend
             const legend = g.selectAll(".legend").data(secondaryCategories).enter().append("g")
                 .attr("class", "legend").attr("transform", (d, i) => `translate(${width - 100},${i * 20})`);
             legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).style("fill", color);
@@ -667,7 +672,7 @@
 
             if(hasLegend) {
                 const legendContainer = d3.select(legendSelector);
-                legendContainer.html(""); // Clear previous legend
+                legendContainer.html("");
                 const legendItems = legendContainer.selectAll(".legend-item")
                     .data(colorScale.domain())
                     .enter().append("div")
