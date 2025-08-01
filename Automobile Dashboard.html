@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Automobile Insights Dashboard</title>
+    <title>Portfolio Piece: Automobile Exploratory Data Analysis</title>
 
-    <!-- Tailwind CSS for styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- D3.js for 2D Charting -->
@@ -20,7 +20,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Babel to transpile JSX in the browser -->
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Google Fonts -->
@@ -30,15 +30,22 @@
 
     <style>
         :root {
-            --bg-primary: #F1F5F9; /* slate-100 */
-            --bg-secondary: #FFFFFF; /* white */
-            --bg-sidebar: #0F172A; /* slate-900 */
-            --border-color: #CBD5E1; /* slate-300 */
-            --text-primary: #1E293B; /* slate-800 */
-            --text-secondary: #475569; /* slate-600 */
-            --text-sidebar: #94A3B8; /* slate-400 */
-            --accent-primary: #0EA5E9; /* sky-500 */
-            --accent-secondary: #6366F1; /* indigo-500 */
+            --bg-primary: #030712; /* gray-950 */
+            --bg-secondary: #111827; /* gray-900 */
+            --bg-tertiary: #1f2937; /* gray-800 */
+            --border-color: #374151; /* gray-700 */
+            --text-primary: #f9fafb; /* gray-50 */
+            --text-secondary: #9ca3af; /* gray-400 */
+            --accent-primary: #38bdf8; /* sky-400 */
+            --accent-secondary: #818cf8; /* indigo-400 */
+        }
+        html.light {
+            --bg-primary: #f9fafb; /* gray-50 */
+            --bg-secondary: #ffffff; /* white */
+            --bg-tertiary: #f3f4f6; /* gray-100 */
+            --border-color: #e5e7eb; /* gray-200 */
+            --text-primary: #111827; /* gray-900 */
+            --text-secondary: #4b5563; /* gray-600 */
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -46,18 +53,18 @@
             color: var(--text-primary);
             overflow-x: hidden;
         }
-        /* Modern Scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
         .chart-tooltip {
             position: absolute;
             text-align: left;
             padding: 0.75rem;
             font-size: 0.875rem;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(17, 24, 39, 0.9); /* gray-900 */
             backdrop-filter: blur(4px);
             border: 1px solid var(--accent-primary);
             border-radius: 8px;
@@ -69,32 +76,28 @@
             white-space: nowrap;
         }
         .chart-container {
-             background-color: var(--bg-secondary);
+            background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
             padding: 1.5rem;
             transition: all 0.3s ease;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
         .axis path, .axis line { stroke: var(--border-color); }
         .axis text { fill: var(--text-secondary); font-size: 12px; }
-        .grid-lines line { stroke: #e2e8f0; stroke-opacity: 0.7; stroke-dasharray: 2,2; }
+        .grid-lines line { stroke: var(--border-color); stroke-opacity: 0.7; stroke-dasharray: 2,2; }
         .grid-lines path { stroke-width: 0; }
-        .three-canvas-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        .three-canvas-container canvas {
-            display: block;
-        }
+        .three-canvas-container { width: 100%; height: 100%; position: relative; }
+        .three-canvas-container canvas { display: block; }
         .label-3d {
-            color: var(--text-secondary);
+            color: var(--text-primary);
             font-size: 12px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 2px 4px;
-            border-radius: 3px;
+            background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
         }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
 <body class="antialiased">
@@ -104,84 +107,100 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef, useCallback, forwardRef } = React;
 
-        // --- Data Loading and Processing Hook ---
-        const DATA_URL = 'public/Rawdata/Automobile_data.csv';
+        // --- DATA LOADING & PROCESSING HOOK ---
+        const DATA_URL = 'https://gist.githubusercontent.com/mbostock/4349187/raw/0d2415848f03fe836894833a8aa136de0736085a/imports-85.csv';
 
         const useAutomobileData = () => {
             const [data, setData] = useState([]);
             const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
 
             const cleanRow = (d) => {
                 const newRow = {};
                 for (const key in d) {
-                    const newKey = key.trim();
+                    const newKey = key.trim().replace(/-/g, '_');
                     const val = d[key].trim();
                     if (val === '?' || val === '') {
                         newRow[newKey] = null;
                     } else {
-                        newRow[newKey] = isNaN(+val) ? val : +val;
+                        const numVal = +val;
+                        newRow[newKey] = isNaN(numVal) ? val : numVal;
                     }
                 }
-                // Ensure essential fields for charting are present
-                if (!newRow.price || !newRow.horsepower || !newRow['curb-weight'] || !newRow.make || !newRow['body-style']) {
+                if (!newRow.price || !newRow.horsepower || !newRow.curb_weight || !newRow.make || !newRow.body_style) {
                     return null;
                 }
                 return newRow;
             };
 
             useEffect(() => {
-                d3.csv(DATA_URL).then(raw => {
-                    const cleanedData = raw.map(cleanRow).filter(d => d);
-                    setData(cleanedData);
-                    setLoading(false);
-                }).catch(error => {
-                    console.error("Error loading or parsing data:", error);
-                    setLoading(false);
-                });
+                d3.csv(DATA_URL)
+                    .then(raw => {
+                        const cleanedData = raw.map(cleanRow).filter(Boolean);
+                        setData(cleanedData);
+                    })
+                    .catch(err => {
+                        console.error("Error loading or parsing data:", err);
+                        setError("Failed to load dataset. Please check the console for details.");
+                    })
+                    .finally(() => setLoading(false));
             }, []);
             
-            const numericCols = useMemo(() => ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'length', 'width', 'height', 'bore', 'stroke', 'compression-ratio', 'peak-rpm', 'symboling', 'normalized-losses'], []);
-            const categoricalCols = useMemo(() => ['make', 'body-style', 'fuel-type', 'aspiration', 'num-of-doors', 'drive-wheels', 'engine-location', 'engine-type', 'num-of-cylinders', 'fuel-system'], []);
+            const numericCols = useMemo(() => ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base', 'length', 'width', 'height', 'bore', 'stroke', 'compression_ratio', 'peak_rpm', 'symboling', 'normalized_losses'], []);
+            const categoricalCols = useMemo(() => ['make', 'body_style', 'fuel_type', 'aspiration', 'num_of_doors', 'drive_wheels', 'engine_location', 'engine_type', 'num_of_cylinders', 'fuel_system'], []);
 
-            return { data, loading, numericCols, categoricalCols };
+            return { data, loading, error, numericCols, categoricalCols };
         };
         
-        // --- Utility & Helper Components ---
+        // --- UI & HELPER COMPONENTS ---
         const Tooltip = forwardRef((props, ref) => <div ref={ref} className="chart-tooltip"></div>);
+
+        const Icon = ({ path, className = "w-6 h-6" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+                {path}
+            </svg>
+        );
+
+        const ICONS = {
+            'Line Chart': <Icon path={<path d="M3.75 18.25h16.5M3.75 12h16.5m-16.5-6.25h16.5" />} />,
+            'Scatter Plot': <Icon path={<path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5a2.25 2.25 0 012.25 2.25v12A2.25 2.25 0 0119.5 20.25H3.75A2.25 2.25 0 011.5 18V6zM3 18.25V6a.75.75 0 01.75-.75h16.5a.75.75 0 01.75.75v12a.75.75 0 01-.75.75H3.75a.75.75 0 01-.75-.75zM8.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12zm3 0a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12zm3 0a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12zm3 0a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12z" clipRule="evenodd" />} />,
+            'Box Plot': <Icon path={<path d="M3 13.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zM3 8.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 8.25zM3 3a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 3z" />} />,
+            'Heatmap': <Icon path={<path d="M13.5 1.5A2.25 2.25 0 0011.25 3.75v16.5A2.25 2.25 0 0013.5 22.5h7.5A2.25 2.25 0 0023.25 20.25V3.75A2.25 2.25 0 0021 1.5h-7.5zM12.75 18a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zM12.75 12a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zM12.75 6a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zM4.5 1.5A2.25 2.25 0 002.25 3.75v16.5A2.25 2.25 0 004.5 22.5h1.5A2.25 2.25 0 008.25 20.25V3.75A2.25 2.25 0 006 1.5H4.5z" />} />,
+            '3D Scatter': <Icon path={<path d="M10.5 4.5a3.75 3.75 0 10-7.5 0 3.75 3.75 0 007.5 0zM21 4.5a3.75 3.75 0 10-7.5 0 3.75 3.75 0 007.5 0zM10.5 19.5a3.75 3.75 0 10-7.5 0 3.75 3.75 0 007.5 0zM21 19.5a3.75 3.75 0 10-7.5 0 3.75 3.75 0 007.5 0z" />} />,
+            'Menu': <Icon path={<path fillRule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />} />,
+            'Close': <Icon path={<path fillRule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clipRule="evenodd" />} />,
+        };
+
+        const KpiCard = ({ title, value, icon, format }) => (
+            <div className="bg-bg-secondary p-4 rounded-lg border border-border-color flex items-center space-x-4">
+                <div className="bg-bg-tertiary p-3 rounded-full text-accent-primary">{icon}</div>
+                <div>
+                    <p className="text-sm text-text-secondary font-medium">{title}</p>
+                    <p className="text-2xl font-bold text-text-primary">{format ? format(value) : value}</p>
+                </div>
+            </div>
+        );
         
         const ControlSelect = ({ label, value, onChange, options, disabled=false }) => (
             <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">{label}</label>
-                <select value={value} onChange={onChange} disabled={disabled} className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
-                    {options.map(opt => <option key={opt} value={opt}>{opt.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                <label className="block text-sm font-medium text-text-secondary mb-1.5 capitalize">{label.replace(/_/g, ' ')}</label>
+                <select value={value} onChange={onChange} disabled={disabled} className="w-full p-2 bg-bg-tertiary border border-border-color rounded-md shadow-sm focus:ring-accent-primary focus:border-accent-primary disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    {options.map(opt => <option key={opt} value={opt}>{opt.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                 </select>
             </div>
         );
 
         const ControlToggle = ({ label, checked, onChange, disabled=false }) => (
-            <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">{label}</span>
+            <div className="flex items-center justify-between pt-6">
+                <span className="text-sm font-medium text-text-secondary">{label}</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-bg-tertiary rounded-full peer peer-focus:ring-2 peer-focus:ring-accent-primary/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-primary"></div>
                 </label>
             </div>
         );
 
-        // --- D3 Charting Logic (Hooks) ---
-        // This hook encapsulates the D3 logic for drawing a chart and handling updates.
-        const useD3 = (renderChartFn, dependencies) => {
-            const ref = useRef();
-            useEffect(() => {
-                renderChartFn(d3.select(ref.current));
-                return () => {};
-            }, dependencies);
-            return ref;
-        };
-
-        // --- Chart Components ---
-
-        // Base component for all 2D charts to handle SVG setup, dimensions, and tooltips
+        // --- D3 CHARTING LOGIC (REUSABLE) ---
         const D3Chart = ({ draw, dependencies, className }) => {
             const svgRef = useRef();
             const tooltipRef = useRef();
@@ -190,13 +209,14 @@
                 const svg = d3.select(svgRef.current);
                 const tooltip = d3.select(tooltipRef.current);
                 
-                // Debounced resize handler
+                if (!svg.node()) return;
+
                 let resizeTimer;
                 const handleResize = () => {
                     clearTimeout(resizeTimer);
                     resizeTimer = setTimeout(() => {
-                        draw(svg, tooltip);
-                    }, 200);
+                        if (svg.node()) draw(svg, tooltip);
+                    }, 150);
                 };
                 
                 draw(svg, tooltip);
@@ -213,481 +233,455 @@
             );
         };
 
-        // 1. Line Chart
-        const LineChart = ({ data, xVar, yVar, hueVar, errorStyle }) => {
-            const draw = useCallback((svg, tooltip) => {
-                svg.selectAll("*").remove();
-                if (!data || data.length === 0) return;
+        // --- CHART COMPONENTS (WRAPPED FOR CLARITY) ---
+        const ChartComponents = {
+            LineChart: ({ data, xVar, yVar, hueVar, errorStyle }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
 
-                const margin = { top: 20, right: 100, bottom: 50, left: 60 };
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
-                const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
-                const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
-
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar);
-                g.append("g").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar);
-
-                const groupedData = hueVar !== 'None' ? d3.group(data, d => d[hueVar]) : [['all', data]];
-                colorScale.domain(Array.from(groupedData.keys()));
-
-                groupedData.forEach((groupData, key) => {
-                    const sortedGroup = groupData.sort((a,b) => a[xVar] - b[xVar]);
+                    const margin = { top: 20, right: 140, bottom: 50, left: 60 };
+                    const width = Math.max(300, svg.node().getBoundingClientRect().width - margin.left - margin.right);
+                    const height = Math.max(250, svg.node().getBoundingClientRect().height - margin.top - margin.bottom);
                     
-                    // Aggregate data to handle multiple y values for a single x
-                    const aggregatedData = Array.from(d3.group(sortedGroup, d => d[xVar]), ([xVal, yVals]) => {
-                        const mean = d3.mean(yVals, d => d[yVar]);
-                        const std = d3.deviation(yVals, d => d[yVar]);
-                        return { x: xVal, y: mean, y0: mean - std, y1: mean + std };
-                    }).filter(d => d.y !== undefined);
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-                    // Error band
-                    if(errorStyle === 'band' && aggregatedData.length > 1){
-                        g.append("path")
-                            .datum(aggregatedData)
-                            .attr("fill", colorScale(key))
-                            .attr("opacity", 0.2)
-                            .attr("d", d3.area().x(d => xScale(d.x)).y0(d => yScale(d.y0)).y1(d => yScale(d.y1)));
-                    }
+                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
+                    const groupedData = hueVar !== 'None' ? d3.group(data, d => d[hueVar]) : [['all', data]];
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(Array.from(groupedData.keys()));
 
-                    // Main line
-                    g.append("path")
-                        .datum(aggregatedData)
-                        .attr("fill", "none")
-                        .attr("stroke", colorScale(key))
-                        .attr("stroke-width", 2)
-                        .attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar.replace(/_/g, ' '));
                     
-                    // Legend
-                    g.append("circle").attr("cx",width + 10).attr("cy",colorScale.domain().indexOf(key)*25).attr("r", 6).style("fill", colorScale(key))
-                    g.append("text").attr("x", width + 20).attr("y", colorScale.domain().indexOf(key)*25).text(key).style("font-size", "12px").attr("alignment-baseline","middle")
-                });
-            }, [data, xVar, yVar, hueVar, errorStyle]);
+                    groupedData.forEach((groupData, key) => {
+                        const sortedGroup = groupData.sort((a,b) => a[xVar] - b[xVar]);
+                        const aggregatedData = Array.from(d3.group(sortedGroup, d => d[xVar]), ([xVal, yVals]) => {
+                            const mean = d3.mean(yVals, d => d[yVar]);
+                            const std = d3.deviation(yVals, d => d[yVar]);
+                            return { x: xVal, y: mean, y0: mean - std, y1: mean + std };
+                        }).filter(d => d.y !== undefined);
 
-            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, errorStyle]} />;
-        };
-        
-        // 2. Scatter Plot
-        const ScatterPlot = ({ data, xVar, yVar, hueVar, sizeVar }) => {
-            const draw = useCallback((svg, tooltip) => {
-                svg.selectAll("*").remove();
-                if (!data || data.length === 0) return;
-
-                const margin = { top: 20, right: 100, bottom: 50, left: 60 };
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
-                const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
-                const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hueVar !== 'None' ? [...new Set(data.map(d => d[hueVar]))].sort() : ['all']);
-                const sizeScale = d3.scaleLinear().domain(sizeVar !== 'None' ? d3.extent(data, d => d[sizeVar]) : [1,1]).range([3, 12]);
-
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar);
-                g.append("g").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar);
-
-                g.selectAll("circle")
-                    .data(data)
-                    .join("circle")
-                    .attr("cx", d => xScale(d[xVar]))
-                    .attr("cy", d => yScale(d[yVar]))
-                    .attr("r", d => sizeScale(sizeVar !== 'None' ? d[sizeVar] : 1))
-                    .attr("fill", d => colorScale(hueVar !== 'None' ? d[hueVar] : 'all'))
-                    .attr("opacity", 0.7)
-                    .on("mouseover", (event, d) => {
-                        tooltip.style("opacity", 1)
-                               .style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                        tooltip.html(`
-                            <strong>${d.make}</strong><br>
-                            ${xVar}: ${d[xVar]}<br>
-                            ${yVar}: ${d[yVar]}
-                            ${hueVar !== 'None' ? `<br>${hueVar}: ${d[hueVar]}` : ''}
-                            ${sizeVar !== 'None' ? `<br>${sizeVar}: ${d[sizeVar]}` : ''}
-                        `);
-                    })
-                    .on("mouseout", () => tooltip.style("opacity", 0));
-                
-                if (hueVar !== 'None') {
-                    const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
-                        .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 10},${i * 20})`);
-                    legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).style("fill", colorScale);
-                    legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d);
-                }
-
-            }, [data, xVar, yVar, hueVar, sizeVar]);
-
-            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, sizeVar]} />;
-        };
-        
-        // 11. Box Plot
-        const BoxPlot = ({ data, xVar, yVar, notch }) => {
-            const draw = useCallback((svg, tooltip) => {
-                svg.selectAll("*").remove();
-                if (!data || data.length === 0) return;
-
-                const margin = { top: 20, right: 30, bottom: 80, left: 60 };
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-                const groupedData = d3.group(data, d => d[xVar]);
-                const summaryStats = [];
-                groupedData.forEach((groupData, key) => {
-                    const sortedValues = groupData.map(d => d[yVar]).sort(d3.ascending);
-                    const q1 = d3.quantile(sortedValues, 0.25);
-                    const median = d3.quantile(sortedValues, 0.5);
-                    const q3 = d3.quantile(sortedValues, 0.75);
-                    if ([q1, median, q3].some(v => v === undefined)) return;
-                    const iqr = q3 - q1;
-                    const min = Math.max(d3.min(sortedValues), q1 - 1.5 * iqr);
-                    const max = Math.min(d3.max(sortedValues), q3 + 1.5 * iqr);
-                    const n = sortedValues.length;
-                    const notchOffset = 1.57 * iqr / Math.sqrt(n);
-                    summaryStats.push({ key, q1, median, q3, min, max, notchUpper: median + notchOffset, notchLower: median - notchOffset });
-                });
-                summaryStats.sort((a,b) => d3.ascending(a.key, b.key));
-
-                const xScale = d3.scaleBand().domain(summaryStats.map(d => d.key)).range([0, width]).padding(0.4);
-                const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[yVar])]).range([height, 0]).nice();
-                
-                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
-                    .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
-                g.append("g").call(d3.axisLeft(yScale));
-
-                summaryStats.forEach(d => {
-                    const boxG = g.append("g").attr("transform", `translate(${xScale(d.key)}, 0)`);
-                    const boxWidth = xScale.bandwidth();
-
-                    // Whiskers
-                    boxG.append("line").attr("x1", boxWidth/2).attr("x2", boxWidth/2).attr("y1", yScale(d.min)).attr("y2", yScale(d.max)).attr("stroke", "black");
-                    boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.min)).attr("y2", yScale(d.min)).attr("stroke", "black");
-                    boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.max)).attr("y2", yScale(d.max)).attr("stroke", "black");
-
-                    // Box or Notched Box
-                    if (notch) {
-                        boxG.append("path")
-                           .attr("d", `
-                                M 0 ${yScale(d.q3)}
-                                H ${boxWidth}
-                                V ${yScale(d.notchUpper)}
-                                L ${boxWidth/2} ${yScale(d.median)}
-                                L 0 ${yScale(d.notchUpper)}
-                                V ${yScale(d.q1)}
-                                L ${boxWidth/2} ${yScale(d.median)}
-                                L ${boxWidth} ${yScale(d.q1)}
-                                V ${yScale(d.notchLower)}
-                                L ${boxWidth/2} ${yScale(d.median)}
-                                L 0 ${yScale(d.notchLower)}
-                                Z
-                           `)
-                           .attr("stroke", "black").attr("fill", "var(--accent-primary)");
-                    } else {
-                        boxG.append("rect").attr("x", 0).attr("y", yScale(d.q3)).attr("width", boxWidth).attr("height", yScale(d.q1) - yScale(d.q3)).attr("stroke", "black").attr("fill", "var(--accent-primary)");
-                        boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.median)).attr("y2", yScale(d.median)).attr("stroke", "black").attr("stroke-width", 2);
-                    }
-                });
-
-            }, [data, xVar, yVar, notch]);
-            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, notch]} />;
-        };
-        
-        // 18. Heatmap
-        const Heatmap = ({ data, numericCols }) => {
-            const calculateCorrelationMatrix = (data, columns) => {
-                const n = columns.length;
-                const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
-                for (let i = 0; i < n; i++) {
-                    for (let j = i; j < n; j++) {
-                        const col1 = columns[i];
-                        const col2 = columns[j];
-                        const validData = data.filter(d => d[col1] != null && d[col2] != null);
-                        if (validData.length < 2) {
-                            matrix[i][j] = matrix[j][i] = 0;
-                            continue;
+                        if(errorStyle === 'band' && aggregatedData.length > 1){
+                            g.append("path").datum(aggregatedData).attr("fill", colorScale(key)).attr("opacity", 0.2).attr("d", d3.area().x(d => xScale(d.x)).y0(d => yScale(d.y0)).y1(d => yScale(d.y1)));
                         }
-                        const xSeries = validData.map(d => d[col1]);
-                        const ySeries = validData.map(d => d[col2]);
-                        const meanX = d3.mean(xSeries);
-                        const meanY = d3.mean(ySeries);
-                        const devX = d3.deviation(xSeries);
-                        const devY = d3.deviation(ySeries);
+                        g.append("path").datum(aggregatedData).attr("fill", "none").attr("stroke", colorScale(key)).attr("stroke-width", 2).attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
+                    });
 
-                        if (devX === 0 || devY === 0) {
-                             matrix[i][j] = matrix[j][i] = 0;
-                             continue;
+                    if (hueVar !== 'None') {
+                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
+                            .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 20},${i * 25})`);
+                        legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
+                        legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
+                    }
+                }, [data, xVar, yVar, hueVar, errorStyle]);
+                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, errorStyle]} />;
+            },
+            ScatterPlot: ({ data, xVar, yVar, hueVar, sizeVar }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 20, right: 140, bottom: 50, left: 60 };
+                    const width = Math.max(300, svg.node().getBoundingClientRect().width - margin.left - margin.right);
+                    const height = Math.max(250, svg.node().getBoundingClientRect().height - margin.top - margin.bottom);
+                    
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hueVar !== 'None' ? [...new Set(data.map(d => d[hueVar]))].sort() : ['all']);
+                    const sizeScale = d3.scaleLinear().domain(sizeVar !== 'None' ? d3.extent(data, d => d[sizeVar]) : [1,1]).range([4, 15]);
+
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar.replace(/_/g, ' '));
+
+                    g.selectAll("circle").data(data).join("circle")
+                        .attr("cx", d => xScale(d[xVar])).attr("cy", d => yScale(d[yVar]))
+                        .attr("r", d => sizeScale(sizeVar !== 'None' ? d[sizeVar] : 1))
+                        .attr("fill", d => colorScale(hueVar !== 'None' ? d[hueVar] : 'all'))
+                        .attr("opacity", 0.7).attr("stroke", "var(--bg-secondary)").attr("stroke-width", 1)
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                            tooltip.html(`<strong class="text-base">${d.make}</strong><br><span class="capitalize">${xVar.replace(/_/g, ' ')}</span>: ${d[xVar]}<br><span class="capitalize">${yVar.replace(/_/g, ' ')}</span>: ${d[yVar]}${hueVar !== 'None' ? `<br><span class="capitalize">${hueVar.replace(/_/g, ' ')}</span>: ${d[hueVar]}` : ''}${sizeVar !== 'None' ? `<br><span class="capitalize">${sizeVar.replace(/_/g, ' ')}</span>: ${d[sizeVar]}` : ''}`);
+                        })
+                        .on("mouseout", () => tooltip.style("opacity", 0));
+                    
+                    if (hueVar !== 'None') {
+                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
+                            .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 20},${i * 25})`);
+                        legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
+                        legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
+                    }
+                }, [data, xVar, yVar, hueVar, sizeVar]);
+                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, sizeVar]} />;
+            },
+            BoxPlot: ({ data, xVar, yVar, notch }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 20, right: 30, bottom: 80, left: 60 };
+                    const width = Math.max(400, svg.node().getBoundingClientRect().width - margin.left - margin.right);
+                    const height = Math.max(300, svg.node().getBoundingClientRect().height - margin.top - margin.bottom);
+                    
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    const groupedData = d3.group(data, d => d[xVar]);
+                    const summaryStats = [];
+                    groupedData.forEach((groupData, key) => {
+                        const sortedValues = groupData.map(d => d[yVar]).filter(v => v != null).sort(d3.ascending);
+                        if(sortedValues.length === 0) return;
+                        const q1 = d3.quantile(sortedValues, 0.25);
+                        const median = d3.quantile(sortedValues, 0.5);
+                        const q3 = d3.quantile(sortedValues, 0.75);
+                        if ([q1, median, q3].some(v => v === undefined)) return;
+                        const iqr = q3 - q1;
+                        const min = Math.max(d3.min(sortedValues), q1 - 1.5 * iqr);
+                        const max = Math.min(d3.max(sortedValues), q3 + 1.5 * iqr);
+                        const n = sortedValues.length;
+                        const notchOffset = 1.57 * iqr / Math.sqrt(n);
+                        summaryStats.push({ key, q1, median, q3, min, max, notchUpper: median + notchOffset, notchLower: median - notchOffset });
+                    });
+                    summaryStats.sort((a,b) => d3.ascending(a.key, b.key));
+
+                    const xScale = d3.scaleBand().domain(summaryStats.map(d => d.key)).range([0, width]).padding(0.4);
+                    const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[yVar])]).range([height, 0]).nice();
+                    
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+
+                    summaryStats.forEach(d => {
+                        const boxG = g.append("g").attr("transform", `translate(${xScale(d.key)}, 0)`);
+                        const boxWidth = xScale.bandwidth();
+
+                        boxG.append("line").attr("x1", boxWidth/2).attr("x2", boxWidth/2).attr("y1", yScale(d.min)).attr("y2", yScale(d.max)).attr("stroke", "var(--text-secondary)");
+                        boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.min)).attr("y2", yScale(d.min)).attr("stroke", "var(--text-secondary)");
+                        boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.max)).attr("y2", yScale(d.max)).attr("stroke", "var(--text-secondary)");
+
+                        if (notch) {
+                            boxG.append("path").attr("d", `M 0 ${yScale(d.q3)} H ${boxWidth} V ${yScale(d.notchUpper)} L ${boxWidth/2} ${yScale(d.median)} L 0 ${yScale(d.notchUpper)} V ${yScale(d.q1)} L ${boxWidth/2} ${yScale(d.median)} L ${boxWidth} ${yScale(d.q1)} V ${yScale(d.notchLower)} L ${boxWidth/2} ${yScale(d.median)} L 0 ${yScale(d.notchLower)} Z`).attr("stroke", "var(--text-primary)").attr("fill", "var(--accent-primary)");
+                        } else {
+                            boxG.append("rect").attr("x", 0).attr("y", yScale(d.q3)).attr("width", boxWidth).attr("height", yScale(d.q1) - yScale(d.q3)).attr("stroke", "var(--text-primary)").attr("fill", "var(--accent-primary)");
+                            boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.median)).attr("y2", yScale(d.median)).attr("stroke", "var(--text-primary)").attr("stroke-width", 2);
                         }
-                        
-                        const correlation = d3.mean(xSeries.map((x_i, k) => (x_i - meanX) * (ySeries[k] - meanY))) / (devX * devY);
-                        matrix[i][j] = matrix[j][i] = isNaN(correlation) ? 0 : correlation;
+                    });
+
+                }, [data, xVar, yVar, notch]);
+                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, notch]} />;
+            },
+            Heatmap: ({ data, numericCols }) => {
+                const calculateCorrelationMatrix = (data, columns) => {
+                    const n = columns.length;
+                    const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
+                    for (let i = 0; i < n; i++) {
+                        for (let j = i; j < n; j++) {
+                            const col1 = columns[i]; const col2 = columns[j];
+                            const validData = data.filter(d => d[col1] != null && d[col2] != null);
+                            if (validData.length < 2) { matrix[i][j] = matrix[j][i] = 0; continue; }
+                            const xSeries = validData.map(d => d[col1]); const ySeries = validData.map(d => d[col2]);
+                            const meanX = d3.mean(xSeries); const meanY = d3.mean(ySeries);
+                            const devX = d3.deviation(xSeries); const devY = d3.deviation(ySeries);
+                            if (devX === 0 || devY === 0) { matrix[i][j] = matrix[j][i] = 0; continue; }
+                            const correlation = d3.mean(xSeries.map((x_i, k) => (x_i - meanX) * (ySeries[k] - meanY))) / (devX * devY);
+                            matrix[i][j] = matrix[j][i] = isNaN(correlation) ? 0 : correlation;
+                        }
                     }
-                }
-                return matrix;
-            };
+                    return matrix;
+                };
 
-            const draw = useCallback((svg, tooltip) => {
-                svg.selectAll("*").remove();
-                if (!data || data.length === 0) return;
-                
-                const selectedCols = ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'symboling'];
-                const matrix = calculateCorrelationMatrix(data, selectedCols);
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+                    
+                    const selectedCols = ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base', 'symboling'];
+                    const matrix = calculateCorrelationMatrix(data, selectedCols);
 
-                const margin = { top: 50, right: 50, bottom: 100, left: 100 };
-                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                
-                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const margin = { top: 100, right: 50, bottom: 50, left: 100 };
+                    const width = Math.max(400, svg.node().getBoundingClientRect().width - margin.left - margin.right);
+                    const height = Math.max(400, svg.node().getBoundingClientRect().height - margin.top - margin.bottom);
+                    
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-                const xScale = d3.scaleBand().domain(selectedCols).range([0, width]).padding(0.05);
-                const yScale = d3.scaleBand().domain(selectedCols).range([height, 0]).padding(0.05);
-                const colorScale = d3.scaleSequential(d3.interpolateRdBu).domain([-1, 1]);
+                    const xScale = d3.scaleBand().domain(selectedCols).range([0, width]).padding(0.05);
+                    const yScale = d3.scaleBand().domain(selectedCols).range([height, 0]).padding(0.05);
+                    const colorScale = d3.scaleSequential(d3.interpolateRdBu).domain([1, -1]);
 
-                g.append("g").call(d3.axisTop(xScale)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "start");
-                g.append("g").call(d3.axisLeft(yScale));
+                    g.append("g").attr("class", "axis").call(d3.axisTop(xScale)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "start");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
 
-                const heatmapData = [];
-                for (let i = 0; i < selectedCols.length; i++) {
-                    for (let j = 0; j < selectedCols.length; j++) {
-                        heatmapData.push({ x: selectedCols[i], y: selectedCols[j], value: matrix[i][j] });
+                    const heatmapData = [];
+                    for (let i = 0; i < selectedCols.length; i++) {
+                        for (let j = 0; j < selectedCols.length; j++) {
+                            heatmapData.push({ x: selectedCols[i], y: selectedCols[j], value: matrix[j][i] });
+                        }
                     }
-                }
 
-                g.selectAll(".tile").data(heatmapData).join("rect")
-                    .attr("class", "tile")
-                    .attr("x", d => xScale(d.x)).attr("y", d => yScale(d.y))
-                    .attr("width", xScale.bandwidth()).attr("height", yScale.bandwidth())
-                    .attr("fill", d => colorScale(d.value))
-                    .on("mouseover", (event, d) => {
-                        tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                        tooltip.html(`Corr(${d.x}, ${d.y}): <b>${d.value.toFixed(2)}</b>`);
-                    })
-                    .on("mouseout", () => tooltip.style("opacity", 0));
+                    g.selectAll(".tile").data(heatmapData).join("rect")
+                        .attr("class", "tile").attr("x", d => xScale(d.x)).attr("y", d => yScale(d.y))
+                        .attr("width", xScale.bandwidth()).attr("height", yScale.bandwidth())
+                        .attr("fill", d => colorScale(d.value))
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                            tooltip.html(`Corr(${d.x}, ${d.y}): <b>${d.value.toFixed(2)}</b>`);
+                        })
+                        .on("mouseout", () => tooltip.style("opacity", 0));
+                }, [data, numericCols]);
+                return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
+            },
+            ScatterPlot3D: ({ data, xVar, yVar, zVar, hueVar }) => {
+                const mountRef = useRef(null);
 
-            }, [data, numericCols]);
-            return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
+                useEffect(() => {
+                    if (!data || data.length === 0 || !mountRef.current) return;
+                    
+                    const currentMount = mountRef.current;
+                    const { clientWidth: width, clientHeight: height } = currentMount;
+
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary').trim());
+                    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                    camera.position.set(3, 3, 3);
+                    const renderer = new THREE.WebGLRenderer({ antialias: true });
+                    renderer.setSize(width, height);
+                    currentMount.innerHTML = '';
+                    currentMount.appendChild(renderer.domElement);
+                    
+                    const labelRenderer = new THREE.CSS2DRenderer();
+                    labelRenderer.setSize(width, height);
+                    labelRenderer.domElement.style.position = 'absolute';
+                    labelRenderer.domElement.style.top = '0px';
+                    labelRenderer.domElement.style.pointerEvents = 'none';
+                    currentMount.appendChild(labelRenderer.domElement);
+
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.enableDamping = true;
+
+                    const getScale = (key) => d3.scaleLinear().domain(d3.extent(data, d => d[key])).range([-2, 2]);
+                    const xScale = getScale(xVar);
+                    const yScale = getScale(yVar);
+                    const zScale = getScale(zVar);
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))]);
+
+                    data.forEach(d => {
+                        if (d[xVar] == null || d[yVar] == null || d[zVar] == null) return;
+                        const geometry = new THREE.SphereGeometry(0.05, 16, 16);
+                        const material = new THREE.MeshBasicMaterial({ color: colorScale(d[hueVar]) });
+                        const sphere = new THREE.Mesh(geometry, material);
+                        sphere.position.set(xScale(d[xVar]), yScale(d[yVar]), zScale(d[zVar]));
+                        scene.add(sphere);
+                    });
+
+                    const axesHelper = new THREE.AxesHelper(2.5);
+                    scene.add(axesHelper);
+                    
+                    const createLabel = (text, position) => {
+                        const div = document.createElement('div');
+                        div.className = 'label-3d';
+                        div.textContent = text;
+                        const label = new THREE.CSS2DObject(div);
+                        label.position.copy(position);
+                        return label;
+                    };
+                    scene.add(createLabel(xVar, new THREE.Vector3(2.7, 0, 0)));
+                    scene.add(createLabel(yVar, new THREE.Vector3(0, 2.7, 0)));
+                    scene.add(createLabel(zVar, new THREE.Vector3(0, 0, 2.7)));
+
+                    const animate = () => {
+                        requestAnimationFrame(animate);
+                        controls.update();
+                        renderer.render(scene, camera);
+                        labelRenderer.render(scene, camera);
+                    };
+                    animate();
+
+                    const handleResize = () => {
+                        const { clientWidth: newWidth, clientHeight: newHeight } = currentMount;
+                        camera.aspect = newWidth / newHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(newWidth, newHeight);
+                        labelRenderer.setSize(newWidth, newHeight);
+                    };
+                    window.addEventListener('resize', handleResize);
+
+                    return () => {
+                        window.removeEventListener('resize', handleResize);
+                        if(currentMount) currentMount.innerHTML = '';
+                    };
+                }, [data, xVar, yVar, zVar, hueVar]);
+
+                return <div ref={mountRef} className="three-canvas-container"></div>;
+            }
         };
 
-        // 3D Scatter Plot
-        const ScatterPlot3D = ({ data, xVar, yVar, zVar, hueVar }) => {
-            const mountRef = useRef(null);
-
-            useEffect(() => {
-                if (!data || data.length === 0 || !mountRef.current) return;
-                
-                const currentMount = mountRef.current;
-                const { clientWidth: width, clientHeight: height } = currentMount;
-
-                // Scene, Camera, Renderer
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0xf1f5f9);
-                const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-                camera.position.z = 5;
-                const renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(width, height);
-                currentMount.innerHTML = '';
-                currentMount.appendChild(renderer.domElement);
-                
-                const labelRenderer = new THREE.CSS2DRenderer();
-                labelRenderer.setSize(width, height);
-                labelRenderer.domElement.style.position = 'absolute';
-                labelRenderer.domElement.style.top = '0px';
-                currentMount.appendChild(labelRenderer.domElement);
-
-                // Controls
-                const controls = new THREE.OrbitControls(camera, labelRenderer.domElement);
-                controls.enableDamping = true;
-
-                // Data Scaling
-                const getScale = (key) => d3.scaleLinear().domain(d3.extent(data, d => d[key])).range([-2, 2]);
-                const xScale = getScale(xVar);
-                const yScale = getScale(yVar);
-                const zScale = getScale(zVar);
-                const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))]);
-
-                // Add points
-                data.forEach(d => {
-                    if (d[xVar] == null || d[yVar] == null || d[zVar] == null) return;
-                    const geometry = new THREE.SphereGeometry(0.05, 16, 16);
-                    const material = new THREE.MeshBasicMaterial({ color: colorScale(d[hueVar]) });
-                    const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set(xScale(d[xVar]), yScale(d[yVar]), zScale(d[zVar]));
-                    scene.add(sphere);
-                });
-
-                // Axes Helper
-                const axesHelper = new THREE.AxesHelper(2.5);
-                scene.add(axesHelper);
-                
-                // Axes Labels
-                const createLabel = (text, position) => {
-                    const div = document.createElement('div');
-                    div.className = 'label-3d';
-                    div.textContent = text;
-                    const label = new THREE.CSS2DObject(div);
-                    label.position.copy(position);
-                    return label;
-                };
-                scene.add(createLabel(xVar, new THREE.Vector3(2.7, 0, 0)));
-                scene.add(createLabel(yVar, new THREE.Vector3(0, 2.7, 0)));
-                scene.add(createLabel(zVar, new THREE.Vector3(0, 0, 2.7)));
-
-                // Animation loop
-                const animate = () => {
-                    requestAnimationFrame(animate);
-                    controls.update();
-                    renderer.render(scene, camera);
-                    labelRenderer.render(scene, camera);
-                };
-                animate();
-
-                // Handle resize
-                const handleResize = () => {
-                    const { clientWidth: newWidth, clientHeight: newHeight } = currentMount;
-                    camera.aspect = newWidth / newHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(newWidth, newHeight);
-                    labelRenderer.setSize(newWidth, newHeight);
-                };
-                window.addEventListener('resize', handleResize);
-
-                return () => {
-                    window.removeEventListener('resize', handleResize);
-                    if(currentMount) currentMount.innerHTML = '';
-                };
-            }, [data, xVar, yVar, zVar, hueVar]);
-
-            return <div ref={mountRef} className="three-canvas-container"></div>;
-        };
-
-        // --- Main App Component ---
+        // --- MAIN APP STRUCTURE ---
         const App = () => {
-            const { data, loading, numericCols, categoricalCols } = useAutomobileData();
+            const { data, loading, error, numericCols, categoricalCols } = useAutomobileData();
             const [activeChart, setActiveChart] = useState('Scatter Plot');
+            const [isSidebarOpen, setSidebarOpen] = useState(false);
             
-            // State for chart controls
             const [controls, setControls] = useState({
-                line: { x: 'horsepower', y: 'price', hue: 'drive-wheels', error: 'band' },
-                scatter: { x: 'horsepower', y: 'price', hue: 'body-style', size: 'curb-weight' },
-                box: { x: 'body-style', y: 'price', notch: true },
+                line: { x: 'horsepower', y: 'price', hue: 'drive_wheels', error: 'band' },
+                scatter: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
+                box: { x: 'body_style', y: 'price', notch: true },
                 heatmap: {},
-                scatter3d: { x: 'price', y: 'horsepower', z: 'curb-weight', hue: 'body-style' },
+                scatter3d: { x: 'price', y: 'horsepower', z: 'curb_weight', hue: 'body_style' },
             });
 
             const handleControlChange = (chart, key, value) => {
-                setControls(prev => ({
-                    ...prev,
-                    [chart]: { ...prev[chart], [key]: value }
-                }));
+                setControls(prev => ({ ...prev, [chart]: { ...prev[chart], [key]: value } }));
             };
 
+            const kpiData = useMemo(() => {
+                if (loading || data.length === 0) return { avgPrice: 0, topMake: 'N/A', maxHp: 0, count: 0 };
+                const prices = data.map(d => d.price).filter(Boolean);
+                const makes = d3.rollup(data, v => v.length, d => d.make);
+                const topMake = [...makes.entries()].sort((a, b) => b[1] - a[1])[0][0];
+                return {
+                    avgPrice: d3.mean(prices),
+                    topMake: topMake.charAt(0).toUpperCase() + topMake.slice(1),
+                    maxHp: d3.max(data, d => d.horsepower),
+                    count: data.length,
+                };
+            }, [data, loading]);
+
             const chartTypes = [
-                { name: 'Line Chart', family: 'Relational' },
-                { name: 'Scatter Plot', family: 'Relational' },
-                { name: 'Box Plot', family: 'Distribution' },
-                { name: 'Heatmap', family: 'Matrix' },
-                { name: '3D Scatter', family: '3D' },
+                { name: 'Scatter Plot', family: 'Relational Analysis' },
+                { name: 'Line Chart', family: 'Relational Analysis' },
+                { name: 'Box Plot', family: 'Distribution Analysis' },
+                { name: 'Heatmap', family: 'Correlation Analysis' },
+                { name: '3D Scatter', family: 'Multi-dimensional Analysis' },
             ];
-            
             const groupedCharts = d3.group(chartTypes, d => d.family);
 
             const renderChart = () => {
-                if (loading) return <div className="flex items-center justify-center h-full"><p className="text-lg">Loading Data...</p></div>;
-                if (data.length === 0 && !loading) return <div className="flex items-center justify-center h-full"><p className="text-lg text-red-500">Failed to load data.</p></div>;
-
-                switch (activeChart) {
-                    case 'Line Chart':
-                        return <LineChart data={data} xVar={controls.line.x} yVar={controls.line.y} hueVar={controls.line.hue} errorStyle={controls.line.error} />;
-                    case 'Scatter Plot':
-                        return <ScatterPlot data={data} xVar={controls.scatter.x} yVar={controls.scatter.y} hueVar={controls.scatter.hue} sizeVar={controls.scatter.size} />;
-                    case 'Box Plot':
-                        return <BoxPlot data={data} xVar={controls.box.x} yVar={controls.box.y} notch={controls.box.notch} />;
-                    case 'Heatmap':
-                        return <Heatmap data={data} numericCols={numericCols} />;
-                    case '3D Scatter':
-                        return <ScatterPlot3D data={data} xVar={controls.scatter3d.x} yVar={controls.scatter3d.y} zVar={controls.scatter3d.z} hueVar={controls.scatter3d.hue} />;
-                    default:
-                        return <div className="text-center">Select a chart type</div>;
-                }
+                if (loading) return <div className="flex items-center justify-center h-full text-text-secondary"><p>Loading Data...</p></div>;
+                if (error) return <div className="flex items-center justify-center h-full text-red-400"><p>{error}</p></div>;
+                if (data.length === 0) return <div className="flex items-center justify-center h-full text-text-secondary"><p>No data available to display.</p></div>;
+                
+                const ChartComponent = ChartComponents[activeChart.replace(' ', '')];
+                const chartControls = controls[activeChart.toLowerCase().replace(' ', '')];
+                return <ChartComponent data={data} {...chartControls} numericCols={numericCols} />;
             };
             
-            const renderControls = () => {
-                switch (activeChart) {
-                    case 'Line Chart':
-                        return <>
-                            <ControlSelect label="X-Axis" value={controls.line.x} onChange={e => handleControlChange('line', 'x', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Y-Axis" value={controls.line.y} onChange={e => handleControlChange('line', 'y', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Hue" value={controls.line.hue} onChange={e => handleControlChange('line', 'hue', e.target.value)} options={['None', ...categoricalCols]} />
-                            <ControlSelect label="Error Style" value={controls.line.error} onChange={e => handleControlChange('line', 'error', e.target.value)} options={['band', 'none']} />
-                        </>;
-                    case 'Scatter Plot':
-                        return <>
-                            <ControlSelect label="X-Axis" value={controls.scatter.x} onChange={e => handleControlChange('scatter', 'x', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Y-Axis" value={controls.scatter.y} onChange={e => handleControlChange('scatter', 'y', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Hue (Color)" value={controls.scatter.hue} onChange={e => handleControlChange('scatter', 'hue', e.target.value)} options={['None', ...categoricalCols]} />
-                            <ControlSelect label="Size" value={controls.scatter.size} onChange={e => handleControlChange('scatter', 'size', e.target.value)} options={['None', ...numericCols]} />
-                        </>;
-                    case 'Box Plot':
-                        return <>
-                            <ControlSelect label="Category (X-Axis)" value={controls.box.x} onChange={e => handleControlChange('box', 'x', e.target.value)} options={categoricalCols} />
-                            <ControlSelect label="Value (Y-Axis)" value={controls.box.y} onChange={e => handleControlChange('box', 'y', e.target.value)} options={numericCols} />
-                            <ControlToggle label="Show Notch" checked={controls.box.notch} onChange={e => handleControlChange('box', 'notch', e.target.checked)} />
-                        </>;
-                    case '3D Scatter':
-                        return <>
-                            <ControlSelect label="X-Axis" value={controls.scatter3d.x} onChange={e => handleControlChange('scatter3d', 'x', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Y-Axis" value={controls.scatter3d.y} onChange={e => handleControlChange('scatter3d', 'y', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Z-Axis" value={controls.scatter3d.z} onChange={e => handleControlChange('scatter3d', 'z', e.target.value)} options={numericCols} />
-                            <ControlSelect label="Hue (Color)" value={controls.scatter3d.hue} onChange={e => handleControlChange('scatter3d', 'hue', e.target.value)} options={categoricalCols} />
-                        </>;
-                    default: return <div className="text-gray-500">No controls for this chart.</div>;
-                }
+            const ControlPanel = () => {
+                const chartKey = activeChart.toLowerCase().replace(' ', '');
+                const currentControls = controls[chartKey];
+                
+                const renderControls = () => {
+                    switch (activeChart) {
+                        case 'Line Chart':
+                            return <>
+                                <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Hue" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} />
+                                <ControlSelect label="Error Style" value={currentControls.error} onChange={e => handleControlChange(chartKey, 'error', e.target.value)} options={['band', 'none']} />
+                            </>;
+                        case 'Scatter Plot':
+                            return <>
+                                <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Hue (Color)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} />
+                                <ControlSelect label="Size" value={currentControls.size} onChange={e => handleControlChange(chartKey, 'size', e.target.value)} options={['None', ...numericCols]} />
+                            </>;
+                        case 'Box Plot':
+                            return <>
+                                <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} />
+                                <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
+                                <ControlToggle label="Show Notch" checked={currentControls.notch} onChange={e => handleControlChange(chartKey, 'notch', e.target.checked)} />
+                            </>;
+                        case '3D Scatter':
+                            return <>
+                                <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Z-Axis" value={currentControls.z} onChange={e => handleControlChange(chartKey, 'z', e.target.value)} options={numericCols} />
+                                <ControlSelect label="Hue (Color)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} />
+                            </>;
+                        default: return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
+                    }
+                };
+
+                return (
+                    <div className="chart-container">
+                        <h3 className="text-lg font-bold text-text-primary mb-4">Chart Controls</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {renderControls()}
+                        </div>
+                    </div>
+                );
             };
 
-            return (
-                <div className="flex h-screen bg-gray-100 font-sans">
-                    {/* Sidebar */}
-                    <aside className="w-64 bg-sidebar text-text-sidebar p-4 flex flex-col flex-shrink-0">
-                        <h1 className="text-2xl font-bold text-white mb-8">Chart Studio</h1>
-                        <nav className="flex-grow">
-                            {Array.from(groupedCharts.keys()).map(family => (
-                                <div key={family} className="mb-4">
-                                    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">{family}</h2>
-                                    <ul>
-                                        {groupedCharts.get(family).map(chart => (
-                                            <li key={chart.name}>
-                                                <button
-                                                    onClick={() => setActiveChart(chart.name)}
-                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                                        activeChart === chart.name
-                                                            ? 'bg-accent-primary text-white'
-                                                            : 'hover:bg-slate-700 hover:text-white'
-                                                    }`}
-                                                >
-                                                    {chart.name}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </nav>
-                    </aside>
-
-                    {/* Main Content */}
-                    <main className="flex-1 flex flex-col p-6 overflow-hidden">
-                        <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex-shrink-0">
-                            <h2 className="text-xl font-bold text-gray-800 mb-3">{activeChart} Controls</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {renderControls()}
+            const Sidebar = () => (
+                <aside className={`fixed top-0 left-0 z-40 w-64 h-screen bg-bg-secondary border-r border-border-color flex flex-col flex-shrink-0 sidebar-transition md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    <div className="flex items-center justify-between h-16 px-4 border-b border-border-color flex-shrink-0">
+                        <h1 className="text-xl font-bold text-text-primary">Auto<span className="text-accent-primary">Analytics</span></h1>
+                        <button onClick={() => setSidebarOpen(false)} className="md:hidden text-text-secondary hover:text-text-primary">
+                            {ICONS.Close}
+                        </button>
+                    </div>
+                    <nav className="flex-grow p-4 overflow-y-auto">
+                        {Array.from(groupedCharts.keys()).map(family => (
+                            <div key={family} className="mb-6">
+                                <h2 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3 px-2">{family}</h2>
+                                <ul>
+                                    {groupedCharts.get(family).map(chart => (
+                                        <li key={chart.name}>
+                                            <button
+                                                onClick={() => { setActiveChart(chart.name); setSidebarOpen(false); }}
+                                                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                                                    activeChart === chart.name
+                                                        ? 'bg-accent-primary/20 text-accent-primary'
+                                                        : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                                                }`}
+                                            >
+                                                {ICONS[chart.name]}
+                                                <span>{chart.name}</span>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        </div>
-                        <div className="flex-grow bg-white p-4 rounded-lg shadow-sm flex items-center justify-center overflow-hidden chart-container">
-                           {renderChart()}
+                        ))}
+                    </nav>
+                </aside>
+            );
+
+            return (
+                <div className="flex h-screen bg-bg-primary font-sans">
+                    <Sidebar />
+                    <div className={`fixed inset-0 bg-black/50 z-30 md:hidden sidebar-transition ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
+                    
+                    <main className="flex-1 flex flex-col md:pl-64 transition-all duration-300">
+                        <header className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 flex-shrink-0">
+                            <button onClick={() => setSidebarOpen(true)} className="md:hidden text-text-secondary hover:text-text-primary">
+                                {ICONS.Menu}
+                            </button>
+                            <div className="hidden md:block">
+                                <h2 className="text-2xl font-bold text-text-primary">{activeChart}</h2>
+                                <p className="text-sm text-text-secondary">Visualizing the 1985 Automobile Dataset</p>
+                            </div>
+                            <div></div>
+                        </header>
+
+                        <div className="flex-1 p-4 sm:px-6 lg:px-8 overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                                <KpiCard title="Vehicle Count" value={loading ? '...' : kpiData.count} icon={<Icon path={<path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5A3.375 3.375 0 006.375 7.5h1.5a3.375 3.375 0 003.375-3.375V3.375c0-.621.504-1.125 1.125-1.125h1.5c.621 0 1.125.504 1.125 1.125v1.875a3.375 3.375 0 003.375 3.375h1.5c.621 0 1.125.504 1.125 1.125v1.5a3.375 3.375 0 00-3.375 3.375v1.875c0 .621-.504 1.125-1.125 1.125h-1.5a3.375 3.375 0 00-3.375-3.375h-1.5A3.375 3.375 0 009 14.25v1.875" />} />} />
+                                <KpiCard title="Average Price" value={loading ? '...' : kpiData.avgPrice} format={v => `$${v.toLocaleString(undefined, {maximumFractionDigits: 0})}`} icon={<Icon path={<path d="M12 6v12m-3-6h6" />} />} />
+                                <KpiCard title="Top Make" value={loading ? '...' : kpiData.topMake} icon={<Icon path={<path fillRule="evenodd" d="M10.788 3.212a.75.75 0 01.43 1.28l-4.01 2.316a.75.75 0 01-.86 0L2.34 4.492a.75.75 0 01.43-1.281L6.75 5.25l4.038-2.038zM12.75 6.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM11.25 8.25a.75.75 0 100 1.5.75.75 0 000-1.5zM13.875 12.375a.75.75 0 100 1.5.75.75 0 000-1.5zM11.25 14.25a.75.75 0 100 1.5.75.75 0 000-1.5zM13.5 15.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM15.75 14.25a.75.75 0 100 1.5.75.75 0 000-1.5zM18.651 8.35a.75.75 0 01.43 1.28l-4.01 2.316a.75.75 0 01-.86 0l-4.01-2.316a.75.75 0 11.86-1.518L15 9.75l4.038-2.038a.75.75 0 011.113.638z" clipRule="evenodd" />} />} />
+                                <KpiCard title="Max Horsepower" value={loading ? '...' : `${kpiData.maxHp} HP`} icon={<Icon path={<path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071 1.052A6.75 6.75 0 0118 10.5a.75.75 0 01-1.5 0 5.25 5.25 0 00-10.083-2.167.75.75 0 01-1.333.667A6.75 6.75 0 016 10.5a.75.75 0 01-1.5 0 8.25 8.25 0 0015.75 0c0-1.922-.723-3.68-1.937-5.04L12.963 2.286z" clipRule="evenodd" />} />} />
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div className="lg:col-span-2 h-[60vh] chart-container">
+                                   {renderChart()}
+                                </div>
+                                <div className="lg:col-span-1">
+                                    <ControlPanel />
+                                </div>
+                            </div>
                         </div>
                     </main>
                 </div>
