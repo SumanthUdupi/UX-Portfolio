@@ -108,7 +108,7 @@
         const { useState, useEffect, useMemo, useRef, useCallback, forwardRef } = React;
 
         // --- DATA LOADING & PROCESSING HOOK ---
-        const DATA_URL = 'public/Rawdata/Automobile_data.csv';
+        const DATA_URL = 'https://gist.githubusercontent.com/mbostock/4349187/raw/0d2415848f03fe836894833a8aa136de0736085a/imports-85.csv';
 
         const useAutomobileData = () => {
             const [data, setData] = useState([]);
@@ -234,8 +234,9 @@
         };
 
         // --- CHART COMPONENTS (WRAPPED FOR CLARITY) ---
+        // FIX: Changed prop names from xVar, yVar etc. to x, y to match what's passed from the controls state.
         const ChartComponents = {
-            LineChart: ({ data, xVar, yVar, hueVar, errorStyle }) => {
+            LineChart: ({ data, x, y, hue, error: errorStyle }) => {
                 const draw = useCallback((svg, tooltip) => {
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
@@ -246,20 +247,20 @@
                     
                     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
-                    const groupedData = hueVar !== 'None' ? d3.group(data, d => d[hueVar]) : [['all', data]];
+                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[x])).range([0, width]).nice();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+                    const groupedData = hue !== 'None' ? d3.group(data, d => d[hue]) : [['all', data]];
                     const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(Array.from(groupedData.keys()));
 
                     g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar.replace(/_/g, ' '));
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(x.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(y.replace(/_/g, ' '));
                     
                     groupedData.forEach((groupData, key) => {
-                        const sortedGroup = groupData.sort((a,b) => a[xVar] - b[xVar]);
-                        const aggregatedData = Array.from(d3.group(sortedGroup, d => d[xVar]), ([xVal, yVals]) => {
-                            const mean = d3.mean(yVals, d => d[yVar]);
-                            const std = d3.deviation(yVals, d => d[yVar]);
+                        const sortedGroup = groupData.sort((a,b) => a[x] - b[x]);
+                        const aggregatedData = Array.from(d3.group(sortedGroup, d => d[x]), ([xVal, yVals]) => {
+                            const mean = d3.mean(yVals, d => d[y]);
+                            const std = d3.deviation(yVals, d => d[y]);
                             return { x: xVal, y: mean, y0: mean - std, y1: mean + std };
                         }).filter(d => d.y !== undefined);
 
@@ -269,16 +270,16 @@
                         g.append("path").datum(aggregatedData).attr("fill", "none").attr("stroke", colorScale(key)).attr("stroke-width", 2).attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
                     });
 
-                    if (hueVar !== 'None') {
+                    if (hue !== 'None') {
                         const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
                             .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 20},${i * 25})`);
                         legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
                         legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
                     }
-                }, [data, xVar, yVar, hueVar, errorStyle]);
-                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, errorStyle]} />;
+                }, [data, x, y, hue, errorStyle]);
+                return <D3Chart draw={draw} dependencies={[data, x, y, hue, errorStyle]} />;
             },
-            ScatterPlot: ({ data, xVar, yVar, hueVar, sizeVar }) => {
+            ScatterPlot: ({ data, x, y, hue, size }) => {
                 const draw = useCallback((svg, tooltip) => {
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
@@ -289,36 +290,36 @@
                     
                     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hueVar !== 'None' ? [...new Set(data.map(d => d[hueVar]))].sort() : ['all']);
-                    const sizeScale = d3.scaleLinear().domain(sizeVar !== 'None' ? d3.extent(data, d => d[sizeVar]) : [1,1]).range([4, 15]);
+                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[x])).range([0, width]).nice();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hue !== 'None' ? [...new Set(data.map(d => d[hue]))].sort() : ['all']);
+                    const sizeScale = d3.scaleLinear().domain(size !== 'None' ? d3.extent(data, d => d[size]) : [1,1]).range([4, 15]);
 
                     g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar.replace(/_/g, ' '));
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(x.replace(/_/g, ' '));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(y.replace(/_/g, ' '));
 
                     g.selectAll("circle").data(data).join("circle")
-                        .attr("cx", d => xScale(d[xVar])).attr("cy", d => yScale(d[yVar]))
-                        .attr("r", d => sizeScale(sizeVar !== 'None' ? d[sizeVar] : 1))
-                        .attr("fill", d => colorScale(hueVar !== 'None' ? d[hueVar] : 'all'))
+                        .attr("cx", d => xScale(d[x])).attr("cy", d => yScale(d[y]))
+                        .attr("r", d => sizeScale(size !== 'None' ? d[size] : 1))
+                        .attr("fill", d => colorScale(hue !== 'None' ? d[hue] : 'all'))
                         .attr("opacity", 0.7).attr("stroke", "var(--bg-secondary)").attr("stroke-width", 1)
                         .on("mouseover", (event, d) => {
                             tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                            tooltip.html(`<strong class="text-base">${d.make}</strong><br><span class="capitalize">${xVar.replace(/_/g, ' ')}</span>: ${d[xVar]}<br><span class="capitalize">${yVar.replace(/_/g, ' ')}</span>: ${d[yVar]}${hueVar !== 'None' ? `<br><span class="capitalize">${hueVar.replace(/_/g, ' ')}</span>: ${d[hueVar]}` : ''}${sizeVar !== 'None' ? `<br><span class="capitalize">${sizeVar.replace(/_/g, ' ')}</span>: ${d[sizeVar]}` : ''}`);
+                            tooltip.html(`<strong class="text-base">${d.make}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d[x]}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d[y]}${hue !== 'None' ? `<br><span class="capitalize">${hue.replace(/_/g, ' ')}</span>: ${d[hue]}` : ''}${size !== 'None' ? `<br><span class="capitalize">${size.replace(/_/g, ' ')}</span>: ${d[size]}` : ''}`);
                         })
                         .on("mouseout", () => tooltip.style("opacity", 0));
                     
-                    if (hueVar !== 'None') {
+                    if (hue !== 'None') {
                         const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
                             .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 20},${i * 25})`);
                         legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
                         legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
                     }
-                }, [data, xVar, yVar, hueVar, sizeVar]);
-                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, sizeVar]} />;
+                }, [data, x, y, hue, size]);
+                return <D3Chart draw={draw} dependencies={[data, x, y, hue, size]} />;
             },
-            BoxPlot: ({ data, xVar, yVar, notch }) => {
+            BoxPlot: ({ data, x, y, notch }) => {
                 const draw = useCallback((svg, tooltip) => {
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
@@ -329,10 +330,10 @@
                     
                     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-                    const groupedData = d3.group(data, d => d[xVar]);
+                    const groupedData = d3.group(data, d => d[x]);
                     const summaryStats = [];
                     groupedData.forEach((groupData, key) => {
-                        const sortedValues = groupData.map(d => d[yVar]).filter(v => v != null).sort(d3.ascending);
+                        const sortedValues = groupData.map(d => d[y]).filter(v => v != null).sort(d3.ascending);
                         if(sortedValues.length === 0) return;
                         const q1 = d3.quantile(sortedValues, 0.25);
                         const median = d3.quantile(sortedValues, 0.5);
@@ -348,7 +349,7 @@
                     summaryStats.sort((a,b) => d3.ascending(a.key, b.key));
 
                     const xScale = d3.scaleBand().domain(summaryStats.map(d => d.key)).range([0, width]).padding(0.4);
-                    const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[yVar])]).range([height, 0]).nice();
+                    const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[y])]).range([height, 0]).nice();
                     
                     g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
                         .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
@@ -370,8 +371,8 @@
                         }
                     });
 
-                }, [data, xVar, yVar, notch]);
-                return <D3Chart draw={draw} dependencies={[data, xVar, yVar, notch]} />;
+                }, [data, x, y, notch]);
+                return <D3Chart draw={draw} dependencies={[data, x, y, notch]} />;
             },
             Heatmap: ({ data, numericCols }) => {
                 const calculateCorrelationMatrix = (data, columns) => {
@@ -432,7 +433,7 @@
                 }, [data, numericCols]);
                 return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
             },
-            ScatterPlot3D: ({ data, xVar, yVar, zVar, hueVar }) => {
+            ScatterPlot3D: ({ data, x, y, z, hue }) => {
                 const mountRef = useRef(null);
 
                 useEffect(() => {
@@ -461,17 +462,17 @@
                     controls.enableDamping = true;
 
                     const getScale = (key) => d3.scaleLinear().domain(d3.extent(data, d => d[key])).range([-2, 2]);
-                    const xScale = getScale(xVar);
-                    const yScale = getScale(yVar);
-                    const zScale = getScale(zVar);
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))]);
+                    const xScale = getScale(x);
+                    const yScale = getScale(y);
+                    const zScale = getScale(z);
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hue]))]);
 
                     data.forEach(d => {
-                        if (d[xVar] == null || d[yVar] == null || d[zVar] == null) return;
+                        if (d[x] == null || d[y] == null || d[z] == null) return;
                         const geometry = new THREE.SphereGeometry(0.05, 16, 16);
-                        const material = new THREE.MeshBasicMaterial({ color: colorScale(d[hueVar]) });
+                        const material = new THREE.MeshBasicMaterial({ color: colorScale(d[hue]) });
                         const sphere = new THREE.Mesh(geometry, material);
-                        sphere.position.set(xScale(d[xVar]), yScale(d[yVar]), zScale(d[zVar]));
+                        sphere.position.set(xScale(d[x]), yScale(d[y]), zScale(d[z]));
                         scene.add(sphere);
                     });
 
@@ -486,9 +487,9 @@
                         label.position.copy(position);
                         return label;
                     };
-                    scene.add(createLabel(xVar, new THREE.Vector3(2.7, 0, 0)));
-                    scene.add(createLabel(yVar, new THREE.Vector3(0, 2.7, 0)));
-                    scene.add(createLabel(zVar, new THREE.Vector3(0, 0, 2.7)));
+                    scene.add(createLabel(x, new THREE.Vector3(2.7, 0, 0)));
+                    scene.add(createLabel(y, new THREE.Vector3(0, 2.7, 0)));
+                    scene.add(createLabel(z, new THREE.Vector3(0, 0, 2.7)));
 
                     const animate = () => {
                         requestAnimationFrame(animate);
@@ -512,7 +513,7 @@
                         window.removeEventListener('resize', handleResize);
                         if(currentMount) currentMount.innerHTML = '';
                     };
-                }, [data, xVar, yVar, zVar, hueVar]);
+                }, [data, x, y, z, hue]);
 
                 return <div ref={mountRef} className="three-canvas-container"></div>;
             }
@@ -524,7 +525,6 @@
             const [activeChart, setActiveChart] = useState('Scatter Plot');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
             
-            // FIX: Renamed keys to match the dynamic key generation logic (e.g., 'line' -> 'linechart').
             const [controls, setControls] = useState({
                 linechart: { x: 'horsepower', y: 'price', hue: 'drive_wheels', error: 'band' },
                 scatterplot: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
@@ -573,7 +573,6 @@
                 const chartKey = activeChart.toLowerCase().replace(/ /g, '');
                 const currentControls = controls[chartKey];
                 
-                // Add a guard clause to prevent crash if controls for a chart are not defined
                 if (!currentControls) {
                     return (
                          <div className="chart-container">
