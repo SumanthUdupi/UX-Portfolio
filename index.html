@@ -264,31 +264,50 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--bg-primary);
+            background-color: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 100;
             display: none; /* Hidden by default */
             padding: 2rem;
-            overflow-y: auto;
+            overflow: hidden;
+            animation: fadeInViewer 0.3s ease-out;
         }
+
+        @keyframes fadeInViewer {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         #close-dashboard-btn {
             position: absolute;
             top: 2rem;
             right: 2rem;
             background-color: var(--brand-gold);
             color: #000;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
+            padding: 0.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
             font-weight: 600;
             cursor: pointer;
             z-index: 110;
-        }
-        #root {
-            width: 100%;
-            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        #close-dashboard-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            background-color: var(--brand-gold-darker);
+        }
+        #dashboard-content {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
         }
 
     </style>
@@ -597,10 +616,13 @@
     
     <!-- Dashboard Viewer -->
     <div id="dashboard-viewer">
-        <button id="close-dashboard-btn">Close</button>
-        <div id="root">
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            <h2 class="text-2xl">Interactive dashboard would load here.</h2>
+        <button id="close-dashboard-btn" title="Close Dashboard">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div id="dashboard-content">
+            <!-- The iframe with the dashboard will be injected here -->
         </div>
     </div>
 
@@ -666,26 +688,22 @@
         function openTab(event, tabName) {
             let i, tabcontent, tablinks;
             
-            // Get all elements with class="tab-content" and remove the "active" class
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].classList.remove("active");
             }
 
-            // Get all elements with class="tab-button" and remove the class "active"
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].classList.remove("active");
             }
 
-            // Show the current tab by adding the "active" class, and add an "active" class to the button that opened the tab
             document.getElementById(tabName).classList.add("active");
             event.currentTarget.classList.add("active");
         }
 
         // Movement UI Logic
         document.addEventListener('DOMContentLoaded', () => {
-            // Parallax Hero Background
             const heroBg = document.querySelector('.hero-bg');
             if (heroBg) {
                 document.addEventListener('mousemove', (e) => {
@@ -696,7 +714,6 @@
                 });
             }
 
-            // Interactive 3D Tilt Cards
             const interactiveCards = document.querySelectorAll('.interactive-card');
             interactiveCards.forEach(card => {
                 card.addEventListener('mousemove', (e) => {
@@ -712,7 +729,6 @@
                 });
             });
 
-            // Magnetic Buttons
             const magneticBtns = document.querySelectorAll('.magnetic-btn');
             magneticBtns.forEach(btn => {
                 btn.addEventListener('mousemove', (e) => {
@@ -726,20 +742,45 @@
                 });
             });
             
-            // --- NEW: Dashboard Viewer Logic ---
+            // --- UPDATED: Dashboard Viewer Logic ---
             const dashboardViewer = document.getElementById('dashboard-viewer');
+            const dashboardContent = document.getElementById('dashboard-content');
             const openDashboardBtn = document.getElementById('view-dashboard-btn');
             const openDashboardBtn2 = document.getElementById('view-dashboard-btn-2'); // For the duplicated slide
             const closeDashboardBtn = document.getElementById('close-dashboard-btn');
+            
+            // *** IMPORTANT: Make sure this file name matches your dashboard file ***
+            const dashboardFileName = 'Automobile Dashboard.html'; 
 
             function openDashboard() {
+                // Clear previous content and create a new iframe
+                dashboardContent.innerHTML = '';
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.src = dashboardFileName; 
+                
+                // Add a loading indicator
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.textContent = 'Loading Dashboard...';
+                loadingIndicator.className = 'flex items-center justify-center h-full text-text-secondary text-xl';
+                dashboardContent.appendChild(loadingIndicator);
+
+                iframe.onload = () => {
+                    // When iframe content has loaded, remove the indicator and show the iframe
+                    loadingIndicator.remove();
+                    dashboardContent.appendChild(iframe);
+                };
+                
                 dashboardViewer.style.display = 'block';
-                document.body.classList.add('overflow-hidden'); // Prevent scrolling of the main page
+                document.body.classList.add('overflow-hidden');
             }
             
             function closeDashboard() {
                 dashboardViewer.style.display = 'none';
-                 document.body.classList.remove('overflow-hidden');
+                dashboardContent.innerHTML = ''; // Clear the iframe to stop it from running in the background
+                document.body.classList.remove('overflow-hidden');
             }
 
             if(openDashboardBtn) {
