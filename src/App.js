@@ -458,9 +458,9 @@ const App = () => {
     const [boxX, setBoxX] = useState('body-style');
 
     // --- DATA LOCATION ---
-    // This is the variable to change for your data file's location.
-    // It should be relative to the `public` folder in your React project.
-    const dataUrl = 'Rawdata/Automobile_data.csv';
+    // This path is relative to the `public` folder.
+    // For this to work, place `Automobile_data.csv` directly in the `public` folder.
+    const dataUrl = './Automobile_data.csv';
     
     const numericCols = ['price', 'horsepower', 'peak-rpm', 'city-mpg', 'highway-mpg', 'curb-weight', 'engine-size', 'wheel-base', 'length', 'width', 'height', 'bore', 'stroke', 'compression-ratio'];
     const categoricalCols = ['make', 'fuel-type', 'aspiration', 'num-of-doors', 'body-style', 'drive-wheels', 'engine-location', 'engine-type', 'num-of-cylinders', 'fuel-system'];
