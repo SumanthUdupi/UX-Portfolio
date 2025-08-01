@@ -460,7 +460,7 @@ const App = () => {
     // --- DATA LOCATION ---
     // This path is relative to the `public` folder.
     // For this to work, place `Automobile_data.csv` directly in the `public` folder.
-    const dataUrl = './Automobile_data.csv';
+    const dataUrl = './Rawdata/Automobile_data.csv';
     
     const numericCols = ['price', 'horsepower', 'peak-rpm', 'city-mpg', 'highway-mpg', 'curb-weight', 'engine-size', 'wheel-base', 'length', 'width', 'height', 'bore', 'stroke', 'compression-ratio'];
     const categoricalCols = ['make', 'fuel-type', 'aspiration', 'num-of-doors', 'body-style', 'drive-wheels', 'engine-location', 'engine-type', 'num-of-cylinders', 'fuel-system'];
