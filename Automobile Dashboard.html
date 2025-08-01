@@ -3,81 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Automobile Insights Dashboard</title>
+    <title>Advanced Automobile Insights Dashboard</title>
+
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- D3.js for 2D Charting -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Three.js for 3D Charting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+
+    <!-- React Libraries -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel to transpile JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-primary: #F1F5F9; /* slate-100 */
             --bg-secondary: #FFFFFF; /* white */
-            --bg-tertiary: #E2E8F0; /* slate-200 */
+            --bg-sidebar: #0F172A; /* slate-900 */
             --border-color: #CBD5E1; /* slate-300 */
             --text-primary: #1E293B; /* slate-800 */
             --text-secondary: #475569; /* slate-600 */
+            --text-sidebar: #94A3B8; /* slate-400 */
             --accent-primary: #0EA5E9; /* sky-500 */
             --accent-secondary: #6366F1; /* indigo-500 */
-            --accent-positive: #10B981; /* emerald-500 */
-            --accent-negative: #EF4444; /* red-500 */
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
+            overflow-x: hidden;
         }
-        .sidebar {
-            background-color: #0F172A; /* slate-900 */
-            color: var(--bg-primary);
-        }
-        .sidebar-item {
-            color: #94A3B8; /* slate-400 */
-        }
-        .sidebar-item:hover {
-            background-color: #1E293B; /* slate-800 */
-            color: #F1F5F9; /* slate-100 */
-        }
-        .sidebar-item.active {
-            background-color: var(--accent-primary);
-            color: white;
-            font-weight: 600;
-        }
-        .chart-container {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-        }
-        .chart-container:hover {
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            border-color: var(--accent-primary);
-        }
-        .kpi-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-        }
-        .filter-select, .reset-button {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-        .filter-select:hover, .reset-button:hover {
-            border-color: var(--accent-primary);
-        }
-        .reset-button {
-             background-color: var(--accent-negative);
-             color: white;
-             border-color: var(--accent-negative);
-        }
-        .reset-button:hover {
-            opacity: 0.8;
-        }
-        .tooltip {
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .chart-tooltip {
             position: absolute;
             text-align: left;
             padding: 0.75rem;
@@ -89,781 +64,637 @@
             pointer-events: none;
             opacity: 0;
             color: white;
-            transition: opacity 0.2s;
-            z-index: 50;
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 9999;
+            white-space: nowrap;
         }
-        .axis path,
-        .axis line {
-            stroke: var(--border-color);
+        .chart-container {
+             background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
-        .axis text {
-            fill: var(--text-secondary);
+        .axis path, .axis line { stroke: var(--border-color); }
+        .axis text { fill: var(--text-secondary); font-size: 12px; }
+        .grid-lines line { stroke: #e2e8f0; stroke-opacity: 0.7; stroke-dasharray: 2,2; }
+        .grid-lines path { stroke-width: 0; }
+        .three-canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .three-canvas-container canvas {
+            display: block;
+        }
+        .label-3d {
+            color: var(--text-secondary);
             font-size: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 4px;
+            border-radius: 3px;
         }
-        .view-content { display: none; }
-        .view-content.active { display: block; }
-        .clickable { cursor: pointer; }
-        .clickable:hover { opacity: 0.8; }
-        .cross-filter-dim { opacity: 0.3; transition: opacity 0.3s ease; }
-        .legend-item.hidden { opacity: 0.4; text-decoration: line-through; }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 flex-shrink-0 p-6 flex flex-col sidebar fixed inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-        <h1 class="text-2xl font-bold mb-10">Automobile Insights</h1>
-        <nav id="sidebar-nav" class="flex-grow">
-            <ul>
-                <li><a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg transition-colors duration-200 active" data-view="overview">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Overview</a></li>
-                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="pricing_market">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    Pricing & Market</a></li>
-                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="performance">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Performance</a></li>
-                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="engine_fuel">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
-                    Engine & Fuel</a></li>
-                 <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="risk_safety">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.494v17.072a1.432 1.432 0 01-1.432 1.432H4.814A1.432 1.432 0 013.382 18.578V7.422c0-.79.642-1.432 1.432-1.432h11.372a1.432 1.432 0 011.432 1.432z"></path></svg>
-                    Risk & Safety</a></li>
-                <li><a href="#" class="sidebar-item flex items-center mt-2 px-4 py-3 rounded-lg transition-colors duration-200" data-view="correlation">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                    Correlations</a></li>
-            </ul>
-        </nav>
-    </aside>
+    <div id="root"></div>
 
-    <!-- Overlay for mobile -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef, useCallback, forwardRef } = React;
 
-    <!-- Main Content Wrapper -->
-    <div class="md:ml-64 transition-all duration-300 ease-in-out">
-        <main class="flex-1 p-6 md:p-8">
-            <header class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 id="dashboard-title" class="text-2xl sm:text-3xl font-bold text-slate-800">Automobile Insights Dashboard</h2>
-                    <p class="text-md sm:text-lg text-slate-500 mt-1">An interactive exploration of automobile data.</p>
-                </div>
-                <button id="menu-btn" class="md:hidden p-2 rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </header>
+        // --- Data Loading and Processing Hook ---
+        const DATA_URL = 'https://gist.githubusercontent.com/lpfann/f23f139546a392df44199920150d1858/raw/e352723c3b9b46e33918f67332305a27076e0767/Automobile_data.csv';
 
-            <!-- Filters -->
-            <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
-                <div class="w-full md:w-auto">
-                    <label for="make-filter" class="text-slate-600 mr-2 font-medium">Filter by Make:</label>
-                    <select id="make-filter" class="filter-select p-2 rounded-md w-full md:w-48"></select>
-                </div>
-                <div class="w-full md:w-auto">
-                    <label for="body-style-filter" class="text-slate-600 mr-2 font-medium">Filter by Body Style:</label>
-                    <select id="body-style-filter" class="filter-select p-2 rounded-md w-full md:w-48"></select>
-                </div>
-                <button id="reset-filter-btn" class="reset-button p-2 rounded-md font-semibold w-full md:w-auto">Reset Cross-Filter</button>
-            </div>
+        const useAutomobileData = () => {
+            const [data, setData] = useState([]);
+            const [loading, setLoading] = useState(true);
 
-            <!-- KPIs -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Total Cars</h3><p id="total-cars" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Price</h3><p id="avg-price" class="text-4xl font-bold text-sky-500 mt-2">$0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average Horsepower</h3><p id="avg-horsepower" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
-                <div class="kpi-card p-6 rounded-lg text-center"><h3 class="text-slate-500 text-lg">Average MPG (City)</h3><p id="avg-mpg" class="text-4xl font-bold text-sky-500 mt-2">0</p></div>
-            </div>
-
-            <!-- View Content Area -->
-            <div id="view-container">
-                <div id="overview-view" class="view-content active"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div class="chart-container col-span-1 lg:col-span-3"><h2 id="price-dist-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution</h2><svg id="price-distribution" class="w-full h-80"></svg></div>
-                    <div class="chart-container col-span-1 lg:col-span-2"><h2 id="body-style-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Vehicles by Body Style</h2><svg id="cars-by-body-style" class="w-full h-80"></svg></div>
-                    <div class="chart-container col-span-1 lg:col-span-5"><h2 id="make-count-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Count of Vehicles by Make</h2><svg id="cars-by-make" class="w-full h-96"></svg></div>
-                </div></div>
-                <div id="pricing_market-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="chart-container md:col-span-2"><h2 id="avg-price-make-title" class="text-xl font-bold text-slate-700 mb-4 text-center">Average Price by Make</h2><svg id="avg-price-by-make" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price Distribution by Body Style</h2><svg id="price-by-body-style-box" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price vs. Horsepower</h2><svg id="price-vs-horsepower-scatter" class="w-full h-96"></svg></div>
-                </div></div>
-                <div id="performance-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Horsepower Distribution by Drive Wheels</h2><svg id="hp-by-drive-wheels-violin" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Curb Weight vs. Price</h2><svg id="curb-weight-vs-price" class="w-full h-96"></svg></div>
-                    <div class="chart-container md:col-span-2"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">City MPG vs. Highway MPG</h2><div id="mpg-scatter-legend" class="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-2"></div><svg id="mpg-scatter" class="w-full h-96"></svg></div>
-                </div></div>
-                <div id="engine_fuel-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">HP by Fuel Type & Aspiration</h2><svg id="hp-by-aspiration" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Engine Size vs. Horsepower</h2><svg id="engine-vs-hp" class="w-full h-96"></svg></div>
-                </div></div>
-                <div id="risk_safety-view" class="view-content"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Insurance Risk Rating Distribution</h2><svg id="symboling-dist" class="w-full h-96"></svg></div>
-                    <div class="chart-container"><h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Price by Insurance Risk Rating</h2><svg id="price-by-symboling" class="w-full h-96"></svg></div>
-                </div></div>
-                <div id="correlation-view" class="view-content"><div class="chart-container">
-                    <h2 class="text-xl font-bold text-slate-700 mb-4 text-center">Feature Correlation Matrix</h2><svg id="correlation-heatmap" class="w-full h-[36rem]"></svg>
-                </div></div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- Mobile Sidebar Toggle ---
-        const sidebar = document.getElementById('sidebar');
-        const menuBtn = document.getElementById('menu-btn');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        
-        function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.classList.toggle('hidden');
-        }
-
-        menuBtn.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-
-        // Data source
-        const csvUrl = 'Rawdata/Automobile_data.csv';
-
-        // --- Global State ---
-        let fullDataset = [];
-        let activeView = 'overview';
-        let crossFilter = { key: null, value: null };
-        let hiddenLegendItems = new Set();
-        
-        const tooltip = d3.select("body").append("div").attr("class", "tooltip");
-        const margin = {top: 30, right: 30, bottom: 60, left: 70};
-        const marginRotated = {top: 30, right: 30, bottom: 100, left: 70};
-
-        // --- Data Loading and Initialization ---
-        d3.csv(csvUrl, (d) => {
-            const newRow = {};
-            for (const key in d) {
-                const val = d[key].trim();
-                if (val === '?') {
-                    newRow[key.trim()] = undefined;
-                } else {
-                    const numVal = +val;
-                    newRow[key.trim()] = isNaN(numVal) ? val : numVal;
+            const cleanRow = (d) => {
+                const newRow = {};
+                for (const key in d) {
+                    const newKey = key.trim();
+                    const val = d[key].trim();
+                    if (val === '?' || val === '') {
+                        newRow[newKey] = null;
+                    } else {
+                        newRow[newKey] = isNaN(+val) ? val : +val;
+                    }
                 }
-            }
-            return newRow;
-        }).then(data => {
-            fullDataset = data.filter(d => d.price && d.horsepower && d['city-mpg'] && d['highway-mpg'] && d['curb-weight'] && d.symboling);
-            populateFilters();
-            updateDashboard();
-        }).catch(error => {
-            console.error('Error loading or parsing data:', error);
-            document.getElementById('view-container').innerHTML = `<div class="text-red-500 text-center p-8 text-xl">
-                <h2 class="text-3xl font-bold mb-4">Error Loading Data</h2>
-                <p>Could not load data from the specified URL. Please ensure 'Automobile_data.csv' is accessible and correctly formatted.</p>
-            </div>`;
-        });
-        
-        function populateFilters() {
-            const makeFilter = d3.select('#make-filter');
-            const bodyStyleFilter = d3.select('#body-style-filter');
-            const makes = ['All', ...new Set(fullDataset.map(d => d.make))].sort();
-            const bodyStyles = ['All', ...new Set(fullDataset.map(d => d['body-style']))].sort();
-            
-            makeFilter.selectAll('option').data(makes).enter().append('option').text(d => d).attr('value', d => d);
-            bodyStyleFilter.selectAll('option').data(bodyStyles).enter().append('option').text(d => d).attr('value', d => d);
-        }
+                // Ensure essential fields for charting are present
+                if (!newRow.price || !newRow.horsepower || !newRow['curb-weight'] || !newRow.make || !newRow['body-style']) {
+                    return null;
+                }
+                return newRow;
+            };
 
-        // --- Event Listeners ---
-        d3.select('#make-filter').on('change', () => updateDashboard());
-        d3.select('#body-style-filter').on('change', () => updateDashboard());
-        d3.select('#reset-filter-btn').on('click', () => {
-            crossFilter = { key: null, value: null };
-            updateDashboard();
-        });
-        d3.select('#sidebar-nav').selectAll('.sidebar-item').on('click', function(event) {
-            event.preventDefault();
-            d3.selectAll('.sidebar-item').classed('active', false);
-            d3.select(this).classed('active', true);
-            activeView = d3.select(this).attr('data-view');
-            
-            d3.selectAll('.view-content').classed('active', false);
-            d3.select(`#${activeView}-view`).classed('active', true);
-            
-            if (window.innerWidth < 768) { // md breakpoint in Tailwind
-                toggleSidebar();
-            }
-            
-            updateDashboard();
-        });
-        window.addEventListener('resize', () => updateDashboard(false));
-
-        // --- Core Update Function ---
-        function updateDashboard(animate = true) {
-            const selectedMake = d3.select('#make-filter').property('value');
-            const selectedBodyStyle = d3.select('#body-style-filter').property('value');
-
-            let filteredData = fullDataset;
-            if (selectedMake !== 'All') {
-                filteredData = filteredData.filter(d => d.make === selectedMake);
-            }
-            if (selectedBodyStyle !== 'All') {
-                filteredData = filteredData.filter(d => d['body-style'] === selectedBodyStyle);
-            }
-            if (crossFilter.key && crossFilter.value) {
-                filteredData = filteredData.filter(d => d[crossFilter.key] === crossFilter.value);
-            }
-            if (hiddenLegendItems.size > 0) {
-                 filteredData = filteredData.filter(d => !hiddenLegendItems.has(d.make));
-            }
-
-            updateKPIs(filteredData);
-            updateDynamicTitles(selectedMake, selectedBodyStyle);
-            drawActiveViewCharts(filteredData, animate);
-        }
-        
-        function setCrossFilter(key, value) {
-            if (crossFilter && crossFilter.key === key && crossFilter.value === value) {
-                crossFilter = { key: null, value: null };
-            } else {
-                crossFilter = { key, value };
-            }
-            updateDashboard();
-        }
-
-        function updateKPIs(data) {
-            d3.select('#total-cars').text(data.length);
-            const avgPrice = d3.mean(data, d => d.price);
-            d3.select('#avg-price').text(avgPrice ? `$${d3.format(",.0f")(avgPrice)}` : 'N/A');
-            const avgHorsepower = d3.mean(data, d => d.horsepower);
-            d3.select('#avg-horsepower').text(avgHorsepower ? d3.format(".0f")(avgHorsepower) : 'N/A');
-            const avgMpg = d3.mean(data, d => d['city-mpg']);
-            d3.select('#avg-mpg').text(avgMpg ? d3.format(".1f")(avgMpg) : 'N/A');
-        }
-        
-        function updateDynamicTitles(make, bodyStyle) {
-            let title = "Automobile Insights Dashboard";
-            if (make !== 'All') title += ` | ${make}`;
-            if (bodyStyle !== 'All') title += ` | ${bodyStyle}`;
-            if (crossFilter.value) title += ` | Cross-Filter: ${crossFilter.value}`;
-            d3.select('#dashboard-title').text(title);
-            d3.select('#price-dist-title').text(`Price Distribution` + (make !== 'All' ? ` for ${make}` : ''));
-            d3.select('#body-style-title').text(`Vehicles by Body Style` + (make !== 'All' ? ` for ${make}` : ''));
-            d3.select('#make-count-title').text(`Count of Vehicles by Make`);
-            d3.select('#avg-price-make-title').text(`Average Price by Make` + (bodyStyle !== 'All' ? ` for ${bodyStyle}s` : ''));
-        }
-
-        function drawActiveViewCharts(data, animate) {
-            if (data.length === 0) {
-                d3.selectAll('.chart-container svg').html('<text x="50%" y="50%" text-anchor="middle" fill="#94A3B8">No data for selected filters.</text>');
-                return;
-            }
-
-            switch(activeView) {
-                case 'overview':
-                    drawPriceDistribution(data, animate);
-                    drawCarsByBodyStyle(data, animate);
-                    drawCarsByMake(data, animate);
-                    break;
-                case 'pricing_market':
-                    drawAvgPriceByMake(data, animate);
-                    drawBoxPlot(data, '#price-by-body-style-box', 'body-style', 'price', 'Body Style', 'Price ($)', animate);
-                    drawScatterPlot(data, '#price-vs-horsepower-scatter', 'horsepower', 'price', 'Horsepower', 'Price ($)', animate, 'make');
-                    break;
-                case 'performance':
-                    drawViolinPlot(data, '#hp-by-drive-wheels-violin', 'drive-wheels', 'horsepower', 'Drive Wheels', 'Horsepower', animate);
-                    drawScatterPlot(data, '#curb-weight-vs-price', 'curb-weight', 'price', 'Curb Weight (lbs)', 'Price ($)', animate, 'make');
-                    drawScatterPlot(data, '#mpg-scatter', 'city-mpg', 'highway-mpg', 'City MPG', 'Highway MPG', animate, 'make', '#mpg-scatter-legend');
-                    break;
-                case 'engine_fuel':
-                    drawGroupedBoxPlot(data, '#hp-by-aspiration', 'fuel-type', 'aspiration', 'horsepower', 'Fuel Type', 'Horsepower', animate);
-                    drawScatterPlot(data, '#engine-vs-hp', 'engine-size', 'horsepower', 'Engine Size', 'Horsepower', animate, 'fuel-type');
-                    break;
-                case 'risk_safety':
-                    drawSymbolingDistribution(data, animate);
-                    drawBoxPlot(data, '#price-by-symboling', 'symboling', 'price', 'Insurance Risk Rating (Symboling)', 'Price ($)', animate);
-                    break;
-                case 'correlation':
-                    drawCorrelationHeatmap(data, animate);
-                    break;
-            }
-        }
-        
-        function drawPriceDistribution(data, animate) {
-            const svg = d3.select("#price-distribution");
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-            const x = d3.scaleLinear().domain(d3.extent(data, d => d.price)).nice().range([0, width]);
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("~s")))
-                .append("text").attr("y", 40).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text("Price ($)");
-
-            const histogram = d3.histogram().value(d => d.price).domain(x.domain()).thresholds(x.ticks(20));
-            const bins = histogram(data);
-
-            const y = d3.scaleLinear().range([height, 0]).domain([0, d3.max(bins, d => d.length)]).nice();
-            g.append("g").call(d3.axisLeft(y));
-
-            g.selectAll("rect").data(bins).join("rect")
-                .attr("x", d => x(d.x0) + 1)
-                .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-                .attr("fill", "var(--accent-primary)")
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`<b>Price Range:</b> $${d.x0.toLocaleString()} - $${d.x1.toLocaleString()}<br><b>Count:</b> ${d.length}`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .attr("y", y(0))
-                .attr("height", 0)
-                .transition().duration(animate ? 800 : 0)
-                .attr("y", d => y(d.length))
-                .attr("height", d => height - y(d.length));
-        }
-        
-        function drawCarsByBodyStyle(data, animate) {
-            const svg = d3.select("#cars-by-body-style");
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width;
-            const height = svg.node().getBoundingClientRect().height;
-            const radius = Math.min(width, height) / 2 - 20;
-            const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-            const counts = d3.rollup(data, v => v.length, d => d['body-style']);
-            const countsArray = Array.from(counts, ([key, value]) => ({type: key, count: value}));
-            
-            const color = d3.scaleOrdinal(d3.schemeTableau10).domain(countsArray.map(d=>d.type));
-            const pie = d3.pie().value(d => d.count).sort(null);
-            const data_ready = pie(countsArray);
-
-            const arc = d3.arc().innerRadius(radius * 0.5).outerRadius(radius);
-
-            g.selectAll("path").data(data_ready).join("path")
-                .attr('d', arc)
-                .attr('fill', d => color(d.data.type))
-                .attr("stroke", "var(--bg-secondary)").style("stroke-width", "3px")
-                .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter.key === 'body-style' && crossFilter.value && crossFilter.value !== d.data.type)
-                .on("click", (event, d) => setCrossFilter('body-style', d.data.type))
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`<b>${d.data.type}</b><br>Count: ${d.data.count} (${d3.format(".1%")(d.data.count / data.length)})`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                    d3.select(event.currentTarget).transition().duration(200).attr('transform', 'scale(1.05)');
-                }).on("mouseout", (event) => {
-                    tooltip.style("opacity", 0);
-                    d3.select(event.currentTarget).transition().duration(200).attr('transform', 'scale(1)');
-                })
-                .transition().duration(animate ? 1000 : 0)
-                .attrTween('d', function(d) {
-                    const i = d3.interpolate(this._current || {startAngle: 0, endAngle: 0}, d);
-                    this._current = i(0);
-                    return t => arc(i(t));
+            useEffect(() => {
+                d3.csv(DATA_URL).then(raw => {
+                    const cleanedData = raw.map(cleanRow).filter(d => d);
+                    setData(cleanedData);
+                    setLoading(false);
+                }).catch(error => {
+                    console.error("Error loading or parsing data:", error);
+                    setLoading(false);
                 });
-        }
-
-        function drawCarsByMake(data, animate) {
-            const svg = d3.select("#cars-by-make");
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - marginRotated.left - marginRotated.right;
-            const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
-            const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
-
-            const counts = d3.rollup(data, v => v.length, d => d.make);
-            const countsArray = Array.from(counts, ([key, value]) => ({make: key, count: value}))
-                .sort((a, b) => d3.descending(a.count, b.count));
-
-            const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.make)).padding(0.2);
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
-                .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
-
-            const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y));
-
-            g.selectAll("rect").data(countsArray).join("rect")
-                .attr("x", d => x(d.make)).attr("width", x.bandwidth())
-                .attr("fill", "var(--accent-secondary)")
-                .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter.key === 'make' && crossFilter.value && crossFilter.value !== d.make)
-                .on("click", (event, d) => setCrossFilter('make', d.make))
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`<b>${d.make}</b><br>Count: ${d.count}`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .attr("y", y(0)).attr("height", 0)
-                .transition().duration(animate ? 800 : 0)
-                .attr("y", d => y(d.count))
-                .attr("height", d => height - y(d.count));
-        }
-
-        function drawAvgPriceByMake(data, animate) {
-            const svg = d3.select("#avg-price-by-make");
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - marginRotated.left - marginRotated.right;
-            const height = svg.node().getBoundingClientRect().height - marginRotated.top - marginRotated.bottom;
-            const g = svg.append("g").attr("transform", `translate(${marginRotated.left},${marginRotated.top})`);
-
-            const overallAvgPrice = d3.mean(fullDataset, d => d.price);
-            const avgPriceData = d3.rollup(data, v => d3.mean(v, d => d.price), d => d.make);
-            const avgPriceArray = Array.from(avgPriceData, ([key, value]) => ({make: key, price: value}))
-                .sort((a,b) => d3.descending(a.price, b.price));
-
-            const x = d3.scaleBand().range([0, width]).domain(avgPriceArray.map(d => d.make)).padding(0.2);
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
-                .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
-
-            const y = d3.scaleLinear().domain([0, d3.max(avgPriceArray, d => d.price)]).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")));
-
-            g.selectAll("rect").data(avgPriceArray).join("rect")
-                .attr("x", d => x(d.make)).attr("width", x.bandwidth())
-                .attr("fill", d => d.price > overallAvgPrice ? "var(--accent-positive)" : "var(--accent-negative)")
-                .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter.key === 'make' && crossFilter.value && crossFilter.value !== d.make)
-                .on("click", (event, d) => setCrossFilter('make', d.make))
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    const priceDiff = d.price - overallAvgPrice;
-                    const diffText = priceDiff > 0 ? `+$${d3.format(",.0f")(Math.abs(priceDiff))}` : `-$${d3.format(",.0f")(Math.abs(priceDiff))}`;
-                    tooltip.html(`<b>${d.make}</b><br>Avg Price: $${d3.format(",.0f")(d.price)}<br>Difference from Overall Avg: ${diffText}`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .attr("y", y(0)).attr("height", 0)
-                .transition().duration(animate ? 800 : 0)
-                .attr("y", d => y(d.price))
-                .attr("height", d => height - y(d.price));
+            }, []);
             
-            g.append("line")
-                .attr("x1", 0).attr("x2", width)
-                .attr("y1", y(overallAvgPrice)).attr("y2", y(overallAvgPrice))
-                .attr("stroke", "var(--accent-primary)").attr("stroke-width", 2).attr("stroke-dasharray", "5,5");
-            g.append("text").attr("x", width).attr("y", y(overallAvgPrice) - 5).attr("text-anchor", "end").attr("fill", "var(--accent-primary)").text("Overall Avg");
-        }
+            const numericCols = useMemo(() => ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'length', 'width', 'height', 'bore', 'stroke', 'compression-ratio', 'peak-rpm', 'symboling', 'normalized-losses'], []);
+            const categoricalCols = useMemo(() => ['make', 'body-style', 'fuel-type', 'aspiration', 'num-of-doors', 'drive-wheels', 'engine-location', 'engine-type', 'num-of-cylinders', 'fuel-system'], []);
+
+            return { data, loading, numericCols, categoricalCols };
+        };
         
-        function drawSymbolingDistribution(data, animate) {
-            const svg = d3.select("#symboling-dist");
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+        // --- Utility & Helper Components ---
+        const Tooltip = forwardRef((props, ref) => <div ref={ref} className="chart-tooltip"></div>);
+        
+        const ControlSelect = ({ label, value, onChange, options, disabled=false }) => (
+            <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">{label}</label>
+                <select value={value} onChange={onChange} disabled={disabled} className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    {options.map(opt => <option key={opt} value={opt}>{opt.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                </select>
+            </div>
+        );
 
-            const symbolingMap = {'-2': 'Very Safe', '-1': 'Safe', '0': 'Neutral', '1': 'Risky', '2': 'Very Risky', '3': 'Most Risky'};
-            const counts = d3.rollup(data, v => v.length, d => d.symboling);
-            const countsArray = Array.from(counts, ([key, value]) => ({symbol: key, name: symbolingMap[key] || key, count: value}))
-                .sort((a,b) => d3.ascending(a.symbol, b.symbol));
+        const ControlToggle = ({ label, checked, onChange, disabled=false }) => (
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-500">{label}</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        );
 
-            const x = d3.scaleBand().range([0, width]).domain(countsArray.map(d => d.symbol)).padding(0.3);
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).tickFormat(d => symbolingMap[d] || d));
+        // --- D3 Charting Logic (Hooks) ---
+        // This hook encapsulates the D3 logic for drawing a chart and handling updates.
+        const useD3 = (renderChartFn, dependencies) => {
+            const ref = useRef();
+            useEffect(() => {
+                renderChartFn(d3.select(ref.current));
+                return () => {};
+            }, dependencies);
+            return ref;
+        };
 
-            const y = d3.scaleLinear().domain([0, d3.max(countsArray, d => d.count)]).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y));
-            
-            const colorScale = d3.scaleOrdinal().domain(['-2','-1','0','1','2','3'])
-                .range(['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444', '#b91c1c']);
+        // --- Chart Components ---
 
-            g.selectAll("rect").data(countsArray).join("rect")
-                .attr("x", d => x(d.symbol)).attr("width", x.bandwidth())
-                .attr("fill", d => colorScale(d.symbol))
-                .attr("class", "clickable")
-                .classed("cross-filter-dim", d => crossFilter.key === 'symboling' && crossFilter.value && crossFilter.value !== d.symbol)
-                .on("click", (event, d) => setCrossFilter('symboling', d.symbol))
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`<b>${d.name} (Rating: ${d.symbol})</b><br>Count: ${d.count}`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .attr("y", y(0)).attr("height", 0)
-                .transition().duration(animate ? 800 : 0)
-                .attr("y", d => y(d.count))
-                .attr("height", d => height - y(d.count));
-        }
+        // Base component for all 2D charts to handle SVG setup, dimensions, and tooltips
+        const D3Chart = ({ draw, dependencies, className }) => {
+            const svgRef = useRef();
+            const tooltipRef = useRef();
 
-        function drawGroupedBoxPlot(data, selector, primaryCat, secondaryCat, numVar, xLabel, yLabel, animate) {
-            const svg = d3.select(selector);
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+            useEffect(() => {
+                const svg = d3.select(svgRef.current);
+                const tooltip = d3.select(tooltipRef.current);
+                
+                // Debounced resize handler
+                let resizeTimer;
+                const handleResize = () => {
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        draw(svg, tooltip);
+                    }, 200);
+                };
+                
+                draw(svg, tooltip);
 
-            const primaryCategories = [...new Set(data.map(d => d[primaryCat]))].sort();
-            const secondaryCategories = [...new Set(data.map(d => d[secondaryCat]))].sort();
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, [draw, ...dependencies]);
 
-            const x0 = d3.scaleBand().range([0, width]).domain(primaryCategories).paddingInner(0.2);
-            const x1 = d3.scaleBand().domain(secondaryCategories).range([0, x0.bandwidth()]).padding(0.1);
-            
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x0))
-                .append("text").attr("y", 45).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
+            return (
+                <div className={`relative w-full h-full ${className || ''}`}>
+                    <svg ref={svgRef} className="w-full h-full" />
+                    <Tooltip ref={tooltipRef} />
+                </div>
+            );
+        };
 
-            const y = d3.scaleLinear().domain([0, d3.max(data, d => d[numVar])]).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
-                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
+        // 1. Line Chart
+        const LineChart = ({ data, xVar, yVar, hueVar, errorStyle }) => {
+            const draw = useCallback((svg, tooltip) => {
+                svg.selectAll("*").remove();
+                if (!data || data.length === 0) return;
 
-            const color = d3.scaleOrdinal().domain(secondaryCategories).range(["var(--accent-primary)", "var(--accent-secondary)"]);
+                const margin = { top: 20, right: 100, bottom: 50, left: 60 };
+                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                
+                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-            const groupedData = d3.group(data, d => d[primaryCat], d => d[secondaryCat]);
-            
-            groupedData.forEach((secondaryGroup, primaryKey) => {
-                secondaryGroup.forEach((values, secondaryKey) => {
-                    const sortedValues = values.map(d => d[numVar]).sort(d3.ascending);
-                    const q1 = d3.quantile(sortedValues, .25);
-                    const median = d3.quantile(sortedValues, .5);
-                    const q3 = d3.quantile(sortedValues, .75);
-                    if (q1 === undefined || median === undefined || q3 === undefined) return;
+                const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
+                const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
+                const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
+                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar);
+                g.append("g").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar);
+
+                const groupedData = hueVar !== 'None' ? d3.group(data, d => d[hueVar]) : [['all', data]];
+                colorScale.domain(Array.from(groupedData.keys()));
+
+                groupedData.forEach((groupData, key) => {
+                    const sortedGroup = groupData.sort((a,b) => a[xVar] - b[xVar]);
                     
-                    const boxG = g.append("g").attr("transform", `translate(${x0(primaryKey)}, 0)`);
+                    // Aggregate data to handle multiple y values for a single x
+                    const aggregatedData = Array.from(d3.group(sortedGroup, d => d[xVar]), ([xVal, yVals]) => {
+                        const mean = d3.mean(yVals, d => d[yVar]);
+                        const std = d3.deviation(yVals, d => d[yVar]);
+                        return { x: xVal, y: mean, y0: mean - std, y1: mean + std };
+                    }).filter(d => d.y !== undefined);
+
+                    // Error band
+                    if(errorStyle === 'band' && aggregatedData.length > 1){
+                        g.append("path")
+                            .datum(aggregatedData)
+                            .attr("fill", colorScale(key))
+                            .attr("opacity", 0.2)
+                            .attr("d", d3.area().x(d => xScale(d.x)).y0(d => yScale(d.y0)).y1(d => yScale(d.y1)));
+                    }
+
+                    // Main line
+                    g.append("path")
+                        .datum(aggregatedData)
+                        .attr("fill", "none")
+                        .attr("stroke", colorScale(key))
+                        .attr("stroke-width", 2)
+                        .attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
                     
-                    boxG.append("rect")
-                        .attr("x", x1(secondaryKey))
-                        .attr("width", x1.bandwidth())
-                        .attr("fill", color(secondaryKey))
-                        .on("mouseover", (event) => {
-                            tooltip.style("opacity", 1).html(`<b>${primaryKey} - ${secondaryKey}</b><br>Median: ${median.toLocaleString()}<br>Q1: ${q1.toLocaleString()}<br>Q3: ${q3.toLocaleString()}`)
-                                .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                        }).on("mouseout", () => tooltip.style("opacity", 0))
-                        .transition().duration(animate ? 800 : 0)
-                        .attr("y", y(q3))
-                        .attr("height", y(q1) - y(q3));
-                        
-                    boxG.append("line")
-                        .attr("x1", x1(secondaryKey)).attr("x2", x1(secondaryKey) + x1.bandwidth())
-                        .attr("stroke", "var(--bg-secondary)").style("stroke-width", "2px")
-                        .transition().duration(animate ? 800 : 0)
-                        .attr("y1", y(median)).attr("y2", y(median));
+                    // Legend
+                    g.append("circle").attr("cx",width + 10).attr("cy",colorScale.domain().indexOf(key)*25).attr("r", 6).style("fill", colorScale(key))
+                    g.append("text").attr("x", width + 20).attr("y", colorScale.domain().indexOf(key)*25).text(key).style("font-size", "12px").attr("alignment-baseline","middle")
                 });
-            });
+            }, [data, xVar, yVar, hueVar, errorStyle]);
 
-            const legend = g.selectAll(".legend").data(secondaryCategories).enter().append("g")
-                .attr("class", "legend").attr("transform", (d, i) => `translate(${width - 100},${i * 20})`);
-            legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).style("fill", color);
-            legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d);
-        }
+            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, errorStyle]} />;
+        };
+        
+        // 2. Scatter Plot
+        const ScatterPlot = ({ data, xVar, yVar, hueVar, sizeVar }) => {
+            const draw = useCallback((svg, tooltip) => {
+                svg.selectAll("*").remove();
+                if (!data || data.length === 0) return;
 
-        function drawScatterPlot(data, selector, xVar, yVar, xLabel, yLabel, animate, hueVar, legendSelector) {
-            const svg = d3.select(selector);
-            svg.selectAll("*").remove();
-            
-            const hasLegend = legendSelector && hueVar;
-            const currentMargin = hasLegend ? {top: 10, right: 30, bottom: 60, left: 70} : margin;
+                const margin = { top: 20, right: 100, bottom: 50, left: 60 };
+                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                
+                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-            const width = svg.node().getBoundingClientRect().width - currentMargin.left - currentMargin.right;
-            const height = svg.node().getBoundingClientRect().height - currentMargin.top - currentMargin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${currentMargin.left},${currentMargin.top})`);
+                const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).range([0, width]).nice();
+                const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).range([height, 0]).nice();
+                const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hueVar !== 'None' ? [...new Set(data.map(d => d[hueVar]))].sort() : ['all']);
+                const sizeScale = d3.scaleLinear().domain(sizeVar !== 'None' ? d3.extent(data, d => d[sizeVar]) : [1,1]).range([3, 12]);
 
-            const x = d3.scaleLinear().domain(d3.extent(data, d => d[xVar])).nice().range([0, width]);
-            g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x))
-                .append("text").attr("y", 45).attr("x", width / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
+                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale)).append("text").attr("y", 40).attr("x", width/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(xVar);
+                g.append("g").call(d3.axisLeft(yScale)).append("text").attr("transform", "rotate(-90)").attr("y", -45).attr("x", -height/2).attr("fill", "currentColor").attr("text-anchor", "middle").text(yVar);
 
-            const y = d3.scaleLinear().domain(d3.extent(data, d => d[yVar])).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
-                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height / 2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
-            
-            const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))].sort());
+                g.selectAll("circle")
+                    .data(data)
+                    .join("circle")
+                    .attr("cx", d => xScale(d[xVar]))
+                    .attr("cy", d => yScale(d[yVar]))
+                    .attr("r", d => sizeScale(sizeVar !== 'None' ? d[sizeVar] : 1))
+                    .attr("fill", d => colorScale(hueVar !== 'None' ? d[hueVar] : 'all'))
+                    .attr("opacity", 0.7)
+                    .on("mouseover", (event, d) => {
+                        tooltip.style("opacity", 1)
+                               .style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                        tooltip.html(`
+                            <strong>${d.make}</strong><br>
+                            ${xVar}: ${d[xVar]}<br>
+                            ${yVar}: ${d[yVar]}
+                            ${hueVar !== 'None' ? `<br>${hueVar}: ${d[hueVar]}` : ''}
+                            ${sizeVar !== 'None' ? `<br>${sizeVar}: ${d[sizeVar]}` : ''}
+                        `);
+                    })
+                    .on("mouseout", () => tooltip.style("opacity", 0));
+                
+                if (hueVar !== 'None') {
+                    const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
+                        .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 10},${i * 20})`);
+                    legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).style("fill", colorScale);
+                    legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d);
+                }
 
-            g.append('g').selectAll("dot").data(data).join("circle")
-                .attr("cx", d => x(d[xVar])).attr("cy", d => y(d[yVar]))
-                .style("fill", d => colorScale(d[hueVar])).style("opacity", 0.7)
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`<b>${d.make} (${d['body-style']})</b><br>${xLabel}: ${d[xVar]}<br>${yLabel}: ${d[yVar].toLocaleString()}`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .attr("r", 0)
-                .transition().duration(animate ? 500 : 0)
-                .attr("r", 5);
+            }, [data, xVar, yVar, hueVar, sizeVar]);
 
-            if(hasLegend) {
-                const legendContainer = d3.select(legendSelector);
-                legendContainer.html("");
-                const legendItems = legendContainer.selectAll(".legend-item")
-                    .data(colorScale.domain())
-                    .enter().append("div")
-                    .attr("class", "legend-item flex items-center space-x-2 clickable")
-                    .classed("hidden", d => hiddenLegendItems.has(d))
-                    .on("click", function(event, d) {
-                        if (hiddenLegendItems.has(d)) {
-                            hiddenLegendItems.delete(d);
-                        } else {
-                            hiddenLegendItems.add(d);
+            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, hueVar, sizeVar]} />;
+        };
+        
+        // 11. Box Plot
+        const BoxPlot = ({ data, xVar, yVar, notch }) => {
+            const draw = useCallback((svg, tooltip) => {
+                svg.selectAll("*").remove();
+                if (!data || data.length === 0) return;
+
+                const margin = { top: 20, right: 30, bottom: 80, left: 60 };
+                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                
+                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const groupedData = d3.group(data, d => d[xVar]);
+                const summaryStats = [];
+                groupedData.forEach((groupData, key) => {
+                    const sortedValues = groupData.map(d => d[yVar]).sort(d3.ascending);
+                    const q1 = d3.quantile(sortedValues, 0.25);
+                    const median = d3.quantile(sortedValues, 0.5);
+                    const q3 = d3.quantile(sortedValues, 0.75);
+                    if ([q1, median, q3].some(v => v === undefined)) return;
+                    const iqr = q3 - q1;
+                    const min = Math.max(d3.min(sortedValues), q1 - 1.5 * iqr);
+                    const max = Math.min(d3.max(sortedValues), q3 + 1.5 * iqr);
+                    const n = sortedValues.length;
+                    const notchOffset = 1.57 * iqr / Math.sqrt(n);
+                    summaryStats.push({ key, q1, median, q3, min, max, notchUpper: median + notchOffset, notchLower: median - notchOffset });
+                });
+                summaryStats.sort((a,b) => d3.ascending(a.key, b.key));
+
+                const xScale = d3.scaleBand().domain(summaryStats.map(d => d.key)).range([0, width]).padding(0.4);
+                const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[yVar])]).range([height, 0]).nice();
+                
+                g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                    .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                g.append("g").call(d3.axisLeft(yScale));
+
+                summaryStats.forEach(d => {
+                    const boxG = g.append("g").attr("transform", `translate(${xScale(d.key)}, 0)`);
+                    const boxWidth = xScale.bandwidth();
+
+                    // Whiskers
+                    boxG.append("line").attr("x1", boxWidth/2).attr("x2", boxWidth/2).attr("y1", yScale(d.min)).attr("y2", yScale(d.max)).attr("stroke", "black");
+                    boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.min)).attr("y2", yScale(d.min)).attr("stroke", "black");
+                    boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.max)).attr("y2", yScale(d.max)).attr("stroke", "black");
+
+                    // Box or Notched Box
+                    if (notch) {
+                        boxG.append("path")
+                           .attr("d", `
+                                M 0 ${yScale(d.q3)}
+                                H ${boxWidth}
+                                V ${yScale(d.notchUpper)}
+                                L ${boxWidth/2} ${yScale(d.median)}
+                                L 0 ${yScale(d.notchUpper)}
+                                V ${yScale(d.q1)}
+                                L ${boxWidth/2} ${yScale(d.median)}
+                                L ${boxWidth} ${yScale(d.q1)}
+                                V ${yScale(d.notchLower)}
+                                L ${boxWidth/2} ${yScale(d.median)}
+                                L 0 ${yScale(d.notchLower)}
+                                Z
+                           `)
+                           .attr("stroke", "black").attr("fill", "var(--accent-primary)");
+                    } else {
+                        boxG.append("rect").attr("x", 0).attr("y", yScale(d.q3)).attr("width", boxWidth).attr("height", yScale(d.q1) - yScale(d.q3)).attr("stroke", "black").attr("fill", "var(--accent-primary)");
+                        boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.median)).attr("y2", yScale(d.median)).attr("stroke", "black").attr("stroke-width", 2);
+                    }
+                });
+
+            }, [data, xVar, yVar, notch]);
+            return <D3Chart draw={draw} dependencies={[data, xVar, yVar, notch]} />;
+        };
+        
+        // 18. Heatmap
+        const Heatmap = ({ data, numericCols }) => {
+            const calculateCorrelationMatrix = (data, columns) => {
+                const n = columns.length;
+                const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
+                for (let i = 0; i < n; i++) {
+                    for (let j = i; j < n; j++) {
+                        const col1 = columns[i];
+                        const col2 = columns[j];
+                        const validData = data.filter(d => d[col1] != null && d[col2] != null);
+                        if (validData.length < 2) {
+                            matrix[i][j] = matrix[j][i] = 0;
+                            continue;
                         }
-                        updateDashboard();
-                    });
+                        const xSeries = validData.map(d => d[col1]);
+                        const ySeries = validData.map(d => d[col2]);
+                        const meanX = d3.mean(xSeries);
+                        const meanY = d3.mean(ySeries);
+                        const devX = d3.deviation(xSeries);
+                        const devY = d3.deviation(ySeries);
 
-                legendItems.append("div")
-                    .style("width", "12px")
-                    .style("height", "12px")
-                    .style("background-color", d => colorScale(d))
-                    .style("border-radius", "50%");
-
-                legendItems.append("span")
-                    .text(d => d);
-            }
-        }
-        
-        function drawBoxPlot(data, selector, catVar, numVar, xLabel, yLabel, animate) {
-            const svg = d3.select(selector);
-            svg.selectAll("*").remove();
-            
-            const isRotated = ['body-style', 'drive-wheels', 'symboling'].includes(catVar);
-            const currentMargin = isRotated ? marginRotated : margin;
-
-            const width = svg.node().getBoundingClientRect().width - currentMargin.left - currentMargin.right;
-            const height = svg.node().getBoundingClientRect().height - currentMargin.top - currentMargin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${currentMargin.left},${currentMargin.top})`);
-
-            const categories = [...new Set(data.map(d => d[catVar]))].sort((a,b) => d3.ascending(a,b));
-            const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.4);
-            const xAxis = g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
-            
-            if (isRotated) {
-                xAxis.selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
-            }
-            if (catVar === 'symboling') {
-                const symbolingMap = {'-2': 'V. Safe', '-1': 'Safe', '0': 'Neutral', '1': 'Risky', '2': 'V. Risky', '3': 'Most Risky'};
-                xAxis.selectAll("text").text(d => symbolingMap[d] || d);
-            }
-
-            const y = d3.scaleLinear().domain([0, d3.max(data, d => d[numVar])]).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y).tickFormat(d3.format("~s")))
-                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
-
-            const groupedData = d3.group(data, d => d[catVar]);
-            
-            groupedData.forEach((group, key) => {
-                const values = group.map(d => d[numVar]).sort(d3.ascending);
-                const q1 = d3.quantile(values, .25);
-                const median = d3.quantile(values, .5);
-                const q3 = d3.quantile(values, .75);
-                if (q1 === undefined || median === undefined || q3 === undefined) return;
-                
-                const boxG = g.append("g").attr("transform", `translate(${x(key)}, 0)`);
-                
-                boxG.append("rect")
-                    .attr("x", 0).attr("width", x.bandwidth())
-                    .style("fill", "var(--accent-primary)").attr("stroke", "var(--border-color)")
-                    .on("mouseover", (event) => {
-                        tooltip.style("opacity", 1).html(`<b>${key}</b><br>Median: ${d3.format("$,.0f")(median)}<br>Q1: ${d3.format("$,.0f")(q1)}<br>Q3: ${d3.format("$,.0f")(q3)}`)
-                            .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                    }).on("mouseout", () => tooltip.style("opacity", 0))
-                    .transition().duration(animate ? 800 : 0)
-                    .attr("y", y(q3)).attr("height", y(q1) - y(q3));
-
-                boxG.append("line")
-                    .attr("x1", 0).attr("x2", x.bandwidth())
-                    .attr("stroke", "var(--bg-secondary)").style("stroke-width", "2px")
-                    .transition().duration(animate ? 800 : 0)
-                    .attr("y1", y(median)).attr("y2", y(median));
-            });
-        }
-
-        function drawViolinPlot(data, selector, catVar, numVar, xLabel, yLabel, animate) {
-            const svg = d3.select(selector);
-            svg.selectAll("*").remove();
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-            const categories = [...new Set(data.map(d => d[catVar]))].sort();
-            const x = d3.scaleBand().range([0, width]).domain(categories).padding(0.1);
-            g.append("g").attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x))
-                .append("text").attr("y", 45).attr("x", width/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(xLabel);
-
-            const y = d3.scaleLinear().domain(d3.extent(data, d => d[numVar])).nice().range([height, 0]);
-            g.append("g").call(d3.axisLeft(y))
-                .append("text").attr("transform", "rotate(-90)").attr("y", -55).attr("x", -height/2).attr("text-anchor", "middle").attr("fill", "currentColor").text(yLabel);
-
-            const histogram = d3.histogram().domain(y.domain()).thresholds(y.ticks(15)).value(d => d[numVar]);
-            const sumstat = d3.group(data, d => d[catVar]);
-            
-            let maxNum = 0;
-            sumstat.forEach(group => {
-                let catBins = histogram(group);
-                let max = d3.max(catBins, d => d.length);
-                if (max > maxNum) maxNum = max;
-            });
-            const xNum = d3.scaleLinear().range([0, x.bandwidth()]).domain([-maxNum, maxNum]);
-
-            g.selectAll("myViolin").data(sumstat).join("g")
-                .attr("transform", d => `translate(${x(d[0])}, 0)`)
-                .append("path")
-                .datum(d => histogram(d[1] || []))
-                .style("stroke", "none").style("fill", "var(--accent-secondary)")
-                .attr("d", d3.area().x0(d => xNum(-d.length)).x1(d => xNum(d.length)).y(d => y(d.x0)).curve(d3.curveCatmullRom))
-                .style("opacity", 0)
-                .transition().duration(animate ? 800 : 0)
-                .style("opacity", 0.7);
-        }
-
-        function drawCorrelationHeatmap(data, animate) {
-            const svg = d3.select("#correlation-heatmap");
-            svg.selectAll("*").remove();
-            const localMargin = { top: 30, right: 30, bottom: 100, left: 100 };
-            const width = svg.node().getBoundingClientRect().width - localMargin.left - localMargin.right;
-            const height = svg.node().getBoundingClientRect().height - localMargin.top - localMargin.bottom;
-            const g = svg.append("g").attr("transform", `translate(${localMargin.left},${localMargin.top})`);
-
-            const columns = ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'length', 'width', 'symboling'];
-            const matrix = calculateCorrelationMatrix(data, columns);
-
-            const x = d3.scaleBand().range([0, width]).domain(columns).padding(0.05);
-            g.append("g").style("font-size", 10).attr("transform", `translate(0, ${height})`).call(d3.axisBottom(x).tickSize(0))
-               .selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
-
-            const y = d3.scaleBand().range([height, 0]).domain(columns).padding(0.05);
-            g.append("g").style("font-size", 10).call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
-
-            const color = d3.scaleSequential(d3.interpolateRdBu).domain([-1, 1]);
-
-            const heatmapData = [];
-            for (let i = 0; i < columns.length; i++) {
-                for (let j = 0; j < columns.length; j++) {
-                    heatmapData.push({ x: columns[i], y: columns[j], value: matrix[i][j] });
+                        if (devX === 0 || devY === 0) {
+                             matrix[i][j] = matrix[j][i] = 0;
+                             continue;
+                        }
+                        
+                        const correlation = d3.mean(xSeries.map((x_i, k) => (x_i - meanX) * (ySeries[k] - meanY))) / (devX * devY);
+                        matrix[i][j] = matrix[j][i] = isNaN(correlation) ? 0 : correlation;
+                    }
                 }
-            }
+                return matrix;
+            };
 
-            g.selectAll(".corr-rect").data(heatmapData, d => d.x+':'+d.y).join("rect")
-                .attr("x", d => x(d.x)).attr("y", d => y(d.y))
-                .attr("rx", 4).attr("ry", 4)
-                .attr("width", x.bandwidth()).attr("height", y.bandwidth())
-                .on("mouseover", (event, d) => {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`Corr(${d.x}, ${d.y}):<br><b>${d.value.toFixed(2)}</b>`)
-                        .style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 20) + "px");
-                }).on("mouseout", () => tooltip.style("opacity", 0))
-                .style("fill", d => color(d.value === undefined ? 0 : d.value))
-                .style("opacity", 0)
-                .transition().duration(animate ? 800 : 0)
-                .style("opacity", 1);
-            
-            g.selectAll(".corr-text").data(heatmapData).join("text")
-                .attr("x", d => x(d.x) + x.bandwidth() / 2)
-                .attr("y", d => y(d.y) + y.bandwidth() / 2)
-                .attr("dy", "0.35em")
-                .attr("text-anchor", "middle")
-                .style("font-size", "10px")
-                .style("fill", d => Math.abs(d.value) > 0.7 ? "white" : "black")
-                .text(d => d.value.toFixed(1))
-                .style("opacity", 0)
-                .transition().duration(animate ? 800 : 0)
-                .style("opacity", 1);
-        }
+            const draw = useCallback((svg, tooltip) => {
+                svg.selectAll("*").remove();
+                if (!data || data.length === 0) return;
+                
+                const selectedCols = ['price', 'horsepower', 'curb-weight', 'engine-size', 'city-mpg', 'highway-mpg', 'wheel-base', 'symboling'];
+                const matrix = calculateCorrelationMatrix(data, selectedCols);
 
-        function calculateCorrelationMatrix(data, columns) {
-            const n = columns.length;
-            const matrix = Array(n).fill(0).map(() => Array(n).fill(0));
-            for (let i = 0; i < n; i++) {
-                for (let j = i; j < n; j++) {
-                    const col1 = columns[i];
-                    const col2 = columns[j];
-                    const validData = data.filter(d => d[col1] !== undefined && d[col2] !== undefined);
-                    const xSeries = validData.map(d => d[col1]);
-                    const ySeries = validData.map(d => d[col2]);
-                    const correlation = d3.mean(xSeries.map((x_i, k) => (x_i - d3.mean(xSeries)) * (ySeries[k] - d3.mean(ySeries)))) / (d3.deviation(xSeries) * d3.deviation(ySeries));
-                    matrix[i][j] = isNaN(correlation) ? 0 : correlation;
-                    matrix[j][i] = isNaN(correlation) ? 0 : correlation;
+                const margin = { top: 50, right: 50, bottom: 100, left: 100 };
+                const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                
+                const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const xScale = d3.scaleBand().domain(selectedCols).range([0, width]).padding(0.05);
+                const yScale = d3.scaleBand().domain(selectedCols).range([height, 0]).padding(0.05);
+                const colorScale = d3.scaleSequential(d3.interpolateRdBu).domain([-1, 1]);
+
+                g.append("g").call(d3.axisTop(xScale)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "start");
+                g.append("g").call(d3.axisLeft(yScale));
+
+                const heatmapData = [];
+                for (let i = 0; i < selectedCols.length; i++) {
+                    for (let j = 0; j < selectedCols.length; j++) {
+                        heatmapData.push({ x: selectedCols[i], y: selectedCols[j], value: matrix[i][j] });
+                    }
                 }
-            }
-            return matrix;
-        }
-    });
+
+                g.selectAll(".tile").data(heatmapData).join("rect")
+                    .attr("class", "tile")
+                    .attr("x", d => xScale(d.x)).attr("y", d => yScale(d.y))
+                    .attr("width", xScale.bandwidth()).attr("height", yScale.bandwidth())
+                    .attr("fill", d => colorScale(d.value))
+                    .on("mouseover", (event, d) => {
+                        tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                        tooltip.html(`Corr(${d.x}, ${d.y}): <b>${d.value.toFixed(2)}</b>`);
+                    })
+                    .on("mouseout", () => tooltip.style("opacity", 0));
+
+            }, [data, numericCols]);
+            return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
+        };
+
+        // 3D Scatter Plot
+        const ScatterPlot3D = ({ data, xVar, yVar, zVar, hueVar }) => {
+            const mountRef = useRef(null);
+
+            useEffect(() => {
+                if (!data || data.length === 0 || !mountRef.current) return;
+                
+                const currentMount = mountRef.current;
+                const { clientWidth: width, clientHeight: height } = currentMount;
+
+                // Scene, Camera, Renderer
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xf1f5f9);
+                const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                camera.position.z = 5;
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(width, height);
+                currentMount.innerHTML = '';
+                currentMount.appendChild(renderer.domElement);
+                
+                const labelRenderer = new THREE.CSS2DRenderer();
+                labelRenderer.setSize(width, height);
+                labelRenderer.domElement.style.position = 'absolute';
+                labelRenderer.domElement.style.top = '0px';
+                currentMount.appendChild(labelRenderer.domElement);
+
+                // Controls
+                const controls = new THREE.OrbitControls(camera, labelRenderer.domElement);
+                controls.enableDamping = true;
+
+                // Data Scaling
+                const getScale = (key) => d3.scaleLinear().domain(d3.extent(data, d => d[key])).range([-2, 2]);
+                const xScale = getScale(xVar);
+                const yScale = getScale(yVar);
+                const zScale = getScale(zVar);
+                const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hueVar]))]);
+
+                // Add points
+                data.forEach(d => {
+                    if (d[xVar] == null || d[yVar] == null || d[zVar] == null) return;
+                    const geometry = new THREE.SphereGeometry(0.05, 16, 16);
+                    const material = new THREE.MeshBasicMaterial({ color: colorScale(d[hueVar]) });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set(xScale(d[xVar]), yScale(d[yVar]), zScale(d[zVar]));
+                    scene.add(sphere);
+                });
+
+                // Axes Helper
+                const axesHelper = new THREE.AxesHelper(2.5);
+                scene.add(axesHelper);
+                
+                // Axes Labels
+                const createLabel = (text, position) => {
+                    const div = document.createElement('div');
+                    div.className = 'label-3d';
+                    div.textContent = text;
+                    const label = new THREE.CSS2DObject(div);
+                    label.position.copy(position);
+                    return label;
+                };
+                scene.add(createLabel(xVar, new THREE.Vector3(2.7, 0, 0)));
+                scene.add(createLabel(yVar, new THREE.Vector3(0, 2.7, 0)));
+                scene.add(createLabel(zVar, new THREE.Vector3(0, 0, 2.7)));
+
+                // Animation loop
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                    labelRenderer.render(scene, camera);
+                };
+                animate();
+
+                // Handle resize
+                const handleResize = () => {
+                    const { clientWidth: newWidth, clientHeight: newHeight } = currentMount;
+                    camera.aspect = newWidth / newHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(newWidth, newHeight);
+                    labelRenderer.setSize(newWidth, newHeight);
+                };
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    window.removeEventListener('resize', handleResize);
+                    if(currentMount) currentMount.innerHTML = '';
+                };
+            }, [data, xVar, yVar, zVar, hueVar]);
+
+            return <div ref={mountRef} className="three-canvas-container"></div>;
+        };
+
+        // --- Main App Component ---
+        const App = () => {
+            const { data, loading, numericCols, categoricalCols } = useAutomobileData();
+            const [activeChart, setActiveChart] = useState('Scatter Plot');
+            
+            // State for chart controls
+            const [controls, setControls] = useState({
+                line: { x: 'horsepower', y: 'price', hue: 'drive-wheels', error: 'band' },
+                scatter: { x: 'horsepower', y: 'price', hue: 'body-style', size: 'curb-weight' },
+                box: { x: 'body-style', y: 'price', notch: true },
+                heatmap: {},
+                scatter3d: { x: 'price', y: 'horsepower', z: 'curb-weight', hue: 'body-style' },
+            });
+
+            const handleControlChange = (chart, key, value) => {
+                setControls(prev => ({
+                    ...prev,
+                    [chart]: { ...prev[chart], [key]: value }
+                }));
+            };
+
+            const chartTypes = [
+                { name: 'Line Chart', family: 'Relational' },
+                { name: 'Scatter Plot', family: 'Relational' },
+                { name: 'Box Plot', family: 'Distribution' },
+                { name: 'Heatmap', family: 'Matrix' },
+                { name: '3D Scatter', family: '3D' },
+            ];
+            
+            const groupedCharts = d3.group(chartTypes, d => d.family);
+
+            const renderChart = () => {
+                if (loading) return <div className="flex items-center justify-center h-full"><p className="text-lg">Loading Data...</p></div>;
+                if (data.length === 0 && !loading) return <div className="flex items-center justify-center h-full"><p className="text-lg text-red-500">Failed to load data.</p></div>;
+
+                switch (activeChart) {
+                    case 'Line Chart':
+                        return <LineChart data={data} xVar={controls.line.x} yVar={controls.line.y} hueVar={controls.line.hue} errorStyle={controls.line.error} />;
+                    case 'Scatter Plot':
+                        return <ScatterPlot data={data} xVar={controls.scatter.x} yVar={controls.scatter.y} hueVar={controls.scatter.hue} sizeVar={controls.scatter.size} />;
+                    case 'Box Plot':
+                        return <BoxPlot data={data} xVar={controls.box.x} yVar={controls.box.y} notch={controls.box.notch} />;
+                    case 'Heatmap':
+                        return <Heatmap data={data} numericCols={numericCols} />;
+                    case '3D Scatter':
+                        return <ScatterPlot3D data={data} xVar={controls.scatter3d.x} yVar={controls.scatter3d.y} zVar={controls.scatter3d.z} hueVar={controls.scatter3d.hue} />;
+                    default:
+                        return <div className="text-center">Select a chart type</div>;
+                }
+            };
+            
+            const renderControls = () => {
+                switch (activeChart) {
+                    case 'Line Chart':
+                        return <>
+                            <ControlSelect label="X-Axis" value={controls.line.x} onChange={e => handleControlChange('line', 'x', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Y-Axis" value={controls.line.y} onChange={e => handleControlChange('line', 'y', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Hue" value={controls.line.hue} onChange={e => handleControlChange('line', 'hue', e.target.value)} options={['None', ...categoricalCols]} />
+                            <ControlSelect label="Error Style" value={controls.line.error} onChange={e => handleControlChange('line', 'error', e.target.value)} options={['band', 'none']} />
+                        </>;
+                    case 'Scatter Plot':
+                        return <>
+                            <ControlSelect label="X-Axis" value={controls.scatter.x} onChange={e => handleControlChange('scatter', 'x', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Y-Axis" value={controls.scatter.y} onChange={e => handleControlChange('scatter', 'y', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Hue (Color)" value={controls.scatter.hue} onChange={e => handleControlChange('scatter', 'hue', e.target.value)} options={['None', ...categoricalCols]} />
+                            <ControlSelect label="Size" value={controls.scatter.size} onChange={e => handleControlChange('scatter', 'size', e.target.value)} options={['None', ...numericCols]} />
+                        </>;
+                    case 'Box Plot':
+                        return <>
+                            <ControlSelect label="Category (X-Axis)" value={controls.box.x} onChange={e => handleControlChange('box', 'x', e.target.value)} options={categoricalCols} />
+                            <ControlSelect label="Value (Y-Axis)" value={controls.box.y} onChange={e => handleControlChange('box', 'y', e.target.value)} options={numericCols} />
+                            <ControlToggle label="Show Notch" checked={controls.box.notch} onChange={e => handleControlChange('box', 'notch', e.target.checked)} />
+                        </>;
+                    case '3D Scatter':
+                        return <>
+                            <ControlSelect label="X-Axis" value={controls.scatter3d.x} onChange={e => handleControlChange('scatter3d', 'x', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Y-Axis" value={controls.scatter3d.y} onChange={e => handleControlChange('scatter3d', 'y', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Z-Axis" value={controls.scatter3d.z} onChange={e => handleControlChange('scatter3d', 'z', e.target.value)} options={numericCols} />
+                            <ControlSelect label="Hue (Color)" value={controls.scatter3d.hue} onChange={e => handleControlChange('scatter3d', 'hue', e.target.value)} options={categoricalCols} />
+                        </>;
+                    default: return <div className="text-gray-500">No controls for this chart.</div>;
+                }
+            };
+
+            return (
+                <div className="flex h-screen bg-gray-100 font-sans">
+                    {/* Sidebar */}
+                    <aside className="w-64 bg-sidebar text-text-sidebar p-4 flex flex-col flex-shrink-0">
+                        <h1 className="text-2xl font-bold text-white mb-8">Chart Studio</h1>
+                        <nav className="flex-grow">
+                            {Array.from(groupedCharts.keys()).map(family => (
+                                <div key={family} className="mb-4">
+                                    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">{family}</h2>
+                                    <ul>
+                                        {groupedCharts.get(family).map(chart => (
+                                            <li key={chart.name}>
+                                                <button
+                                                    onClick={() => setActiveChart(chart.name)}
+                                                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                        activeChart === chart.name
+                                                            ? 'bg-accent-primary text-white'
+                                                            : 'hover:bg-slate-700 hover:text-white'
+                                                    }`}
+                                                >
+                                                    {chart.name}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </nav>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col p-6 overflow-hidden">
+                        <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex-shrink-0">
+                            <h2 className="text-xl font-bold text-gray-800 mb-3">{activeChart} Controls</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {renderControls()}
+                            </div>
+                        </div>
+                        <div className="flex-grow bg-white p-4 rounded-lg shadow-sm flex items-center justify-center overflow-hidden chart-container">
+                           {renderChart()}
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
