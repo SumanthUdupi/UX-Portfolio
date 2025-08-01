@@ -184,6 +184,11 @@
         }
 
         /* --- Tab Component Styles --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .tabs-container {
             display: flex;
             gap: 2rem;
@@ -221,6 +226,7 @@
         }
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.5s ease-out forwards;
         }
         @media (max-width: 767px) {
             .tabs-container {
@@ -233,6 +239,18 @@
                 padding-bottom: 1rem;
                 white-space: nowrap;
             }
+        }
+
+        /* --- Movement UI Styles --- */
+        .hero-bg {
+            transition: transform 0.2s ease-out;
+        }
+        .interactive-card {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+        }
+        .magnetic-btn {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
     </style>
@@ -259,7 +277,7 @@
     <main>
         <!-- Hero Section -->
         <section class="relative overflow-hidden bg-bg-primary">
-            <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+            <div class="hero-bg absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
             
             <div class="container mx-auto px-6 py-24 md:py-40 text-center relative z-20">
                 <div class="max-w-4xl mx-auto">
@@ -271,7 +289,7 @@
                         A strategic analyst with a foundation in Systems Engineering and Data Science, skilled in translating complex business needs into technical solutions for global enterprise clients.
                     </p>
                     <div class="fade-in-up" style="animation-delay: 300ms;">
-                        <a href="#portfolio" class="btn btn-primary text-lg">View My Projects</a>
+                        <a href="#portfolio" class="btn btn-primary text-lg magnetic-btn">View My Projects</a>
                     </div>
                 </div>
             </div>
@@ -289,8 +307,8 @@
                 <div class="swiper-container portfolio-carousel fade-in-up">
                     <div class="swiper-wrapper">
                         <!-- Slide 1 -->
-                        <div class="swiper-slide">
-                            <a href="Automobile Dashboard.html" target="_blank" class="block h-full">
+                        <div class="swiper-slide interactive-card">
+                            <a href="#" target="_blank" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
                                         <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
@@ -304,7 +322,7 @@
                             </a>
                         </div>
                         <!-- Slide 2 -->
-                        <div class="swiper-slide">
+                        <div class="swiper-slide interactive-card">
                             <a href="#" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
@@ -319,7 +337,7 @@
                             </a>
                         </div>
                         <!-- Slide 3 -->
-                        <div class="swiper-slide">
+                        <div class="swiper-slide interactive-card">
                             <a href="#" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
@@ -334,7 +352,7 @@
                             </a>
                         </div>
                         <!-- Slide 4 (Duplicate of 1) -->
-                        <div class="swiper-slide">
+                        <div class="swiper-slide interactive-card">
                             <a href="#" target="_blank" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
@@ -349,7 +367,7 @@
                             </a>
                         </div>
                         <!-- Slide 5 (Duplicate of 2) -->
-                        <div class="swiper-slide">
+                        <div class="swiper-slide interactive-card">
                             <a href="#" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
@@ -364,7 +382,7 @@
                             </a>
                         </div>
                         <!-- Slide 6 (Duplicate of 3) -->
-                        <div class="swiper-slide">
+                        <div class="swiper-slide interactive-card">
                             <a href="#" class="block h-full">
                                 <div class="project-card">
                                     <div class="project-image-container">
@@ -483,7 +501,7 @@
         <section id="about" class="py-24 md:py-32 bg-bg-primary">
             <div class="container mx-auto px-6">
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 md:gap-16 items-center">
-                    <div class="lg:col-span-2 fade-in-up">
+                    <div class="lg:col-span-2 fade-in-up interactive-card">
                         <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="rounded-xl w-full object-cover shadow-2xl">
                     </div>
                     <div class="lg:col-span-3 fade-in-up" style="animation-delay: 150ms;">
@@ -516,7 +534,7 @@
                     <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Let's Discuss Your Next Project.</h2>
                     <p class="text-lg text-text-secondary mt-5 mb-10 fade-in-up" style="animation-delay: 100ms;">I'm available for new opportunities. If you're looking for a dedicated analyst to help drive your business forward, I'd love to connect.</p>
                     <div class="fade-in-up" style="animation-delay: 200ms;">
-                        <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-xl">sumanthudupi858@gmail.com</a>
+                        <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-xl magnetic-btn">sumanthudupi858@gmail.com</a>
                     </div>
                 </div>
             </div>
@@ -599,17 +617,67 @@
         // Tab functionality
         function openTab(event, tabName) {
             let i, tabcontent, tablinks;
+            
+            // Get all elements with class="tab-content" and remove the "active" class
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
             }
+
+            // Get all elements with class="tab-button" and remove the class "active"
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
+                tablinks[i].classList.remove("active");
             }
-            document.getElementById(tabName).style.display = "block";
-            event.currentTarget.className += " active";
+
+            // Show the current tab by adding the "active" class, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
         }
+
+        // Movement UI Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Parallax Hero Background
+            const heroBg = document.querySelector('.hero-bg');
+            if (heroBg) {
+                document.addEventListener('mousemove', (e) => {
+                    const { clientX, clientY } = e;
+                    const x = (clientX / window.innerWidth - 0.5) * 30;
+                    const y = (clientY / window.innerHeight - 0.5) * 30;
+                    heroBg.style.transform = `translate(${x}px, ${y}px)`;
+                });
+            }
+
+            // Interactive 3D Tilt Cards
+            const interactiveCards = document.querySelectorAll('.interactive-card');
+            interactiveCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = card.getBoundingClientRect();
+                    const x = e.clientX - left;
+                    const y = e.clientY - top;
+                    const rotateX = (y / height - 0.5) * -15;
+                    const rotateY = (x / width - 0.5) * 15;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                });
+            });
+
+            // Magnetic Buttons
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = btn.getBoundingClientRect();
+                    const x = e.clientX - left - width / 2;
+                    const y = e.clientY - top - height / 2;
+                    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px)`;
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+        });
     </script>
 
 </body>
