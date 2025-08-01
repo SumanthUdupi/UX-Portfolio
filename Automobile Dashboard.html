@@ -461,7 +461,7 @@
                 }, [data, numericCols]);
                 return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
             },
-            ScatterPlot3D: ({ data, x, y, z, hue }) => {
+            '3DScatter': ({ data, x, y, z, hue }) => {
                 const mountRef = useRef(null);
                 const theme = document.documentElement.className;
 
@@ -594,7 +594,7 @@
                 if (error) return <div className="flex items-center justify-center h-full text-red-500 bg-red-500/10 rounded-lg p-4"><p>{error}</p></div>;
                 if (data.length === 0) return <div className="flex items-center justify-center h-full text-text-secondary"><p>No data available to display.</p></div>;
                 
-                const ChartComponent = ChartComponents[activeChart.replace(' ', '')];
+                const ChartComponent = ChartComponents[activeChart.replace(/ /g, '')];
                 const chartControls = controls[activeChart.toLowerCase().replace(/ /g, '')];
                 return <ChartComponent data={data} {...chartControls} numericCols={numericCols} categoricalCols={categoricalCols} />;
             };
