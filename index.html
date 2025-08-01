@@ -156,11 +156,11 @@
              border-radius: 0.75rem;
              overflow: hidden;
              transition: all 0.3s ease;
-        }
+         }
         
         .swiper-slide-active .project-card {
              box-shadow: 0 10px 30px var(--shadow-color);
-        }
+         }
         
         .swiper-slide .project-image-container {
             flex-shrink: 0;
@@ -591,6 +591,19 @@
     <!-- Swiper.js for Carousel -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
+        // --- FIX: Add window.onload to remove loading screen ---
+        window.onload = function() {
+            document.body.classList.remove('is-loading');
+            const loadingScreen = document.querySelector('.loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                // Remove from DOM after transition to prevent interaction issues
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500); // This duration should match the CSS transition
+            }
+        };
+
         // Staggered fade-in animation for sections on scroll
         const animatedElements = document.querySelectorAll('.fade-in-up');
 
