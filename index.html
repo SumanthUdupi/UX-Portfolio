@@ -30,6 +30,10 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        
+        body.overflow-hidden {
+            overflow: hidden;
+        }
 
         .gradient-text {
             background: linear-gradient(90deg, #ffffff, var(--brand-gold));
@@ -252,6 +256,40 @@
         .magnetic-btn {
             transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+        
+        /* --- Dashboard Viewer Styles --- */
+        #dashboard-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            z-index: 100;
+            display: none; /* Hidden by default */
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        #close-dashboard-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background-color: var(--brand-gold);
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 110;
+        }
+        #root {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
 
     </style>
 </head>
@@ -308,18 +346,18 @@
                     <div class="swiper-wrapper">
                         <!-- Slide 1 -->
                         <div class="swiper-slide interactive-card">
-                            <a href="#" target="_blank" class="block h-full">
+                            <div id="view-dashboard-btn" class="block h-full cursor-pointer">
                                 <div class="project-card">
                                     <div class="project-image-container">
                                         <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-8">
-                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS</p>
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS • REACT</p>
                                         <h3 class="text-2xl font-bold mb-4">Interactive Automobile Dashboard</h3>
-                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations to uncover deep insights from automobile data.</p>
+                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations. Click to view.</p>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <!-- Slide 2 -->
                         <div class="swiper-slide interactive-card">
@@ -353,18 +391,18 @@
                         </div>
                         <!-- Slide 4 (Duplicate of 1) -->
                         <div class="swiper-slide interactive-card">
-                            <a href="#" target="_blank" class="block h-full">
+                             <div id="view-dashboard-btn-2" class="block h-full cursor-pointer">
                                 <div class="project-card">
                                     <div class="project-image-container">
                                         <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-8">
-                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS</p>
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS • REACT</p>
                                         <h3 class="text-2xl font-bold mb-4">Interactive Automobile Dashboard</h3>
-                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations to uncover deep insights from automobile data.</p>
+                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations. Click to view.</p>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <!-- Slide 5 (Duplicate of 2) -->
                         <div class="swiper-slide interactive-card">
@@ -556,6 +594,16 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Dashboard Viewer -->
+    <div id="dashboard-viewer">
+        <button id="close-dashboard-btn">Close</button>
+        <div id="root">
+            <noscript>You need to enable JavaScript to run this app.</noscript>
+            <h2 class="text-2xl">Interactive dashboard would load here.</h2>
+        </div>
+    </div>
+
 
     <!-- Swiper.js for Carousel -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
@@ -677,6 +725,32 @@
                     btn.style.transform = 'translate(0, 0)';
                 });
             });
+            
+            // --- NEW: Dashboard Viewer Logic ---
+            const dashboardViewer = document.getElementById('dashboard-viewer');
+            const openDashboardBtn = document.getElementById('view-dashboard-btn');
+            const openDashboardBtn2 = document.getElementById('view-dashboard-btn-2'); // For the duplicated slide
+            const closeDashboardBtn = document.getElementById('close-dashboard-btn');
+
+            function openDashboard() {
+                dashboardViewer.style.display = 'block';
+                document.body.classList.add('overflow-hidden'); // Prevent scrolling of the main page
+            }
+            
+            function closeDashboard() {
+                dashboardViewer.style.display = 'none';
+                 document.body.classList.remove('overflow-hidden');
+            }
+
+            if(openDashboardBtn) {
+                openDashboardBtn.addEventListener('click', openDashboard);
+            }
+            if(openDashboardBtn2) {
+                openDashboardBtn2.addEventListener('click', openDashboard);
+            }
+            if(closeDashboardBtn) {
+                closeDashboardBtn.addEventListener('click', closeDashboard);
+            }
         });
     </script>
 
