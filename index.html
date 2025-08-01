@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumanth Udupi - Senior Business Analyst</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Swiper.js CSS for Carousel -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --brand-gold: #f5cb5c;
+            --brand-gold-darker: #e4b94c;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --border-color: rgba(245, 203, 92, 0.15);
+            --shadow-color: rgba(245, 203, 92, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body.overflow-hidden {
+            overflow: hidden;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #ffffff, var(--brand-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            padding: 14px 36px;
+            border-radius: 8px;
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--brand-gold);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.6s;
+            z-index: -1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px var(--shadow-color), 0 5px 15px rgba(245, 203, 92, 0.2);
+        }
+        
+        .btn-primary:hover:before {
+            left: 100%;
+        }
+
+        .glass-effect {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* --- Carousel Styles --- */
+        .portfolio-carousel-section {
+            background-color: var(--bg-secondary);
+            overflow: hidden;
+        }
+        
+        .portfolio-carousel {
+            width: 100%;
+            padding-top: 50px;
+            padding-bottom: 80px; /* Extra space for pagination */
+        }
+
+        .swiper-slide {
+            width: 90%; /* Responsive width for mobile */
+            max-width: 400px; /* Max width for larger screens */
+            height: 500px;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            opacity: 0.4;
+            transform: scale(0.9);
+        }
+        
+        .swiper-slide-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .swiper-slide .project-card {
+             height: 100%;
+             display: flex;
+             flex-direction: column;
+             background-color: var(--bg-tertiary);
+             border: 1px solid var(--border-color);
+             border-radius: 0.75rem;
+             overflow: hidden;
+             transition: all 0.3s ease;
+        }
+        
+        .swiper-slide-active .project-card {
+             box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        
+        .swiper-slide .project-image-container {
+            flex-shrink: 0;
+            height: 200px;
+        }
+        
+        .swiper-slide .p-8 {
+            flex-grow: 1;
+        }
+
+        .swiper-3d .swiper-slide-shadow {
+            background-image: none !important;
+        }
+        
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--brand-gold);
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            transform: translateY(-50%) scale(1.2);
+        }
+        
+        @media (max-width: 767px) {
+            .swiper-button-next, .swiper-button-prev {
+                display: none;
+            }
+        }
+        
+        .swiper-pagination {
+            bottom: 20px !important;
+        }
+        
+        .swiper-pagination-bullet {
+            background: rgba(255,255,255,0.5);
+            width: 10px;
+            height: 10px;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: var(--brand-gold);
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        /* --- Tab Component Styles --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 2rem;
+        }
+        .tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            width: 250px;
+        }
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid transparent;
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: var(--bg-tertiary);
+            color: var(--brand-gold);
+            border-color: var(--border-color);
+        }
+        .tab-content {
+            display: none;
+            background-color: var(--bg-tertiary);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            flex-grow: 1;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @media (max-width: 767px) {
+            .tabs-container {
+                flex-direction: column;
+            }
+            .tab-buttons {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 1rem;
+                white-space: nowrap;
+            }
+        }
+
+        /* --- Movement UI Styles --- */
+        .hero-bg {
+            transition: transform 0.2s ease-out;
+        }
+        .interactive-card {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+        }
+        .magnetic-btn {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* --- Dashboard Viewer Styles --- */
+        #dashboard-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            z-index: 100;
+            display: none; /* Hidden by default */
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        #close-dashboard-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background-color: var(--brand-gold);
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 110;
+        }
+        #root {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="glass-effect sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl md:text-2xl font-bold text-white tracking-tight hover:text-brand-gold transition-colors duration-300">Sumanth Udupi</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#portfolio" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Projects</a>
+                <a href="#process" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">Process</a>
+                <a href="#about" class="text-gray-300 hover:text-white transition-colors duration-300 font-medium">About</a>
+                <a href="#contact" class="btn btn-primary text-sm py-2 px-6">Contact Me</a>
+            </div>
+            <div class="md:hidden">
+                 <a href="#contact" class="btn btn-primary text-sm py-2 px-4">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden bg-bg-primary">
+            <div class="hero-bg absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+            
+            <div class="container mx-auto px-6 py-24 md:py-40 text-center relative z-20">
+                <div class="max-w-4xl mx-auto">
+                    <p class="text-lg font-semibold text-brand-gold mb-4 fade-in-up">SUMANTH UDUPI - SENIOR BUSINESS ANALYST</p>
+                    <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 fade-in-up" style="animation-delay: 100ms;">
+                        <span class="gradient-text">Bridging Business & Technology with Data-Driven Insights.</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-text-secondary mb-12 max-w-3xl mx-auto fade-in-up" style="animation-delay: 200ms;">
+                        A strategic analyst with a foundation in Systems Engineering and Data Science, skilled in translating complex business needs into technical solutions for global enterprise clients.
+                    </p>
+                    <div class="fade-in-up" style="animation-delay: 300ms;">
+                        <a href="#portfolio" class="btn btn-primary text-lg magnetic-btn">View My Projects</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="portfolio-carousel-section py-24 md:py-32">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Data Science & Analytics Dashboards</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">Interactive dashboards and analytical models designed to turn data into actionable insights.</p>
+                </div>
+            
+                 <!-- Swiper Carousel for Data Science Projects -->
+                <div class="swiper-container portfolio-carousel fade-in-up">
+                    <div class="swiper-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide interactive-card">
+                            <div id="view-dashboard-btn" class="block h-full cursor-pointer">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS • REACT</p>
+                                        <h3 class="text-2xl font-bold mb-4">Interactive Automobile Dashboard</h3>
+                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations. Click to view.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide interactive-card">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Predictive+Analytics%0Afor+Compliance+Risk&font=inter" alt="Predictive Analytics for Compliance Risk" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">AI/ML INTEGRATION ANALYSIS</p>
+                                        <h3 class="text-2xl font-bold mb-4">Predictive Analytics for Compliance Risk</h3>
+                                        <p class="text-text-secondary">Spearheaded the business analysis for integrating predictive AI/ML models into compliance modules, improving early risk detection accuracy by 20%.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide interactive-card">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Process+Performance%0AMetrics+Dashboard&font=inter" alt="Process Performance Metrics Dashboard" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">INTERACTIVE DASHBOARDS</p>
+                                        <h3 class="text-2xl font-bold mb-3">Process Performance Dashboards</h3>
+                                        <p class="text-text-secondary">Developed a suite of dashboards in Power BI and Superset to track metrics across ESG, CAPA, and risk modules, improving executive reporting accuracy.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Slide 4 (Duplicate of 1) -->
+                        <div class="swiper-slide interactive-card">
+                             <div id="view-dashboard-btn-2" class="block h-full cursor-pointer">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Automobile%0AAnalytics&font=inter" alt="Automobile Data Dashboard" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">DATA VISUALIZATION • D3.JS • REACT</p>
+                                        <h3 class="text-2xl font-bold mb-4">Interactive Automobile Dashboard</h3>
+                                        <p class="text-text-secondary">A comprehensive dashboard with interactive filters, dynamic KPIs, and multiple visualizations. Click to view.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 5 (Duplicate of 2) -->
+                        <div class="swiper-slide interactive-card">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Predictive+Analytics%0Afor+Compliance+Risk&font=inter" alt="Predictive Analytics for Compliance Risk" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">AI/ML INTEGRATION ANALYSIS</p>
+                                        <h3 class="text-2xl font-bold mb-4">Predictive Analytics for Compliance Risk</h3>
+                                        <p class="text-text-secondary">Spearheaded the business analysis for integrating predictive AI/ML models into compliance modules, improving early risk detection accuracy by 20%.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Slide 6 (Duplicate of 3) -->
+                        <div class="swiper-slide interactive-card">
+                            <a href="#" class="block h-full">
+                                <div class="project-card">
+                                    <div class="project-image-container">
+                                        <img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Process+Performance%0AMetrics+Dashboard&font=inter" alt="Process Performance Metrics Dashboard" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="p-8">
+                                        <p class="text-sm font-semibold text-brand-gold mb-2">INTERACTIVE DASHBOARDS</p>
+                                        <h3 class="text-2xl font-bold mb-3">Process Performance Dashboards</h3>
+                                        <p class="text-text-secondary">Developed a suite of dashboards in Power BI and Superset to track metrics across ESG, CAPA, and risk modules, improving executive reporting accuracy.</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Add Pagination -->
+                    <div class="swiper-pagination"></div>
+                    <!-- Add Navigation -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Initiatives Section -->
+        <section id="business-initiatives" class="py-24 md:py-32 bg-bg-primary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Strategic Business Initiatives</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">A selection of projects where I applied analytical rigor to solve key business challenges.</p>
+                </div>
+
+                <div class="tabs-container fade-in-up" style="animation-delay: 200ms;">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="openTab(event, 'esg-platform')">ESG & EHS Platform</button>
+                        <button class="tab-button" onclick="openTab(event, 'qms-modernization')">Automotive QMS</button>
+                        <button class="tab-button" onclick="openTab(event, 'agile-delivery')">Agile Delivery</button>
+                        <button class="tab-button" onclick="openTab(event, 'api-strategy')">API Integration</button>
+                    </div>
+                    <div id="esg-platform" class="tab-content active">
+                        <h3 class="text-3xl font-bold mb-4">Enterprise ESG & EHS Compliance Platform</h3>
+                        <p class="text-text-secondary mb-6">Led the end-to-end business analysis for a comprehensive Environmental, Health, and Safety (EHS) platform. My role involved conducting global discovery sessions, defining the product roadmap, and authoring over 200 Gherkin-based user stories for modules like Risk Assessment and Incident Management. This initiative ensured the platform met stringent GRI and SASB standards, ultimately reducing client audit preparation time by 40%.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">End-to-End Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">GRI & SASB</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Product Roadmap</span>
+                        </div>
+                    </div>
+                    <div id="qms-modernization" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Automotive QMS Modernization</h3>
+                        <p class="text-text-secondary mb-6">Drove the requirements engineering process for modernizing critical Quality Management System (QMS) modules for major automotive OEMs. I facilitated workshops to gather requirements for Production Part Approval Process (PPAP) and Non-Conformity tracking. By creating detailed process models and user stories, we streamlined complex lab test data workflows and enhanced supplier compliance reporting capabilities.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Requirements Engineering</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">PPAP</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Process Modeling</span>
+                        </div>
+                    </div>
+                    <div id="agile-delivery" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Agile Delivery Acceleration</h3>
+                        <p class="text-text-secondary mb-6">Championed Agile methodologies by leading all ceremonies (sprint planning, backlog grooming, sprint reviews) for a 7-member cross-functional squad. Through meticulous backlog management in Azure DevOps and Jira and clear communication, I helped accelerate feature delivery by 15%. My focus on writing clear, unambiguous user stories reduced requirement-related queries from the development team by 30%.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Agile Leadership</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Azure DevOps</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Backlog Grooming</span>
+                        </div>
+                    </div>
+                     <div id="api-strategy" class="tab-content">
+                        <h3 class="text-3xl font-bold mb-4">Third-Party API Integration Strategy</h3>
+                        <p class="text-text-secondary mb-6">Authored detailed API requirements and system integration plans to automate data synchronization between core enterprise platforms and third-party systems. Using Postman and Swagger, I validated and documented REST API endpoints for features like Supplier Management and PLM, reducing API defects by 25% and enabling seamless data exchange for major industrial clients.</p>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">API & Systems Analysis</span>
+                             <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Postman & Swagger</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">REST API</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Process Section -->
+        <section id="process" class="py-24 md:py-32 bg-bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">My Analytical Process</h2>
+                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto fade-in-up" style="animation-delay: 100ms;">I employ a structured, iterative approach to deliver impactful business outcomes.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <!-- Process Step 1 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">01</div>
+                        <h3 class="text-2xl font-bold mb-3">Discovery & Elicitation</h3>
+                        <p class="text-text-secondary">Engaging with stakeholders to understand business objectives and elicit detailed requirements through interviews, workshops, and documentation analysis.</p>
+                    </div>
+                    <!-- Process Step 2 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 150ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">02</div>
+                        <h3 class="text-2xl font-bold mb-3">Analysis & Modeling</h3>
+                        <p class="text-text-secondary">Analyzing information, modeling processes (BPMN), and creating data models to define the current state and conceptualize the future state solution.</p>
+                    </div>
+                    <!-- Process Step 3 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 300ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">03</div>
+                        <h3 class="text-2xl font-bold mb-3">Specification & Validation</h3>
+                        <p class="text-text-secondary">Documenting clear, concise functional requirements and user stories in Gherkin syntax, ensuring alignment with all stakeholders before development.</p>
+                    </div>
+                    <!-- Process Step 4 -->
+                    <div class="border border-border-color p-8 rounded-xl fade-in-up" style="animation-delay: 450ms;">
+                        <div class="text-4xl font-bold text-brand-gold mb-4">04</div>
+                        <h3 class="text-2xl font-bold mb-3">Support & UAT</h3>
+                        <p class="text-text-secondary">Collaborating with development teams, validating solutions using Postman/Swagger, and facilitating User Acceptance Testing (UAT) to ensure the solution meets business needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me & Skills Section -->
+        <section id="about" class="py-24 md:py-32 bg-bg-primary">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 md:gap-16 items-center">
+                    <div class="lg:col-span-2 fade-in-up interactive-card">
+                        <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="rounded-xl w-full object-cover shadow-2xl">
+                    </div>
+                    <div class="lg:col-span-3 fade-in-up" style="animation-delay: 150ms;">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6">A Passion for Solving Complex Business Puzzles.</h2>
+                        <div class="space-y-6 text-lg text-text-secondary">
+                            <p>As a strategic Business Analyst with a unique foundation in Systems Engineering and Data Science, I thrive on dissecting complex business challenges and translating them into clear, actionable strategies. My goal is to serve as the critical link between business stakeholders and technical teams, ensuring that technology investments deliver tangible value.</p>
+                            <p>I am adept at managing product roadmaps, writing detailed user stories in Gherkin syntax, and leading Agile ceremonies. My experience includes collaborating with UX teams on Figma-based prototypes and using Postman and Swagger to validate and document REST API endpoints.</p>
+                        </div>
+                         <h3 class="text-2xl font-bold mt-12 mb-6">Core Competencies</h3>
+                         <div class="flex flex-wrap gap-3">
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Agile & Scrum</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Gherkin User Stories</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Azure DevOps & Jira</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">SQL</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Power BI & Tableau</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Process Modeling (BPMN)</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">REST API Analysis</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">Postman & Swagger</span>
+                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2 rounded-md">UAT Planning</span>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 md:py-32 bg-bg-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-4xl md:text-5xl font-bold fade-in-up">Let's Discuss Your Next Project.</h2>
+                    <p class="text-lg text-text-secondary mt-5 mb-10 fade-in-up" style="animation-delay: 100ms;">I'm available for new opportunities. If you're looking for a dedicated analyst to help drive your business forward, I'd love to connect.</p>
+                    <div class="fade-in-up" style="animation-delay: 200ms;">
+                        <a href="mailto:sumanthudupi858@gmail.com" class="btn btn-primary text-xl magnetic-btn">sumanthudupi858@gmail.com</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white border-t border-gray-900">
+        <div class="container mx-auto px-6 py-12">
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <div>
+                    <p class="text-lg font-bold">Sumanth Udupi</p>
+                    <p class="text-gray-500">&copy; 2025 All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6 mt-6 md:mt-0">
+                    <a href="https://linkedin.com/in/sumanth-udupi" target="_blank" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">LinkedIn</a>
+                    <a href="https://github.com/SumanthUdupi" target="_blank" class="text-gray-400 hover:text-brand-gold transition-colors duration-300">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Dashboard Viewer -->
+    <div id="dashboard-viewer">
+        <button id="close-dashboard-btn">Close</button>
+        <div id="root">
+            <noscript>You need to enable JavaScript to run this app.</noscript>
+            <h2 class="text-2xl">Interactive dashboard would load here.</h2>
+        </div>
+    </div>
+
+
+    <!-- Swiper.js for Carousel -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Staggered fade-in animation for sections on scroll
+        const animatedElements = document.querySelectorAll('.fade-in-up');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1 // Triggers when 10% of the element is visible
+        });
+
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Initialize Swiper Carousel
+        const swiper = new Swiper('.portfolio-carousel', {
+            effect: 'coverflow',
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            loop: true,
+            coverflowEffect: {
+                rotate: 0,
+                stretch: 0,
+                depth: 150,
+                modifier: 1,
+                slideShadows: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            breakpoints: {
+                // when window width is >= 768px
+                768: {
+                   coverflowEffect: {
+                        rotate: 25,
+                        depth: 150,
+                    },
+                }
+            }
+        });
+
+        // Tab functionality
+        function openTab(event, tabName) {
+            let i, tabcontent, tablinks;
+            
+            // Get all elements with class="tab-content" and remove the "active" class
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            // Get all elements with class="tab-button" and remove the class "active"
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+
+            // Show the current tab by adding the "active" class, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+
+        // Movement UI Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Parallax Hero Background
+            const heroBg = document.querySelector('.hero-bg');
+            if (heroBg) {
+                document.addEventListener('mousemove', (e) => {
+                    const { clientX, clientY } = e;
+                    const x = (clientX / window.innerWidth - 0.5) * 30;
+                    const y = (clientY / window.innerHeight - 0.5) * 30;
+                    heroBg.style.transform = `translate(${x}px, ${y}px)`;
+                });
+            }
+
+            // Interactive 3D Tilt Cards
+            const interactiveCards = document.querySelectorAll('.interactive-card');
+            interactiveCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = card.getBoundingClientRect();
+                    const x = e.clientX - left;
+                    const y = e.clientY - top;
+                    const rotateX = (y / height - 0.5) * -15;
+                    const rotateY = (x / width - 0.5) * 15;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                });
+            });
+
+            // Magnetic Buttons
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = btn.getBoundingClientRect();
+                    const x = e.clientX - left - width / 2;
+                    const y = e.clientY - top - height / 2;
+                    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px)`;
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+            
+            // --- NEW: Dashboard Viewer Logic ---
+            const dashboardViewer = document.getElementById('dashboard-viewer');
+            const openDashboardBtn = document.getElementById('view-dashboard-btn');
+            const openDashboardBtn2 = document.getElementById('view-dashboard-btn-2'); // For the duplicated slide
+            const closeDashboardBtn = document.getElementById('close-dashboard-btn');
+
+            function openDashboard() {
+                dashboardViewer.style.display = 'block';
+                document.body.classList.add('overflow-hidden'); // Prevent scrolling of the main page
+            }
+            
+            function closeDashboard() {
+                dashboardViewer.style.display = 'none';
+                 document.body.classList.remove('overflow-hidden');
+            }
+
+            if(openDashboardBtn) {
+                openDashboardBtn.addEventListener('click', openDashboard);
+            }
+            if(openDashboardBtn2) {
+                openDashboardBtn2.addEventListener('click', openDashboard);
+            }
+            if(closeDashboardBtn) {
+                closeDashboardBtn.addEventListener('click', closeDashboard);
+            }
+        });
+    </script>
+
+</body>
+</html>
