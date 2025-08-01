@@ -132,7 +132,7 @@ const ScatterPlot = ({ data, xVar, yVar }) => {
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave);
 
-    }, [data, xVar, yVar]);
+    }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
     return (
         <div className="w-full h-full relative">
@@ -228,7 +228,7 @@ const BarChart = ({ data, xVar, yVar }) => {
             .attr("height", d => boundedHeight - yScale(d.value))
             .attr("fill", "#10b981");
 
-    }, [data, xVar, yVar]);
+    }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
     return <svg ref={svgRef} className="w-full h-full"></svg>;
 };
@@ -318,7 +318,7 @@ const Histogram = ({ data, xVar }) => {
             .attr("height", d => boundedHeight - yScale(d.length))
             .attr("fill", "#8b5cf6");
 
-    }, [data, xVar]);
+    }, [data, xVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
     return <svg ref={svgRef} className="w-full h-full"></svg>;
 };
@@ -436,7 +436,7 @@ const BoxPlot = ({ data, xVar, yVar }) => {
                 .style("stroke-width", "2px");
         });
 
-    }, [data, xVar, yVar]);
+    }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
     return <svg ref={svgRef} className="w-full h-full"></svg>;
 };
