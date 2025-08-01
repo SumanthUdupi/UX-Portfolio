@@ -30,7 +30,8 @@
 
     <style>
         :root {
-            /* Light Theme (kept for toggle functionality, but default is dark) */
+            color-scheme: light;
+            /* Light Theme */
             --bg-primary: #f9fafb;
             --bg-secondary: #ffffff;
             --bg-tertiary: #f3f4f6;
@@ -45,6 +46,7 @@
         }
         /* --- Black and Gold Theme --- */
         html.dark {
+            color-scheme: dark;
             --bg-primary: #0a0a0a; /* near black */
             --bg-secondary: #1a1a1a; /* darker gray */
             --bg-tertiary: #2a2a2a; /* dark gray */
@@ -114,6 +116,12 @@
             border-radius: 6px;
         }
         .sidebar-transition { transition: transform 0.3s ease-in-out; }
+        
+        /* FIX: Style dropdown options for dark mode */
+        html.dark select, html.dark option {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -218,7 +226,7 @@
                         disabled={disabled} 
                         className="appearance-none w-full p-2.5 bg-bg-tertiary text-text-primary border border-border-color rounded-lg shadow-sm focus:ring-2 focus:ring-accent-primary focus:border-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors pr-8"
                     >
-                        {options.map(opt => <option key={opt} value={opt} className="bg-bg-secondary text-text-primary">{opt.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                        {options.map(opt => <option key={opt} value={opt}>{opt.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -306,6 +314,19 @@
                             g.append("path").datum(aggregatedData).attr("fill", colorScale(key)).attr("opacity", 0.2).attr("d", d3.area().x(d => xScale(d.x)).y0(d => yScale(d.y0)).y1(d => yScale(d.y1)));
                         }
                         g.append("path").datum(aggregatedData).attr("fill", "none").attr("stroke", colorScale(key)).attr("stroke-width", 2.5).attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
+                    
+                        // Add invisible circles for tooltips
+                        g.selectAll(`.dot-${key}`).data(aggregatedData).enter().append("circle")
+                            .attr("class", `dot-${key}`)
+                            .attr("cx", d => xScale(d.x))
+                            .attr("cy", d => yScale(d.y))
+                            .attr("r", 5)
+                            .attr("fill", "transparent")
+                            .on("mouseover", (event, d) => {
+                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                                tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${key}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d.x}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d.y.toFixed(0)}`);
+                            })
+                            .on("mouseout", () => tooltip.style("opacity", 0));
                     });
 
                     if (hue !== 'None') {
@@ -442,6 +463,14 @@
                         boxG.append("line").attr("x1", boxWidth/2).attr("x2", boxWidth/2).attr("y1", yScale(d.min)).attr("y2", yScale(d.max)).attr("stroke", "var(--text-tertiary)").attr("stroke-width", 1.5);
                         boxG.append("rect").attr("x", 0).attr("y", yScale(d.q3)).attr("width", boxWidth).attr("height", yScale(d.q1) - yScale(d.q3)).attr("stroke", "var(--text-primary)").attr("stroke-width", 1.5).attr("fill", colorScale(d.key)).attr("opacity", 0.8);
                         boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.median)).attr("y2", yScale(d.median)).attr("stroke", "var(--text-primary)").attr("stroke-width", 2);
+                    
+                        boxG.append("rect").attr("x", 0).attr("y", 0).attr("width", boxWidth).attr("height", height)
+                            .attr("fill", "transparent")
+                            .on("mouseover", (event) => {
+                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
+                                tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Max: ${d.max.toFixed(0)}<br>Q3: ${d.q3.toFixed(0)}<br>Median: ${d.median.toFixed(0)}<br>Q1: ${d.q1.toFixed(0)}<br>Min: ${d.min.toFixed(0)}`);
+                            })
+                            .on("mouseout", () => tooltip.style("opacity", 0));
                     });
 
                 }, [data, x, y, notch]);
