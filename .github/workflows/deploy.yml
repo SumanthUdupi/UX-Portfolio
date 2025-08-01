@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18 # A stable, long-term support version of Node.js
-          cache: 'npm'
+          # The 'cache' line has been removed to prevent the lock file error.
 
       - name: Install dependencies
         run: npm install
