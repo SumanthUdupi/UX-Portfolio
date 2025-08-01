@@ -73,7 +73,7 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-        .chart-tooltip {
+        .chart-tooltip, .info-tooltip-content {
             position: absolute;
             text-align: left;
             padding: 0.75rem;
@@ -90,6 +90,10 @@
             transition: opacity 0.2s, transform 0.2s;
             z-index: 9999;
             white-space: nowrap;
+        }
+        .info-tooltip-content {
+            white-space: normal;
+            max-width: 300px;
         }
         .chart-container {
             background-color: var(--bg-secondary);
@@ -117,7 +121,6 @@
         }
         .sidebar-transition { transition: transform 0.3s ease-in-out; }
         
-        /* FIX: Style dropdown options for dark mode */
         html.dark select, html.dark option {
             background-color: var(--bg-tertiary);
             color: var(--text-primary);
@@ -132,7 +135,7 @@
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
         // --- FIXED DATA URL ---
-        const DATA_URL = 'public/Rawdata/Automobile_data.csv';
+        const DATA_URL = 'Automobile_data.csv';
 
         // --- DATA LOADING & PROCESSING HOOK ---
         const useAutomobileData = () => {
@@ -152,6 +155,7 @@
                         newRow[newKey] = isNaN(numVal) ? val : numVal;
                     }
                 }
+                // Basic check for essential data points
                 if (!newRow.price || !newRow.horsepower || !newRow.curb_weight || !newRow.make || !newRow.body_style) {
                     return null;
                 }
@@ -166,13 +170,13 @@
                     })
                     .catch(err => {
                         console.error("Error loading or parsing data:", err);
-                        setError("Failed to load dataset. Please check the console for details.");
+                        setError("Failed to load dataset. Please check the file path and console for details.");
                     })
                     .finally(() => setLoading(false));
             }, [cleanRow]);
             
-            const numericCols = useMemo(() => ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base', 'length', 'width', 'height', 'bore', 'stroke', 'compression_ratio', 'peak_rpm', 'symboling', 'normalized_losses'], []);
-            const categoricalCols = useMemo(() => ['make', 'body_style', 'fuel_type', 'aspiration', 'num_of_doors', 'drive_wheels', 'engine_location', 'engine_type', 'num_of_cylinders', 'fuel_system'], []);
+            const numericCols = useMemo(() => ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base', 'length', 'width', 'height', 'bore', 'stroke', 'compression_ratio', 'peak_rpm', 'symboling', 'normalized_losses'].sort(), []);
+            const categoricalCols = useMemo(() => ['make', 'body_style', 'fuel_type', 'aspiration', 'num_of_doors', 'drive_wheels', 'engine_location', 'engine_type', 'num_of_cylinders', 'fuel_system'].sort(), []);
 
             return { data, loading, error, numericCols, categoricalCols };
         };
@@ -185,8 +189,7 @@
                 {path}
             </svg>
         );
-
-        // --- NEW Black & Gold Theme Icons ---
+        
         const ICONS = {
             'Line Chart': <Icon path={<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></>} />,
             'Scatter Plot': <Icon path={<><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="5" r="1"></circle><circle cx="5" cy="19" r="1"></circle><circle cx="5" cy="5" r="1"></circle><circle cx="19" cy="19" r="1"></circle></>} />,
@@ -194,6 +197,13 @@
             'Box Plot': <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></>} />,
             'Heatmap': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></>} />,
             '3D Scatter': <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="m3.27 6.96 8.74 5.05 8.74-5.05"></path><path d="m12 22.08 V 12"></path></>} />,
+            'Count Plot': <Icon path={<><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></>} />,
+            'Histogram': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /></>} />,
+            'Violin Plot': <Icon path={<><path d="M8 14s1.5-2 4-2 4 2 4 2"/><path d="M9 22c-2.5-1-4-2-4-4 0-2 1-4 4-4s4 2 4 4c0 2-1.5 3-4 4Z"/><path d="M15 22c2.5-1 4-2 4-4 0-2-1-4-4-4s-4 2-4 4c0 2 1.5 3 4 4Z"/><path d="M9 14v- архитектурно-строительный 2c0-2.5 2-4 4-4s4 1.5 4 4v2"/></>} />,
+            'Strip Plot': <Icon path={<><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></>} />,
+            'Swarm Plot': <Icon path={<><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="18" cy="12" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="16" cy="16" r="1"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="8" r="1"/></>} />,
+            'Pair Plot': <Icon path={<><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>} />,
+            'Joint Plot': <Icon path={<><path d="M3 3v18h18"/><path d="M7 17v-4h4"/><path d="M17 7V3h-4"/></>} />,
             'Menu': <Icon path={<><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>} />,
             'Close': <Icon path={<><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>} />,
             'Sun': <Icon path={<><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></>} className="w-5 h-5" />,
@@ -202,6 +212,60 @@
             'Dollar': <Icon path={<><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></>} />,
             'Trophy': <Icon path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></>} />,
             'Zap': <Icon path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>} />,
+            'Info': <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></>} className="w-5 h-5" />,
+        };
+
+        const CHART_DESCRIPTIONS = {
+            'Line Chart': 'Shows trends over a continuous interval. Best for visualizing changes in a variable (like price) against another (like horsepower).',
+            'Scatter Plot': 'Displays the relationship between two numerical variables. Each dot is an observation, revealing patterns, clusters, or outliers.',
+            'Bar Chart': 'Compares a numerical variable across different categories. Each bar shows an aggregate value, typically the average.',
+            'Count Plot': 'A simple bar chart that shows the number of occurrences for each category. Excellent for understanding categorical data distribution.',
+            'Box Plot': 'Summarizes data distribution for categories. Shows median, quartiles, and potential outliers, making it great for comparing groups.',
+            'Violin Plot': 'A combination of a Box Plot and a Kernel Density Plot. It shows the full distribution of the data, which is useful for seeing modality (multiple peaks).',
+            'Strip Plot': 'A simple categorical scatter plot. It plots each data point along an axis, which can be useful for seeing the spread and density of data.',
+            'Swarm Plot': 'Similar to a Strip Plot, but points are adjusted to not overlap. This gives a better representation of the distribution, especially for smaller datasets.',
+            'Histogram': 'Represents the distribution of a single numerical variable by grouping data into bins and counting the observations in each bin.',
+            'Heatmap': 'Visualizes a matrix of data, where values are represented by colors. Perfect for showing correlations between many variables at once.',
+            'Pair Plot': 'Creates a grid of plots to show pairwise relationships between several variables. The diagonal shows the distribution of each variable.',
+            'Joint Plot': 'Combines a bivariate plot (like a scatter) with univariate plots (like histograms) of the two variables in the margins.',
+            '3D Scatter': 'Extends a scatter plot to three dimensions, allowing for the visualization of relationships between three numerical variables.',
+        };
+
+        const InfoTooltip = ({ text }) => {
+            const [visible, setVisible] = useState(false);
+            const tooltipRef = useRef(null);
+            const iconRef = useRef(null);
+
+            const showTooltip = () => {
+                setVisible(true);
+                const iconRect = iconRef.current.getBoundingClientRect();
+                const tooltipNode = tooltipRef.current;
+                if (tooltipNode) {
+                    tooltipNode.style.opacity = 1;
+                    tooltipNode.style.transform = `translate(${iconRect.right + 10}px, ${iconRect.top}px)`;
+                }
+            };
+            const hideTooltip = () => {
+                setVisible(false);
+                const tooltipNode = tooltipRef.current;
+                if (tooltipNode) {
+                    tooltipNode.style.opacity = 0;
+                }
+            };
+
+            return (
+                <div className="relative inline-block ml-2">
+                    <button ref={iconRef} onMouseEnter={showTooltip} onMouseLeave={hideTooltip} className="text-text-tertiary hover:text-text-primary transition-colors">
+                        {ICONS.Info}
+                    </button>
+                    {ReactDOM.createPortal(
+                        <div ref={tooltipRef} className="info-tooltip-content fixed">
+                            {text}
+                        </div>,
+                        document.body
+                    )}
+                </div>
+            );
         };
 
         const KpiCard = ({ title, value, icon, format }) => (
@@ -234,16 +298,6 @@
                         </svg>
                     </div>
                 </div>
-            </div>
-        );
-
-        const ControlToggle = ({ label, checked, onChange, disabled=false }) => (
-            <div className="flex items-center justify-between pt-2">
-                <span className="text-sm font-medium text-text-secondary">{label}</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-bg-tertiary rounded-full peer peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-offset-bg-secondary peer-focus:ring-accent-primary/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-primary"></div>
-                </label>
             </div>
         );
         
@@ -282,7 +336,7 @@
 
         // --- CHART COMPONENTS ---
         const ChartComponents = {
-            LineChart: ({ data, x, y, hue, error: errorStyle }) => {
+            LineChart: ({ data, x, y, hue }) => {
                 const draw = useCallback((svg, tooltip) => {
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
@@ -304,39 +358,21 @@
                     
                     groupedData.forEach((groupData, key) => {
                         const sortedGroup = groupData.sort((a,b) => a[x] - b[x]);
-                        const aggregatedData = Array.from(d3.group(sortedGroup, d => d[x]), ([xVal, yVals]) => {
-                            const mean = d3.mean(yVals, d => d[y]);
-                            const std = d3.deviation(yVals, d => d[y]);
-                            return { x: xVal, y: mean, y0: mean - std, y1: mean + std };
-                        }).filter(d => d.y !== undefined);
-
-                        if(errorStyle === 'band' && aggregatedData.length > 1){
-                            g.append("path").datum(aggregatedData).attr("fill", colorScale(key)).attr("opacity", 0.2).attr("d", d3.area().x(d => xScale(d.x)).y0(d => yScale(d.y0)).y1(d => yScale(d.y1)));
-                        }
+                        const aggregatedData = Array.from(d3.group(sortedGroup, d => d[x]), ([xVal, yVals]) => ({ x: xVal, y: d3.mean(yVals, d => d[y]) })).filter(d => d.y !== undefined);
                         g.append("path").datum(aggregatedData).attr("fill", "none").attr("stroke", colorScale(key)).attr("stroke-width", 2.5).attr("d", d3.line().x(d => xScale(d.x)).y(d => yScale(d.y)));
-                    
-                        // Add invisible circles for tooltips
-                        g.selectAll(`.dot-${key}`).data(aggregatedData).enter().append("circle")
-                            .attr("class", `dot-${key}`)
-                            .attr("cx", d => xScale(d.x))
-                            .attr("cy", d => yScale(d.y))
-                            .attr("r", 5)
-                            .attr("fill", "transparent")
+                        g.selectAll(`.dot-${key}`).data(aggregatedData).enter().append("circle").attr("class", `dot-${key}`).attr("cx", d => xScale(d.x)).attr("cy", d => yScale(d.y)).attr("r", 5).attr("fill", "transparent")
                             .on("mouseover", (event, d) => {
-                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                                tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${key}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d.x}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d.y.toFixed(0)}`);
-                            })
-                            .on("mouseout", () => tooltip.style("opacity", 0));
+                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${key}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d.x}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d.y.toFixed(0)}`);
+                            }).on("mouseout", () => tooltip.style("opacity", 0));
                     });
 
                     if (hue !== 'None') {
-                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
-                            .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 30},${i * 25})`);
+                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g").attr("class", "legend").attr("transform", (d, i) => `translate(${width + 30},${i * 25})`);
                         legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
                         legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
                     }
-                }, [data, x, y, hue, errorStyle]);
-                return <D3Chart draw={draw} dependencies={[data, x, y, hue, errorStyle]} />;
+                }, [data, x, y, hue]);
+                return <D3Chart draw={draw} dependencies={[data, x, y, hue]} />;
             },
             ScatterPlot: ({ data, x, y, hue, size }) => {
                 const draw = useCallback((svg, tooltip) => {
@@ -349,7 +385,6 @@
                     if (width <= 0 || height <= 0) return;
                     
                     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
                     const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[x])).range([0, width]).nice();
                     const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
                     const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(hue !== 'None' ? [...new Set(data.map(d => d[hue]))].sort() : ['all']);
@@ -365,14 +400,11 @@
                         .attr("fill", d => colorScale(hue !== 'None' ? d[hue] : 'var(--accent-primary)'))
                         .attr("opacity", 0.7).attr("stroke", "var(--bg-secondary)").attr("stroke-width", 1.5)
                         .on("mouseover", (event, d) => {
-                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                            tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d[x]}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d[y]}${hue !== 'None' ? `<br><span class="capitalize">${hue.replace(/_/g, ' ')}</span>: ${d[hue]}` : ''}${size !== 'None' ? `<br><span class="capitalize">${size.replace(/_/g, ' ')}</span>: ${d[size]}` : ''}`);
-                        })
-                        .on("mouseout", () => tooltip.style("opacity", 0));
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br><span class="capitalize">${x.replace(/_/g, ' ')}</span>: ${d[x]}<br><span class="capitalize">${y.replace(/_/g, ' ')}</span>: ${d[y]}${hue !== 'None' ? `<br><span class="capitalize">${hue.replace(/_/g, ' ')}</span>: ${d[hue]}` : ''}${size !== 'None' ? `<br><span class="capitalize">${size.replace(/_/g, ' ')}</span>: ${d[size]}` : ''}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
                     
                     if (hue !== 'None') {
-                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g")
-                            .attr("class", "legend").attr("transform", (d, i) => `translate(${width + 30},${i * 25})`);
+                        const legend = g.selectAll(".legend").data(colorScale.domain()).enter().append("g").attr("class", "legend").attr("transform", (d, i) => `translate(${width + 30},${i * 25})`);
                         legend.append("rect").attr("x", 0).attr("width", 18).attr("height", 18).attr("rx", 4).style("fill", colorScale);
                         legend.append("text").attr("x", 24).attr("y", 9).attr("dy", ".35em").style("text-anchor", "start").text(d => d).attr("fill", "var(--text-secondary)");
                     }
@@ -403,22 +435,49 @@
                     g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
 
                     g.selectAll(".bar").data(aggregatedData).join("rect")
-                        .attr("class", "bar")
-                        .attr("x", d => xScale(d.key))
-                        .attr("y", d => yScale(d.value))
-                        .attr("width", xScale.bandwidth())
-                        .attr("height", d => height - yScale(d.value))
+                        .attr("class", "bar").attr("x", d => xScale(d.key)).attr("y", d => yScale(d.value))
+                        .attr("width", xScale.bandwidth()).attr("height", d => height - yScale(d.value))
                         .attr("fill", "var(--accent-primary)")
                         .on("mouseover", (event, d) => {
-                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                            tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Avg ${y.replace(/_/g, ' ')}: ${d.value.toFixed(0)}`);
-                        })
-                        .on("mouseout", () => tooltip.style("opacity", 0));
-
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Avg ${y.replace(/_/g, ' ')}: ${d.value.toFixed(0)}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
                 }, [data, x, y]);
                 return <D3Chart draw={draw} dependencies={[data, x, y]} />;
             },
-            BoxPlot: ({ data, x, y, notch }) => {
+            CountPlot: ({ data, x }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                     if (width <= 0 || height <= 0) return;
+
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    const counts = d3.rollup(data, v => v.length, d => d[x]);
+                    const aggregatedData = Array.from(counts, ([key, value]) => ({key, value})).sort((a,b) => b.value - a.value);
+                    
+                    const xScale = d3.scaleBand().domain(aggregatedData.map(d => d.key)).range([0, width]).padding(0.2);
+                    const yScale = d3.scaleLinear().domain([0, d3.max(aggregatedData, d => d.value)]).range([height, 0]).nice();
+
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+
+                    g.selectAll(".bar").data(aggregatedData).join("rect")
+                        .attr("class", "bar").attr("x", d => xScale(d.key)).attr("y", d => yScale(d.value))
+                        .attr("width", xScale.bandwidth()).attr("height", d => height - yScale(d.value))
+                        .attr("fill", "var(--accent-primary)")
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Count: ${d.value}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
+                }, [data, x]);
+                return <D3Chart draw={draw} dependencies={[data, x]} />;
+            },
+            BoxPlot: ({ data, x, y }) => {
                 const draw = useCallback((svg, tooltip) => {
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
@@ -453,28 +512,196 @@
                         .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
                     g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
                     g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-
                     const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(summaryStats.map(d => d.key));
 
                     summaryStats.forEach(d => {
                         const boxG = g.append("g").attr("transform", `translate(${xScale(d.key)}, 0)`);
                         const boxWidth = xScale.bandwidth();
-
                         boxG.append("line").attr("x1", boxWidth/2).attr("x2", boxWidth/2).attr("y1", yScale(d.min)).attr("y2", yScale(d.max)).attr("stroke", "var(--text-tertiary)").attr("stroke-width", 1.5);
                         boxG.append("rect").attr("x", 0).attr("y", yScale(d.q3)).attr("width", boxWidth).attr("height", yScale(d.q1) - yScale(d.q3)).attr("stroke", "var(--text-primary)").attr("stroke-width", 1.5).attr("fill", colorScale(d.key)).attr("opacity", 0.8);
                         boxG.append("line").attr("x1", 0).attr("x2", boxWidth).attr("y1", yScale(d.median)).attr("y2", yScale(d.median)).attr("stroke", "var(--text-primary)").attr("stroke-width", 2);
-                    
-                        boxG.append("rect").attr("x", 0).attr("y", 0).attr("width", boxWidth).attr("height", height)
-                            .attr("fill", "transparent")
+                        boxG.append("rect").attr("x", 0).attr("y", 0).attr("width", boxWidth).attr("height", height).attr("fill", "transparent")
                             .on("mouseover", (event) => {
-                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                                tooltip.html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Max: ${d.max.toFixed(0)}<br>Q3: ${d.q3.toFixed(0)}<br>Median: ${d.median.toFixed(0)}<br>Q1: ${d.q1.toFixed(0)}<br>Min: ${d.min.toFixed(0)}`);
-                            })
-                            .on("mouseout", () => tooltip.style("opacity", 0));
+                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Max: ${d.max.toFixed(0)}<br>Q3: ${d.q3.toFixed(0)}<br>Median: ${d.median.toFixed(0)}<br>Q1: ${d.q1.toFixed(0)}<br>Min: ${d.min.toFixed(0)}`);
+                            }).on("mouseout", () => tooltip.style("opacity", 0));
                     });
+                }, [data, x, y]);
+                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
+            },
+            ViolinPlot: ({ data, x, y }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
 
-                }, [data, x, y, notch]);
-                return <D3Chart draw={draw} dependencies={[data, x, y, notch]} />;
+                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    
+                    const groupedData = d3.group(data, d => d[x]);
+                    const categories = [...groupedData.keys()].sort();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.1);
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
+
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+
+                    // KDE function
+                    function kernelDensityEstimator(kernel, X) {
+                        return function(V) {
+                            return X.map(function(x) {
+                                return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+                            });
+                        };
+                    }
+                    function kernelEpanechnikov(k) {
+                        return function(v) {
+                            return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+                        };
+                    }
+                    
+                    const kde = kernelDensityEstimator(kernelEpanechnikov(7), yScale.ticks(40));
+                    
+                    const maxDensity = d3.max(Array.from(groupedData.values()), group => d3.max(kde(group.map(d => d[y])), d => d[1]));
+                    const xNum = d3.scaleLinear().range([0, xScale.bandwidth()]).domain([-maxDensity, maxDensity]);
+
+                    groupedData.forEach((groupData, key) => {
+                        const values = groupData.map(d => d[y]).filter(d => d != null);
+                        const density = kde(values);
+                        const q1 = d3.quantile(values, 0.25);
+                        const median = d3.quantile(values, 0.5);
+                        const q3 = d3.quantile(values, 0.75);
+                        const iqr = q3 - q1;
+                        const min = Math.max(d3.min(values), q1 - 1.5 * iqr);
+                        const max = Math.min(d3.max(values), q3 + 1.5 * iqr);
+
+                        const violinG = g.append("g").attr("transform", `translate(${xScale(key)}, 0)`);
+                        
+                        violinG.append("path").datum(density)
+                            .attr("fill", colorScale(key)).attr("opacity", 0.7)
+                            .attr("d", d3.area().x0(d => xNum(-d[1])).x1(d => xNum(d[1])).y(d => yScale(d[0])).curve(d3.curveCatmullRom));
+                        
+                        violinG.append("line").attr("x1", xScale.bandwidth()/2).attr("x2", xScale.bandwidth()/2).attr("y1", yScale(min)).attr("y2", yScale(max)).attr("stroke", "var(--text-primary)").attr("stroke-width", 1.5);
+                        violinG.append("rect").attr("x", xScale.bandwidth()/2 - 5).attr("y", yScale(q3)).attr("width", 10).attr("height", yScale(q1) - yScale(q3)).attr("fill", "var(--bg-secondary)").attr("stroke", "var(--text-primary)");
+                        violinG.append("circle").attr("cx", xScale.bandwidth()/2).attr("cy", yScale(median)).attr("r", 4).attr("fill", "var(--bg-secondary)").attr("stroke", "var(--text-primary)");
+                        
+                        violinG.append("rect").attr("x", 0).attr("y", 0).attr("width", xScale.bandwidth()).attr("height", height).attr("fill", "transparent")
+                            .on("mouseover", (event) => {
+                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${key}</strong><br>Median: ${median.toFixed(0)}<br>IQR: ${iqr.toFixed(0)}`);
+                            }).on("mouseout", () => tooltip.style("opacity", 0));
+                    });
+                }, [data, x, y]);
+                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
+            },
+            StripPlot: ({ data, x, y }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const categories = [...new Set(data.map(d => d[x]))].sort();
+                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.2);
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
+
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+
+                    g.selectAll("circle").data(data).join("circle")
+                        .attr("cx", d => xScale(d[x]) + xScale.bandwidth() / 2 + (Math.random() - 0.5) * 20) // Jitter
+                        .attr("cy", d => yScale(d[y]))
+                        .attr("r", 4)
+                        .attr("fill", d => colorScale(d[x]))
+                        .attr("opacity", 0.7)
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br>${x.replace(/_/g, ' ')}: ${d[x]}<br>${y.replace(/_/g, ' ')}: ${d[y]}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
+                }, [data, x, y]);
+                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
+            },
+            SwarmPlot: ({ data, x, y }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const categories = [...new Set(data.map(d => d[x]))].sort();
+                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.2);
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
+                    
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
+
+                    const simulation = d3.forceSimulation(data)
+                        .force("x", d3.forceX(d => xScale(d[x]) + xScale.bandwidth() / 2).strength(1))
+                        .force("y", d3.forceY(d => yScale(d[y])).strength(1))
+                        .force("collide", d3.forceCollide(5))
+                        .stop();
+
+                    for (let i = 0; i < 120; ++i) simulation.tick();
+
+                    g.selectAll("circle").data(data).join("circle")
+                        .attr("cx", d => d.x).attr("cy", d => d.y)
+                        .attr("r", 4)
+                        .attr("fill", d => colorScale(d[x]))
+                        .attr("opacity", 0.8)
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br>${x.replace(/_/g, ' ')}: ${d[x]}<br>${y.replace(/_/g, ' ')}: ${d[y]}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
+                }, [data, x, y]);
+                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
+            },
+            Histogram: ({ data, x, bins }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 30, right: 30, bottom: 60, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const values = data.map(d => d[x]).filter(d => d != null);
+                    const xScale = d3.scaleLinear().domain(d3.extent(values)).range([0, width]).nice();
+                    const histogram = d3.bin().value(d => d).domain(xScale.domain()).thresholds(xScale.ticks(bins));
+                    const binData = histogram(values);
+                    const yScale = d3.scaleLinear().domain([0, d3.max(binData, d => d.length)]).range([height, 0]).nice();
+
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+                    
+                    g.selectAll("rect").data(binData).join("rect")
+                        .attr("x", d => xScale(d.x0) + 1)
+                        .attr("width", d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
+                        .attr("y", d => yScale(d.length))
+                        .attr("height", d => height - yScale(d.length))
+                        .attr("fill", "var(--accent-primary)")
+                        .on("mouseover", (event, d) => {
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`Range: ${d.x0.toFixed(0)}-${d.x1.toFixed(0)}<br>Count: ${d.length}`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
+                }, [data, x, bins]);
+                return <D3Chart draw={draw} dependencies={[data, x, bins]} />;
             },
             Heatmap: ({ data, numericCols }) => {
                 const calculateCorrelationMatrix = (data, columns) => {
@@ -527,15 +754,102 @@
                     g.selectAll(".tile").data(heatmapData).join("rect")
                         .attr("class", "tile").attr("x", d => xScale(d.x)).attr("y", d => yScale(d.y))
                         .attr("width", xScale.bandwidth()).attr("height", yScale.bandwidth())
-                        .attr("rx", 4)
-                        .attr("fill", d => colorScale(d.value))
+                        .attr("rx", 4).attr("fill", d => colorScale(d.value))
                         .on("mouseover", (event, d) => {
-                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`);
-                            tooltip.html(`Corr(${d.x.replace(/_/g, ' ')}, ${d.y.replace(/_/g, ' ')}): <b>${d.value.toFixed(2)}</b>`);
-                        })
-                        .on("mouseout", () => tooltip.style("opacity", 0));
+                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`Corr(${d.x.replace(/_/g, ' ')}, ${d.y.replace(/_/g, ' ')}): <b>${d.value.toFixed(2)}</b>`);
+                        }).on("mouseout", () => tooltip.style("opacity", 0));
                 }, [data, numericCols]);
                 return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
+            },
+            PairPlot: ({ data, columns, hue }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0 || columns.length < 2) return;
+
+                    const margin = { top: 40, right: 40, bottom: 40, left: 40 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+                    
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const size = width / columns.length;
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hue]))].sort());
+
+                    const scales = {};
+                    columns.forEach(col => {
+                        scales[col] = d3.scaleLinear().domain(d3.extent(data, d => d[col])).range([size, 0]).nice();
+                    });
+
+                    columns.forEach((colY, i) => {
+                        columns.forEach((colX, j) => {
+                            const cell = g.append("g").attr("transform", `translate(${j * size}, ${i * size})`);
+                            if (i === j) { // Diagonal: Histogram
+                                const values = data.map(d => d[colX]).filter(d => d != null);
+                                const xScaleHist = d3.scaleLinear().domain(scales[colX].domain()).range([0, size]);
+                                const bins = d3.bin().domain(xScaleHist.domain()).thresholds(10)(values);
+                                const yScaleHist = d3.scaleLinear().range([size, 0]).domain([0, d3.max(bins, d => d.length)]);
+                                cell.selectAll("rect").data(bins).enter().append("rect")
+                                    .attr("x", d => xScaleHist(d.x0)).attr("width", d => xScaleHist(d.x1) - xScaleHist(d.x0) -1)
+                                    .attr("y", d => yScaleHist(d.length)).attr("height", d => size - yScaleHist(d.length))
+                                    .attr("fill", "var(--accent-primary)");
+                            } else { // Off-diagonal: Scatter plot
+                                cell.selectAll("circle").data(data).enter().append("circle")
+                                    .attr("cx", d => scales[colX].copy().range([0, size])(d[colX]))
+                                    .attr("cy", d => scales[colY](d[colY]))
+                                    .attr("r", 2).attr("fill", d => colorScale(d[hue])).attr("opacity", 0.6);
+                            }
+                            cell.append("rect").attr("width", size).attr("height", size).attr("fill", "none").attr("stroke", "var(--border-color)");
+                            if (i === columns.length - 1) cell.append("text").attr("x", size / 2).attr("y", size + 15).text(colX.replace(/_/g, ' ')).attr("text-anchor", "middle").attr("fill", "var(--text-secondary)");
+                            if (j === 0) cell.append("text").attr("transform", "rotate(-90)").attr("x", -size / 2).attr("y", -10).text(colY.replace(/_/g, ' ')).attr("text-anchor", "middle").attr("fill", "var(--text-secondary)");
+                        });
+                    });
+                }, [data, columns, hue]);
+                return <D3Chart draw={draw} dependencies={[data, columns, hue]} />;
+            },
+            JointPlot: ({ data, x, y }) => {
+                const draw = useCallback((svg, tooltip) => {
+                    svg.selectAll("*").remove();
+                    if (!data || data.length === 0) return;
+
+                    const margin = { top: 70, right: 70, bottom: 70, left: 70 };
+                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+                    if (width <= 0 || height <= 0) return;
+                    
+                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[x])).range([0, width]).nice();
+                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
+
+                    // Scatter plot
+                    g.selectAll("circle").data(data).join("circle")
+                        .attr("cx", d => xScale(d[x])).attr("cy", d => yScale(d[y]))
+                        .attr("r", 3).attr("fill", "var(--accent-primary)").attr("opacity", 0.6);
+                    
+                    // Top Histogram
+                    const histX = d3.bin().value(d => d[x]).domain(xScale.domain()).thresholds(20);
+                    const binsX = histX(data);
+                    const yHistScaleX = d3.scaleLinear().domain([0, d3.max(binsX, d => d.length)]).range([margin.top - 10, 0]);
+                    const gHistX = svg.append("g").attr("transform", `translate(${margin.left}, 0)`);
+                    gHistX.selectAll("rect").data(binsX).join("rect")
+                        .attr("x", d => xScale(d.x0)).attr("width", d => xScale(d.x1) - xScale(d.x0) - 1)
+                        .attr("y", d => yHistScaleX(d.length)).attr("height", d => margin.top - 10 - yHistScaleX(d.length))
+                        .attr("fill", "var(--accent-primary)");
+
+                    // Right Histogram
+                    const histY = d3.bin().value(d => d[y]).domain(yScale.domain()).thresholds(20);
+                    const binsY = histY(data);
+                    const xHistScaleY = d3.scaleLinear().domain([0, d3.max(binsY, d => d.length)]).range([0, margin.right - 10]);
+                    const gHistY = svg.append("g").attr("transform", `translate(${margin.left + width + 10}, ${margin.top})`);
+                    gHistY.selectAll("rect").data(binsY).join("rect")
+                        .attr("y", d => yScale(d.x1)).attr("height", d => yScale(d.x0) - yScale(d.x1) - 1)
+                        .attr("x", 0).attr("width", d => xHistScaleY(d.length))
+                        .attr("fill", "var(--accent-primary)");
+
+                    // Axes
+                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale));
+                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
+                }, [data, x, y]);
+                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
             },
             '3DScatter': ({ data, x, y, z, hue }) => {
                 const mountRef = useRef(null);
@@ -650,11 +964,18 @@
             };
             
             const [controls, setControls] = useState({
-                linechart: { x: 'horsepower', y: 'price', hue: 'drive_wheels', error: 'band' },
+                linechart: { x: 'horsepower', y: 'price', hue: 'drive_wheels' },
                 scatterplot: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
                 barchart: { x: 'make', y: 'price' },
+                countplot: { x: 'make' },
                 boxplot: { x: 'body_style', y: 'price' },
+                violinplot: { x: 'body_style', y: 'price' },
+                stripplot: { x: 'body_style', y: 'price' },
+                swarmplot: { x: 'body_style', y: 'price' },
+                histogram: { x: 'price', bins: 20 },
                 heatmap: {},
+                pairplot: { columns: ['price', 'horsepower', 'curb_weight'], hue: 'body_style' },
+                jointplot: { x: 'horsepower', y: 'price' },
                 '3dscatter': { x: 'price', y: 'horsepower', z: 'curb_weight', hue: 'body_style' },
             });
 
@@ -676,12 +997,19 @@
             }, [filteredData, loading]);
 
             const chartTypes = [
-                { name: 'Scatter Plot', family: 'Relational Analysis' },
-                { name: 'Line Chart', family: 'Relational Analysis' },
-                { name: 'Bar Chart', family: 'Categorical Analysis' },
-                { name: '3D Scatter', family: 'Multi-dimensional Analysis' },
-                { name: 'Box Plot', family: 'Distribution Analysis' },
-                { name: 'Heatmap', family: 'Correlation Analysis' },
+                { name: 'Scatter Plot', family: 'Relational' },
+                { name: 'Line Chart', family: 'Relational' },
+                { name: 'Joint Plot', family: 'Relational' },
+                { name: 'Pair Plot', family: 'Relational' },
+                { name: 'Bar Chart', family: 'Categorical' },
+                { name: 'Count Plot', family: 'Categorical' },
+                { name: 'Box Plot', family: 'Categorical' },
+                { name: 'Violin Plot', family: 'Categorical' },
+                { name: 'Strip Plot', family: 'Categorical' },
+                { name: 'Swarm Plot', family: 'Categorical' },
+                { name: 'Histogram', family: 'Distribution' },
+                { name: 'Heatmap', family: 'Matrix' },
+                { name: '3D Scatter', family: 'Multi-dimensional' },
             ];
             const groupedCharts = d3.group(chartTypes, d => d.family);
 
@@ -702,40 +1030,18 @@
                 if (!currentControls) {
                     return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
                 }
-
+                
                 const renderControls = () => {
                     switch (activeChart) {
-                        case 'Line Chart':
-                            return <>
-                                <ControlSelect label="X-Axis (Numeric)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Y-Axis (Numeric)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Group By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} />
-                                <ControlSelect label="Error Style" value={currentControls.error} onChange={e => handleControlChange(chartKey, 'error', e.target.value)} options={['band', 'none']} />
-                            </>;
-                        case 'Scatter Plot':
-                            return <>
-                                <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} />
-                                <ControlSelect label="Size By" value={currentControls.size} onChange={e => handleControlChange(chartKey, 'size', e.target.value)} options={['None', ...numericCols]} />
-                            </>;
-                        case 'Bar Chart':
-                            return <>
-                                <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} />
-                                <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
-                            </>;
-                        case 'Box Plot':
-                            return <>
-                                <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} />
-                                <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
-                            </>;
-                        case '3D Scatter':
-                            return <>
-                                <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Z-Axis" value={currentControls.z} onChange={e => handleControlChange(chartKey, 'z', e.target.value)} options={numericCols} />
-                                <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} />
-                            </>;
+                        case 'Line Chart': return <> <ControlSelect label="X-Axis (Numeric)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis (Numeric)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Group By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} /> </>;
+                        case 'Scatter Plot': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} /> <ControlSelect label="Size By" value={currentControls.size} onChange={e => handleControlChange(chartKey, 'size', e.target.value)} options={['None', ...numericCols]} /> </>;
+                        case 'Bar Chart': return <> <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
+                        case 'Count Plot': return <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} />;
+                        case 'Box Plot': case 'Violin Plot': case 'Strip Plot': case 'Swarm Plot': return <> <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
+                        case 'Histogram': return <> <ControlSelect label="Variable" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <div><label className="block text-sm font-medium text-text-secondary mb-1.5">Bins</label><input type="range" min="5" max="50" value={currentControls.bins} onChange={e => handleControlChange(chartKey, 'bins', +e.target.value)} className="w-full" /></div> </>;
+                        case 'Pair Plot': return <> <ControlSelect label="Hue" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} /> <div className="text-sm text-text-secondary">Select 3-5 variables for best results.</div></>;
+                        case 'Joint Plot': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
+                        case '3D Scatter': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Z-Axis" value={currentControls.z} onChange={e => handleControlChange(chartKey, 'z', e.target.value)} options={numericCols} /> <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} /> </>;
                         default: return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
                     }
                 };
@@ -812,7 +1118,10 @@
                                     {ICONS.Menu}
                                 </button>
                                 <div>
-                                    <h2 className="text-2xl font-bold text-text-primary">{activeChart}</h2>
+                                    <h2 className="text-2xl font-bold text-text-primary flex items-center">
+                                        {activeChart}
+                                        <InfoTooltip text={CHART_DESCRIPTIONS[activeChart]} />
+                                    </h2>
                                     <p className="text-sm text-text-secondary">Visualizing the 1985 Automobile Dataset</p>
                                 </div>
                            </div>
