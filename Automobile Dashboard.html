@@ -108,7 +108,6 @@
         const { useState, useEffect, useMemo, useRef, useCallback, forwardRef } = React;
 
         // --- DATA LOADING & PROCESSING HOOK ---
-        // FIX: Changed the DATA_URL to a valid, public URL to ensure the data can be fetched.
         const DATA_URL = 'https://gist.githubusercontent.com/mbostock/4349187/raw/0d2415848f03fe836894833a8aa136de0736085a/imports-85.csv';
 
         const useAutomobileData = () => {
@@ -500,6 +499,7 @@
                     animate();
 
                     const handleResize = () => {
+                        if (!currentMount) return;
                         const { clientWidth: newWidth, clientHeight: newHeight } = currentMount;
                         camera.aspect = newWidth / newHeight;
                         camera.updateProjectionMatrix();
@@ -524,12 +524,13 @@
             const [activeChart, setActiveChart] = useState('Scatter Plot');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
             
+            // FIX: Renamed keys to match the dynamic key generation logic (e.g., 'line' -> 'linechart').
             const [controls, setControls] = useState({
-                line: { x: 'horsepower', y: 'price', hue: 'drive_wheels', error: 'band' },
-                scatter: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
-                box: { x: 'body_style', y: 'price', notch: true },
+                linechart: { x: 'horsepower', y: 'price', hue: 'drive_wheels', error: 'band' },
+                scatterplot: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
+                boxplot: { x: 'body_style', y: 'price', notch: true },
                 heatmap: {},
-                scatter3d: { x: 'price', y: 'horsepower', z: 'curb_weight', hue: 'body_style' },
+                '3dscatter': { x: 'price', y: 'horsepower', z: 'curb_weight', hue: 'body_style' },
             });
 
             const handleControlChange = (chart, key, value) => {
@@ -564,14 +565,24 @@
                 if (data.length === 0) return <div className="flex items-center justify-center h-full text-text-secondary"><p>No data available to display.</p></div>;
                 
                 const ChartComponent = ChartComponents[activeChart.replace(' ', '')];
-                const chartControls = controls[activeChart.toLowerCase().replace(' ', '')];
+                const chartControls = controls[activeChart.toLowerCase().replace(/ /g, '')];
                 return <ChartComponent data={data} {...chartControls} numericCols={numericCols} />;
             };
             
             const ControlPanel = () => {
-                const chartKey = activeChart.toLowerCase().replace(' ', '');
+                const chartKey = activeChart.toLowerCase().replace(/ /g, '');
                 const currentControls = controls[chartKey];
                 
+                // Add a guard clause to prevent crash if controls for a chart are not defined
+                if (!currentControls) {
+                    return (
+                         <div className="chart-container">
+                            <h3 className="text-lg font-bold text-text-primary mb-4">Chart Controls</h3>
+                            <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>
+                        </div>
+                    );
+                }
+
                 const renderControls = () => {
                     switch (activeChart) {
                         case 'Line Chart':
