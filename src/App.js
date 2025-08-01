@@ -34,8 +34,7 @@ const ScatterPlot = ({ data, xVar, yVar }) => {
     const boundedWidth = width - margin.left - margin.right;
     const boundedHeight = height - margin.top - margin.bottom;
 
-    useEffect(() => {
-        if (!data || data.length === 0) return;
+useEffect(() => {   // effect code }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
         const svg = d3.select(svgRef.current)
             .attr("width", "100%")
@@ -149,8 +148,7 @@ const BarChart = ({ data, xVar, yVar }) => {
     const boundedWidth = width - margin.left - margin.right;
     const boundedHeight = height - margin.top - margin.bottom;
 
-    useEffect(() => {
-        if (!data || data.length === 0) return;
+useEffect(() => {   // effect code }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
         // Aggregate data: calculate mean of yVar for each category in xVar
         const aggregatedData = Array.from(
@@ -240,8 +238,7 @@ const Histogram = ({ data, xVar }) => {
     const boundedWidth = width - margin.left - margin.right;
     const boundedHeight = height - margin.top - margin.bottom;
 
-    useEffect(() => {
-        if (!data || data.length === 0) return;
+useEffect(() => {   // effect code }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
         const svg = d3.select(svgRef.current)
             .attr("width", "100%")
@@ -330,8 +327,7 @@ const BoxPlot = ({ data, xVar, yVar }) => {
     const boundedWidth = width - margin.left - margin.right;
     const boundedHeight = height - margin.top - margin.bottom;
 
-    useEffect(() => {
-        if (!data || data.length === 0) return;
+useEffect(() => {   // effect code }, [data, xVar, yVar, boundedHeight, boundedWidth, height, margin.left, margin.top, width]);
 
         const svg = d3.select(svgRef.current)
             .attr("width", "100%")
