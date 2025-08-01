@@ -31,6 +31,33 @@
             -moz-osx-font-smoothing: grayscale;
         }
         
+        /* --- Loading Screen Styles --- */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-primary);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--bg-tertiary);
+            border-top-color: var(--brand-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        body.is-loading > *:not(.loading-screen) {
+            visibility: hidden;
+            opacity: 0;
+        }
+
         .gradient-text {
             background: linear-gradient(90deg, #ffffff, var(--brand-gold));
             -webkit-background-clip: text;
@@ -254,7 +281,12 @@
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased is-loading">
+
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
 
     <!-- Header & Navigation -->
     <header class="glass-effect sticky top-0 z-50">
@@ -675,3 +707,4 @@
 
 </body>
 </html>
+" is not working as expected. Can you please help fix th
