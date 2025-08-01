@@ -1,7 +1,9 @@
+# .github/workflows/deploy.yml
+
 name: Deploy React App to GitHub Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Runs on pushes targeting the default branch (usually 'main')
   push:
     branches: ["main"]
 
@@ -27,29 +29,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        # Use the latest version of the checkout action
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        # Use the latest version of the setup-node action
+        uses: actions/setup-node@v4
         with:
-          node-version: 18 # Use a stable version of Node.js
+          node-version: 18 # A stable, long-term support version of Node.js
           cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build React App
+        # This command creates the 'build' folder with your final website files
         run: npm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        # Use the latest version of the configure-pages action
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        # Use the latest version of the upload-pages-artifact action
+        uses: actions/upload-pages-artifact@v3
         with:
-          # Upload build folder
+          # Upload the 'build' folder created in the previous step
           path: './build'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        # Use the latest version of the deploy-pages action
+        uses: actions/deploy-pages@v4
