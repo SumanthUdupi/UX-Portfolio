@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automobile Data Dashboard | Portfolio Edition</title>
+    <title>Automobile Data Story | Powered by Gemini</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -102,13 +102,15 @@
             padding: 1.5rem; /* 24px */
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
         }
         .axis path, .axis line { stroke: var(--border-color); }
         .axis text { fill: var(--text-secondary); font-size: 12px; }
         .grid-lines line { stroke: var(--border-color); stroke-opacity: 0.7; stroke-dasharray: 4,4; }
         .grid-lines path { stroke-width: 0; }
         
-        .three-canvas-container { width: 100%; height: 100%; position: relative; border-radius: 0.75rem; overflow: hidden;}
+        .three-canvas-container { flex-grow: 1; width: 100%; height: 100%; min-height: 300px; position: relative; border-radius: 0.75rem; overflow: hidden;}
         .three-canvas-container canvas { display: block; }
         
         .label-3d {
@@ -118,12 +120,24 @@
             background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
             padding: 4px 8px;
             border-radius: 6px;
+            pointer-events: none;
         }
         .sidebar-transition { transition: transform 0.3s ease-in-out; }
         
         html.dark select, html.dark option {
             background-color: var(--bg-tertiary);
             color: var(--text-primary);
+        }
+        .gemini-story-panel {
+            background: var(--accent-gradient);
+            padding: 1px;
+            border-radius: 0.75rem;
+        }
+        .gemini-story-content {
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 0.7rem;
+            height: 100%;
         }
     </style>
 </head>
@@ -134,7 +148,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-        // --- FIXED DATA URL ---
+        // --- DATA SOURCE ---
         const DATA_URL = 'public/Rawdata/Automobile_data.csv';
 
         // --- DATA LOADING & PROCESSING HOOK ---
@@ -155,7 +169,6 @@
                         newRow[newKey] = isNaN(numVal) ? val : numVal;
                     }
                 }
-                // Basic check for essential data points
                 if (!newRow.price || !newRow.horsepower || !newRow.curb_weight || !newRow.make || !newRow.body_style) {
                     return null;
                 }
@@ -196,14 +209,10 @@
             'Bar Chart': <Icon path={<><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></>} />,
             'Box Plot': <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></>} />,
             'Heatmap': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></>} />,
-            '3D Scatter': <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="m3.27 6.96 8.74 5.05 8.74-5.05"></path><path d="m12 22.08 V 12"></path></>} />,
+            '3D Scatter': <Icon path={<><path d="m21 16-4-4-4 4-4-4-4 4"/><path d="m7 12 4 4 4-4 4 4"/><path d="M3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8Z"/></>} />,
+            '3D Bar Chart': <Icon path={<><rect x="5" y="5" width="14" height="14" rx="2" /><path d="M12 3v18" /><path d="M3 12h18" /></>} />,
             'Count Plot': <Icon path={<><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></>} />,
-            'Histogram': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /></>} />,
-            'Violin Plot': <Icon path={<><path d="M8 14s1.5-2 4-2 4 2 4 2"/><path d="M9 22c-2.5-1-4-2-4-4 0-2 1-4 4-4s4 2 4 4c0 2-1.5 3-4 4Z"/><path d="M15 22c2.5-1 4-2 4-4 0-2-1-4-4-4s-4 2-4 4c0 2 1.5 3 4 4Z"/><path d="M9 14v- архитектурно-строительный 2c0-2.5 2-4 4-4s4 1.5 4 4v2"/></>} />,
-            'Strip Plot': <Icon path={<><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></>} />,
-            'Swarm Plot': <Icon path={<><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="18" cy="12" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="16" cy="16" r="1"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="8" r="1"/></>} />,
-            'Pair Plot': <Icon path={<><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>} />,
-            'Joint Plot': <Icon path={<><path d="M3 3v18h18"/><path d="M7 17v-4h4"/><path d="M17 7V3h-4"/></>} />,
+            'Histogram': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /></>} />,
             'Menu': <Icon path={<><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>} />,
             'Close': <Icon path={<><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>} />,
             'Sun': <Icon path={<><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></>} className="w-5 h-5" />,
@@ -213,6 +222,11 @@
             'Trophy': <Icon path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></>} />,
             'Zap': <Icon path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>} />,
             'Info': <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></>} className="w-5 h-5" />,
+            'Story': <Icon path={<><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M8 12h8"/><path d="M8 16h5"/><path d="m12 8-2 2 2 2"/></>} />,
+            'Explore': <Icon path={<><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="8"/></>} />,
+            'Next': <Icon path={<><polyline points="9 18 15 12 9 6"></polyline></>} className="w-5 h-5"/>,
+            'Prev': <Icon path={<><polyline points="15 18 9 12 15 6"></polyline></>} className="w-5 h-5"/>,
+            'Gemini': <Icon path={<><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></>} />,
         };
 
         const CHART_DESCRIPTIONS = {
@@ -221,14 +235,10 @@
             'Bar Chart': 'Compares a numerical variable across different categories. Each bar shows an aggregate value, typically the average.',
             'Count Plot': 'A simple bar chart that shows the number of occurrences for each category. Excellent for understanding categorical data distribution.',
             'Box Plot': 'Summarizes data distribution for categories. Shows median, quartiles, and potential outliers, making it great for comparing groups.',
-            'Violin Plot': 'A combination of a Box Plot and a Kernel Density Plot. It shows the full distribution of the data, which is useful for seeing modality (multiple peaks).',
-            'Strip Plot': 'A simple categorical scatter plot. It plots each data point along an axis, which can be useful for seeing the spread and density of data.',
-            'Swarm Plot': 'Similar to a Strip Plot, but points are adjusted to not overlap. This gives a better representation of the distribution, especially for smaller datasets.',
             'Histogram': 'Represents the distribution of a single numerical variable by grouping data into bins and counting the observations in each bin.',
             'Heatmap': 'Visualizes a matrix of data, where values are represented by colors. Perfect for showing correlations between many variables at once.',
-            'Pair Plot': 'Creates a grid of plots to show pairwise relationships between several variables. The diagonal shows the distribution of each variable.',
-            'Joint Plot': 'Combines a bivariate plot (like a scatter) with univariate plots (like histograms) of the two variables in the margins.',
             '3D Scatter': 'Extends a scatter plot to three dimensions, allowing for the visualization of relationships between three numerical variables.',
+            '3D Bar Chart': 'Compares a numerical value across two different categorical variables in a 3D space. Useful for spotting high-level interactions.',
         };
 
         const InfoTooltip = ({ text }) => {
@@ -243,23 +253,20 @@
                 if (tooltipNode) {
                     tooltipNode.style.opacity = 1;
                     tooltipNode.style.transform = `translate(${iconRect.right + 10}px, ${iconRect.top}px)`;
+                    tooltipNode.style.position = 'fixed';
+                    tooltipNode.style.left = `${iconRect.right + 10}px`;
+                    tooltipNode.style.top = `${iconRect.top}px`;
                 }
             };
-            const hideTooltip = () => {
-                setVisible(false);
-                const tooltipNode = tooltipRef.current;
-                if (tooltipNode) {
-                    tooltipNode.style.opacity = 0;
-                }
-            };
+            const hideTooltip = () => setVisible(false);
 
             return (
                 <div className="relative inline-block ml-2">
                     <button ref={iconRef} onMouseEnter={showTooltip} onMouseLeave={hideTooltip} className="text-text-tertiary hover:text-text-primary transition-colors">
                         {ICONS.Info}
                     </button>
-                    {ReactDOM.createPortal(
-                        <div ref={tooltipRef} className="info-tooltip-content fixed">
+                    {visible && ReactDOM.createPortal(
+                        <div ref={tooltipRef} className="info-tooltip-content">
                             {text}
                         </div>,
                         document.body
@@ -327,7 +334,7 @@
             }, [draw, ...dependencies]);
 
             return (
-                <div className={`relative w-full h-full ${className || ''}`}>
+                <div className={`relative w-full h-full flex-grow ${className || ''}`}>
                     <svg ref={svgRef} className="w-full h-full" />
                     <Tooltip ref={tooltipRef} />
                 </div>
@@ -503,7 +510,7 @@
                         const max = Math.min(d3.max(sortedValues), q3 + 1.5 * iqr);
                         summaryStats.push({ key, q1, median, q3, min, max });
                     });
-                    summaryStats.sort((a,b) => d3.ascending(a.key, b.key));
+                    summaryStats.sort((a,b) => a.median - b.median);
 
                     const xScale = d3.scaleBand().domain(summaryStats.map(d => d.key)).range([0, width]).padding(0.4);
                     const yScale = d3.scaleLinear().domain([0, d3.max(data, d => d[y])]).range([height, 0]).nice();
@@ -525,149 +532,6 @@
                                 tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.key}</strong><br>Max: ${d.max.toFixed(0)}<br>Q3: ${d.q3.toFixed(0)}<br>Median: ${d.median.toFixed(0)}<br>Q1: ${d.q1.toFixed(0)}<br>Min: ${d.min.toFixed(0)}`);
                             }).on("mouseout", () => tooltip.style("opacity", 0));
                     });
-                }, [data, x, y]);
-                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
-            },
-            ViolinPlot: ({ data, x, y }) => {
-                const draw = useCallback((svg, tooltip) => {
-                    svg.selectAll("*").remove();
-                    if (!data || data.length === 0) return;
-
-                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
-                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                    if (width <= 0 || height <= 0) return;
-
-                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-                    
-                    const groupedData = d3.group(data, d => d[x]);
-                    const categories = [...groupedData.keys()].sort();
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
-                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.1);
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
-
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
-                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
-                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-
-                    // KDE function
-                    function kernelDensityEstimator(kernel, X) {
-                        return function(V) {
-                            return X.map(function(x) {
-                                return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-                            });
-                        };
-                    }
-                    function kernelEpanechnikov(k) {
-                        return function(v) {
-                            return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-                        };
-                    }
-                    
-                    const kde = kernelDensityEstimator(kernelEpanechnikov(7), yScale.ticks(40));
-                    
-                    const maxDensity = d3.max(Array.from(groupedData.values()), group => d3.max(kde(group.map(d => d[y])), d => d[1]));
-                    const xNum = d3.scaleLinear().range([0, xScale.bandwidth()]).domain([-maxDensity, maxDensity]);
-
-                    groupedData.forEach((groupData, key) => {
-                        const values = groupData.map(d => d[y]).filter(d => d != null);
-                        const density = kde(values);
-                        const q1 = d3.quantile(values, 0.25);
-                        const median = d3.quantile(values, 0.5);
-                        const q3 = d3.quantile(values, 0.75);
-                        const iqr = q3 - q1;
-                        const min = Math.max(d3.min(values), q1 - 1.5 * iqr);
-                        const max = Math.min(d3.max(values), q3 + 1.5 * iqr);
-
-                        const violinG = g.append("g").attr("transform", `translate(${xScale(key)}, 0)`);
-                        
-                        violinG.append("path").datum(density)
-                            .attr("fill", colorScale(key)).attr("opacity", 0.7)
-                            .attr("d", d3.area().x0(d => xNum(-d[1])).x1(d => xNum(d[1])).y(d => yScale(d[0])).curve(d3.curveCatmullRom));
-                        
-                        violinG.append("line").attr("x1", xScale.bandwidth()/2).attr("x2", xScale.bandwidth()/2).attr("y1", yScale(min)).attr("y2", yScale(max)).attr("stroke", "var(--text-primary)").attr("stroke-width", 1.5);
-                        violinG.append("rect").attr("x", xScale.bandwidth()/2 - 5).attr("y", yScale(q3)).attr("width", 10).attr("height", yScale(q1) - yScale(q3)).attr("fill", "var(--bg-secondary)").attr("stroke", "var(--text-primary)");
-                        violinG.append("circle").attr("cx", xScale.bandwidth()/2).attr("cy", yScale(median)).attr("r", 4).attr("fill", "var(--bg-secondary)").attr("stroke", "var(--text-primary)");
-                        
-                        violinG.append("rect").attr("x", 0).attr("y", 0).attr("width", xScale.bandwidth()).attr("height", height).attr("fill", "transparent")
-                            .on("mouseover", (event) => {
-                                tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${key}</strong><br>Median: ${median.toFixed(0)}<br>IQR: ${iqr.toFixed(0)}`);
-                            }).on("mouseout", () => tooltip.style("opacity", 0));
-                    });
-                }, [data, x, y]);
-                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
-            },
-            StripPlot: ({ data, x, y }) => {
-                const draw = useCallback((svg, tooltip) => {
-                    svg.selectAll("*").remove();
-                    if (!data || data.length === 0) return;
-
-                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
-                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                    if (width <= 0 || height <= 0) return;
-
-                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-                    const categories = [...new Set(data.map(d => d[x]))].sort();
-                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.2);
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
-
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
-                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
-                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-
-                    g.selectAll("circle").data(data).join("circle")
-                        .attr("cx", d => xScale(d[x]) + xScale.bandwidth() / 2 + (Math.random() - 0.5) * 20) // Jitter
-                        .attr("cy", d => yScale(d[y]))
-                        .attr("r", 4)
-                        .attr("fill", d => colorScale(d[x]))
-                        .attr("opacity", 0.7)
-                        .on("mouseover", (event, d) => {
-                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br>${x.replace(/_/g, ' ')}: ${d[x]}<br>${y.replace(/_/g, ' ')}: ${d[y]}`);
-                        }).on("mouseout", () => tooltip.style("opacity", 0));
-                }, [data, x, y]);
-                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
-            },
-            SwarmPlot: ({ data, x, y }) => {
-                const draw = useCallback((svg, tooltip) => {
-                    svg.selectAll("*").remove();
-                    if (!data || data.length === 0) return;
-
-                    const margin = { top: 30, right: 30, bottom: 100, left: 70 };
-                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                    if (width <= 0 || height <= 0) return;
-
-                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-                    const categories = [...new Set(data.map(d => d[x]))].sort();
-                    const xScale = d3.scaleBand().domain(categories).range([0, width]).padding(0.2);
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(categories);
-                    
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
-                        .selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
-                    g.append("g").attr("class", "grid-lines").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(""));
-
-                    const simulation = d3.forceSimulation(data)
-                        .force("x", d3.forceX(d => xScale(d[x]) + xScale.bandwidth() / 2).strength(1))
-                        .force("y", d3.forceY(d => yScale(d[y])).strength(1))
-                        .force("collide", d3.forceCollide(5))
-                        .stop();
-
-                    for (let i = 0; i < 120; ++i) simulation.tick();
-
-                    g.selectAll("circle").data(data).join("circle")
-                        .attr("cx", d => d.x).attr("cy", d => d.y)
-                        .attr("r", 4)
-                        .attr("fill", d => colorScale(d[x]))
-                        .attr("opacity", 0.8)
-                        .on("mouseover", (event, d) => {
-                            tooltip.style("opacity", 1).style("transform", `translate(${event.pageX + 15}px, ${event.pageY}px)`).html(`<strong class="text-base" style="color: var(--text-primary);">${d.make}</strong><br>${x.replace(/_/g, ' ')}: ${d[x]}<br>${y.replace(/_/g, ' ')}: ${d[y]}`);
-                        }).on("mouseout", () => tooltip.style("opacity", 0));
                 }, [data, x, y]);
                 return <D3Chart draw={draw} dependencies={[data, x, y]} />;
             },
@@ -727,7 +591,7 @@
                     svg.selectAll("*").remove();
                     if (!data || data.length === 0) return;
                     
-                    const selectedCols = ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base', 'symboling'];
+                    const selectedCols = ['price', 'horsepower', 'curb_weight', 'engine_size', 'city_mpg', 'highway_mpg', 'wheel_base'];
                     const matrix = calculateCorrelationMatrix(data, selectedCols);
 
                     const margin = { top: 100, right: 50, bottom: 50, left: 100 };
@@ -760,96 +624,6 @@
                         }).on("mouseout", () => tooltip.style("opacity", 0));
                 }, [data, numericCols]);
                 return <D3Chart draw={draw} dependencies={[data, numericCols]} />;
-            },
-            PairPlot: ({ data, columns, hue }) => {
-                const draw = useCallback((svg, tooltip) => {
-                    svg.selectAll("*").remove();
-                    if (!data || data.length === 0 || columns.length < 2) return;
-
-                    const margin = { top: 40, right: 40, bottom: 40, left: 40 };
-                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                    if (width <= 0 || height <= 0) return;
-                    
-                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-                    const size = width / columns.length;
-                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain([...new Set(data.map(d => d[hue]))].sort());
-
-                    const scales = {};
-                    columns.forEach(col => {
-                        scales[col] = d3.scaleLinear().domain(d3.extent(data, d => d[col])).range([size, 0]).nice();
-                    });
-
-                    columns.forEach((colY, i) => {
-                        columns.forEach((colX, j) => {
-                            const cell = g.append("g").attr("transform", `translate(${j * size}, ${i * size})`);
-                            if (i === j) { // Diagonal: Histogram
-                                const values = data.map(d => d[colX]).filter(d => d != null);
-                                const xScaleHist = d3.scaleLinear().domain(scales[colX].domain()).range([0, size]);
-                                const bins = d3.bin().domain(xScaleHist.domain()).thresholds(10)(values);
-                                const yScaleHist = d3.scaleLinear().range([size, 0]).domain([0, d3.max(bins, d => d.length)]);
-                                cell.selectAll("rect").data(bins).enter().append("rect")
-                                    .attr("x", d => xScaleHist(d.x0)).attr("width", d => xScaleHist(d.x1) - xScaleHist(d.x0) -1)
-                                    .attr("y", d => yScaleHist(d.length)).attr("height", d => size - yScaleHist(d.length))
-                                    .attr("fill", "var(--accent-primary)");
-                            } else { // Off-diagonal: Scatter plot
-                                cell.selectAll("circle").data(data).enter().append("circle")
-                                    .attr("cx", d => scales[colX].copy().range([0, size])(d[colX]))
-                                    .attr("cy", d => scales[colY](d[colY]))
-                                    .attr("r", 2).attr("fill", d => colorScale(d[hue])).attr("opacity", 0.6);
-                            }
-                            cell.append("rect").attr("width", size).attr("height", size).attr("fill", "none").attr("stroke", "var(--border-color)");
-                            if (i === columns.length - 1) cell.append("text").attr("x", size / 2).attr("y", size + 15).text(colX.replace(/_/g, ' ')).attr("text-anchor", "middle").attr("fill", "var(--text-secondary)");
-                            if (j === 0) cell.append("text").attr("transform", "rotate(-90)").attr("x", -size / 2).attr("y", -10).text(colY.replace(/_/g, ' ')).attr("text-anchor", "middle").attr("fill", "var(--text-secondary)");
-                        });
-                    });
-                }, [data, columns, hue]);
-                return <D3Chart draw={draw} dependencies={[data, columns, hue]} />;
-            },
-            JointPlot: ({ data, x, y }) => {
-                const draw = useCallback((svg, tooltip) => {
-                    svg.selectAll("*").remove();
-                    if (!data || data.length === 0) return;
-
-                    const margin = { top: 70, right: 70, bottom: 70, left: 70 };
-                    const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-                    const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-                    if (width <= 0 || height <= 0) return;
-                    
-                    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-                    const xScale = d3.scaleLinear().domain(d3.extent(data, d => d[x])).range([0, width]).nice();
-                    const yScale = d3.scaleLinear().domain(d3.extent(data, d => d[y])).range([height, 0]).nice();
-
-                    // Scatter plot
-                    g.selectAll("circle").data(data).join("circle")
-                        .attr("cx", d => xScale(d[x])).attr("cy", d => yScale(d[y]))
-                        .attr("r", 3).attr("fill", "var(--accent-primary)").attr("opacity", 0.6);
-                    
-                    // Top Histogram
-                    const histX = d3.bin().value(d => d[x]).domain(xScale.domain()).thresholds(20);
-                    const binsX = histX(data);
-                    const yHistScaleX = d3.scaleLinear().domain([0, d3.max(binsX, d => d.length)]).range([margin.top - 10, 0]);
-                    const gHistX = svg.append("g").attr("transform", `translate(${margin.left}, 0)`);
-                    gHistX.selectAll("rect").data(binsX).join("rect")
-                        .attr("x", d => xScale(d.x0)).attr("width", d => xScale(d.x1) - xScale(d.x0) - 1)
-                        .attr("y", d => yHistScaleX(d.length)).attr("height", d => margin.top - 10 - yHistScaleX(d.length))
-                        .attr("fill", "var(--accent-primary)");
-
-                    // Right Histogram
-                    const histY = d3.bin().value(d => d[y]).domain(yScale.domain()).thresholds(20);
-                    const binsY = histY(data);
-                    const xHistScaleY = d3.scaleLinear().domain([0, d3.max(binsY, d => d.length)]).range([0, margin.right - 10]);
-                    const gHistY = svg.append("g").attr("transform", `translate(${margin.left + width + 10}, ${margin.top})`);
-                    gHistY.selectAll("rect").data(binsY).join("rect")
-                        .attr("y", d => yScale(d.x1)).attr("height", d => yScale(d.x0) - yScale(d.x1) - 1)
-                        .attr("x", 0).attr("width", d => xHistScaleY(d.length))
-                        .attr("fill", "var(--accent-primary)");
-
-                    // Axes
-                    g.append("g").attr("class", "axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale));
-                    g.append("g").attr("class", "axis").call(d3.axisLeft(yScale));
-                }, [data, x, y]);
-                return <D3Chart draw={draw} dependencies={[data, x, y]} />;
             },
             '3DScatter': ({ data, x, y, z, hue }) => {
                 const mountRef = useRef(null);
@@ -922,6 +696,139 @@
                 }, [data, x, y, z, hue, theme]);
 
                 return <div ref={mountRef} className="three-canvas-container"></div>;
+            },
+            '3DBarChart': ({ data, x, y, z }) => {
+                const mountRef = useRef(null);
+                const theme = document.documentElement.className;
+
+                useEffect(() => {
+                    if (!data || data.length === 0 || !mountRef.current) return;
+                    
+                    const currentMount = mountRef.current;
+                    let animationFrameId;
+
+                    // --- Data Processing ---
+                    const aggregatedData = Array.from(d3.group(data, d => d[x], d => d[z]), 
+                        ([xKey, zValues]) => {
+                            return Array.from(zValues, ([zKey, values]) => ({
+                                x: xKey,
+                                z: zKey,
+                                y: d3.mean(values, v => v[y])
+                            }));
+                        }
+                    ).flat();
+                    
+                    const xCategories = [...new Set(aggregatedData.map(d => d.x))].sort();
+                    const zCategories = [...new Set(aggregatedData.map(d => d.z))].sort();
+                    const yMax = d3.max(aggregatedData, d => d.y);
+
+                    // --- Scene Setup ---
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary').trim());
+                    
+                    const camera = new THREE.PerspectiveCamera(50, currentMount.clientWidth / currentMount.clientHeight, 0.1, 1000);
+                    camera.position.set(xCategories.length * 1.5, yMax * 0.0002, zCategories.length * 1.5);
+                    
+                    const renderer = new THREE.WebGLRenderer({ antialias: true });
+                    renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    
+                    const labelRenderer = new THREE.CSS2DRenderer();
+                    labelRenderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
+                    labelRenderer.domElement.style.position = 'absolute';
+                    labelRenderer.domElement.style.top = '0px';
+                    labelRenderer.domElement.style.pointerEvents = 'none';
+
+                    currentMount.innerHTML = '';
+                    currentMount.appendChild(renderer.domElement);
+                    currentMount.appendChild(labelRenderer.domElement);
+
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.enableDamping = true;
+                    
+                    // --- Lighting ---
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                    directionalLight.position.set(5, 10, 7.5);
+                    scene.add(directionalLight);
+
+                    // --- Scales and Colors ---
+                    const xScale = d3.scalePoint().domain(xCategories).range([-xCategories.length/2, xCategories.length/2]);
+                    const zScale = d3.scalePoint().domain(zCategories).range([-zCategories.length/2, zCategories.length/2]);
+                    const yScale = d3.scaleLinear().domain([0, yMax]).range([0, 8]);
+                    const colorScale = d3.scaleOrdinal(d3.schemeTableau10).domain(xCategories);
+
+                    // --- Create Bars ---
+                    const barGeometry = new THREE.BoxGeometry(0.8, 1, 0.8);
+                    aggregatedData.forEach(d => {
+                        const barHeight = yScale(d.y);
+                        if (isNaN(barHeight) || barHeight <= 0) return;
+                        
+                        const material = new THREE.MeshStandardMaterial({ color: colorScale(d.x), roughness: 0.5, metalness: 0.2 });
+                        const bar = new THREE.Mesh(barGeometry, material);
+                        bar.scale.y = barHeight;
+                        bar.position.set(xScale(d.x), barHeight / 2, zScale(d.z));
+                        scene.add(bar);
+                    });
+
+                    // --- Grid and Axes Labels ---
+                    const gridHelper = new THREE.GridHelper(Math.max(xCategories.length, zCategories.length) + 2, Math.max(xCategories.length, zCategories.length) + 2, '#888888', '#444444');
+                    scene.add(gridHelper);
+
+                    const createLabel = (text) => {
+                        const div = document.createElement('div');
+                        div.className = 'label-3d';
+                        div.textContent = text;
+                        return new THREE.CSS2DObject(div);
+                    };
+                    
+                    xCategories.forEach(cat => {
+                        const label = createLabel(cat);
+                        label.position.set(xScale(cat), -0.2, zCategories.length / 2 + 1);
+                        scene.add(label);
+                    });
+                    zCategories.forEach(cat => {
+                        const label = createLabel(cat);
+                        label.position.set(xCategories.length / 2 + 1, -0.2, zScale(cat));
+                        label.rotation.y = -Math.PI / 2;
+                        scene.add(label);
+                    });
+                     // Y-Axis Labels
+                    for (let i = 0; i <= 5; i++) {
+                        const value = (yMax / 5) * i;
+                        const label = createLabel(value.toFixed(0));
+                        label.position.set(xCategories.length / 2 + 1, yScale(value), zCategories.length / 2 + 1);
+                        scene.add(label);
+                    }
+
+                    // --- Animation Loop ---
+                    const animate = () => {
+                        animationFrameId = requestAnimationFrame(animate);
+                        controls.update();
+                        renderer.render(scene, camera);
+                        labelRenderer.render(scene, camera);
+                    };
+                    animate();
+
+                    const handleResize = () => {
+                        if (!currentMount) return;
+                        const { clientWidth: newWidth, clientHeight: newHeight } = currentMount;
+                        camera.aspect = newWidth / newHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(newWidth, newHeight);
+                        labelRenderer.setSize(newWidth, newHeight);
+                    };
+                    window.addEventListener('resize', handleResize);
+
+                    return () => {
+                        window.removeEventListener('resize', handleResize);
+                        cancelAnimationFrame(animationFrameId);
+                        if(currentMount) currentMount.innerHTML = '';
+                        barGeometry.dispose();
+                    };
+                }, [data, x, y, z, theme]);
+
+                return <div ref={mountRef} className="three-canvas-container"></div>;
             }
         };
 
@@ -930,86 +837,71 @@
             const { data, loading, error, numericCols, categoricalCols } = useAutomobileData();
             const [activeChart, setActiveChart] = useState('Scatter Plot');
             const [isSidebarOpen, setSidebarOpen] = useState(false);
-            const [theme, setTheme] = useState('dark'); // Default to dark theme
+            const [theme, setTheme] = useState('dark');
+            const [viewMode, setViewMode] = useState('story'); // 'story', 'explore'
+            const [storyStep, setStoryStep] = useState(0);
             
-            const initialFilters = { make: 'all', body_style: 'all' };
-            const [filters, setFilters] = useState(initialFilters);
+            // --- STORY DEFINITION ---
+            const story = useMemo(() => [
+                { title: "Chapter 1: The Manufacturers", narrative: "Welcome! Let's start by seeing which brands are most represented in this 1985 dataset. Toyota, Nissan, and Mazda lead the pack, indicating their strong market presence at the time.", chartType: 'Count Plot', config: { x: 'make' } },
+                { title: "Chapter 2: The Price Landscape", narrative: "What did cars cost back then? This histogram shows most cars were priced between $5,000 and $13,000. There's a long tail of more expensive luxury vehicles, suggesting a competitive market for budget-friendly cars.", chartType: 'Histogram', config: { x: 'price', bins: 30 } },
+                { title: "Chapter 3: Power vs. Price", narrative: "A key factor in price is performance. Here, we see a clear positive correlation: as horsepower increases, so does the price. Sedans and hardtops tend to reach higher price and power points.", chartType: 'Scatter Plot', config: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' } },
+                { title: "Chapter 4: The Performance Triangle", narrative: "Let's add a third dimension: fuel efficiency (Highway MPG). In this 3D plot, you can see the trade-offs. The most expensive, powerful cars (top-right) have lower MPG (closer to you). Explore the cloud to find the sweet spots!", chartType: '3D Scatter', config: { x: 'price', y: 'horsepower', z: 'highway_mpg', hue: 'body_style' } },
+                { title: "Chapter 5: A New Dimension", narrative: "This 3D Bar Chart shows average price across body styles and drive-wheel types. Rear-wheel drive (rwd) convertibles are, on average, the most expensive. Four-wheel drive (4wd) is mostly limited to wagons.", chartType: '3D Bar Chart', config: { x: 'drive_wheels', z: 'body_style', y: 'price' } },
+                { title: "Chapter 6: Brand Price Tiers", narrative: "How do brands compare on price? This box plot reveals the price range for each. Mercedes-Benz, BMW, and Jaguar occupy the high-end, while brands like Chevrolet and Honda are on the budget-friendly side.", chartType: 'Box Plot', config: { x: 'make', y: 'price' } },
+                { title: "Chapter 7: The Big Picture", narrative: "Finally, this heatmap shows correlations between features. Red means a strong positive correlation (e.g., price and horsepower), blue means a strong negative one (e.g., horsepower and MPG). This concludes our tour. Feel free to exit Story Mode to explore on your own!", chartType: 'Heatmap', config: {} },
+            ], []);
 
-            const filteredData = useMemo(() => {
-                if (loading) return [];
-                return data.filter(d => {
-                    const makeFilter = filters.make === 'all' || d.make === filters.make;
-                    const bodyStyleFilter = filters.body_style === 'all' || d.body_style === filters.body_style;
-                    return makeFilter && bodyStyleFilter;
-                });
-            }, [data, filters, loading]);
-
-            const handleFilterChange = (filterName, value) => {
-                setFilters(prev => ({ ...prev, [filterName]: value }));
-            };
-            
-            const resetFilters = () => setFilters(initialFilters);
-
-            useEffect(() => {
-                const savedTheme = localStorage.getItem('dashboard-theme') || 'dark';
-                setTheme(savedTheme);
-                document.documentElement.className = savedTheme;
-            }, []);
-
-            const toggleTheme = () => {
-                const newTheme = theme === 'light' ? 'dark' : 'light';
-                setTheme(newTheme);
-                document.documentElement.className = newTheme;
-                localStorage.setItem('dashboard-theme', newTheme);
-            };
-            
             const [controls, setControls] = useState({
                 linechart: { x: 'horsepower', y: 'price', hue: 'drive_wheels' },
                 scatterplot: { x: 'horsepower', y: 'price', hue: 'body_style', size: 'curb_weight' },
                 barchart: { x: 'make', y: 'price' },
                 countplot: { x: 'make' },
-                boxplot: { x: 'body_style', y: 'price' },
-                violinplot: { x: 'body_style', y: 'price' },
-                stripplot: { x: 'body_style', y: 'price' },
-                swarmplot: { x: 'body_style', y: 'price' },
+                boxplot: { x: 'make', y: 'price' },
                 histogram: { x: 'price', bins: 20 },
                 heatmap: {},
-                pairplot: { columns: ['price', 'horsepower', 'curb_weight'], hue: 'body_style' },
-                jointplot: { x: 'horsepower', y: 'price' },
-                '3dscatter': { x: 'price', y: 'horsepower', z: 'curb_weight', hue: 'body_style' },
+                '3dscatter': { x: 'price', y: 'horsepower', z: 'highway_mpg', hue: 'body_style' },
+                '3dbarchart': { x: 'drive_wheels', z: 'body_style', y: 'price' },
             });
+
+            // Effect to update chart when in story mode
+            useEffect(() => {
+                if (viewMode === 'story') {
+                    const currentStep = story[storyStep];
+                    setActiveChart(currentStep.chartType);
+                    const chartKey = currentStep.chartType.toLowerCase().replace(/ /g, '');
+                    setControls(prev => ({ ...prev, [chartKey]: currentStep.config }));
+                }
+            }, [viewMode, storyStep, story]);
+
 
             const handleControlChange = (chart, key, value) => {
                 setControls(prev => ({ ...prev, [chart]: { ...prev[chart], [key]: value } }));
             };
 
             const kpiData = useMemo(() => {
-                if (loading || filteredData.length === 0) return { avgPrice: 0, topMake: 'N/A', maxHp: 0, count: 0 };
-                const prices = filteredData.map(d => d.price).filter(Boolean);
-                const makes = d3.rollup(filteredData, v => v.length, d => d.make);
+                if (loading || data.length === 0) return { avgPrice: 0, topMake: 'N/A', maxHp: 0, count: 0 };
+                const prices = data.map(d => d.price).filter(Boolean);
+                const makes = d3.rollup(data, v => v.length, d => d.make);
                 const topMake = makes.size > 0 ? [...makes.entries()].sort((a, b) => b[1] - a[1])[0][0] : 'N/A';
                 return {
                     avgPrice: d3.mean(prices) || 0,
                     topMake: topMake.charAt(0).toUpperCase() + topMake.slice(1),
-                    maxHp: d3.max(filteredData, d => d.horsepower) || 0,
-                    count: filteredData.length,
+                    maxHp: d3.max(data, d => d.horsepower) || 0,
+                    count: data.length,
                 };
-            }, [filteredData, loading]);
+            }, [data, loading]);
 
             const chartTypes = [
                 { name: 'Scatter Plot', family: 'Relational' },
                 { name: 'Line Chart', family: 'Relational' },
-                { name: 'Joint Plot', family: 'Relational' },
-                { name: 'Pair Plot', family: 'Relational' },
                 { name: 'Bar Chart', family: 'Categorical' },
                 { name: 'Count Plot', family: 'Categorical' },
                 { name: 'Box Plot', family: 'Categorical' },
-                { name: 'Violin Plot', family: 'Categorical' },
-                { name: 'Strip Plot', family: 'Categorical' },
-                { name: 'Swarm Plot', family: 'Categorical' },
                 { name: 'Histogram', family: 'Distribution' },
                 { name: 'Heatmap', family: 'Matrix' },
                 { name: '3D Scatter', family: 'Multi-dimensional' },
+                { name: '3D Bar Chart', family: 'Multi-dimensional' },
             ];
             const groupedCharts = d3.group(chartTypes, d => d.family);
 
@@ -1020,16 +912,14 @@
                 
                 const ChartComponent = ChartComponents[activeChart.replace(/ /g, '')];
                 const chartControls = controls[activeChart.toLowerCase().replace(/ /g, '')];
-                return <ChartComponent data={filteredData} {...chartControls} numericCols={numericCols} categoricalCols={categoricalCols} />;
+                return <ChartComponent data={data} {...chartControls} numericCols={numericCols} categoricalCols={categoricalCols} />;
             };
             
             const ControlPanel = () => {
                 const chartKey = activeChart.toLowerCase().replace(/ /g, '');
                 const currentControls = controls[chartKey];
                 
-                if (!currentControls) {
-                    return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
-                }
+                if (!currentControls) return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
                 
                 const renderControls = () => {
                     switch (activeChart) {
@@ -1037,11 +927,10 @@
                         case 'Scatter Plot': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={['None', ...categoricalCols]} /> <ControlSelect label="Size By" value={currentControls.size} onChange={e => handleControlChange(chartKey, 'size', e.target.value)} options={['None', ...numericCols]} /> </>;
                         case 'Bar Chart': return <> <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
                         case 'Count Plot': return <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} />;
-                        case 'Box Plot': case 'Violin Plot': case 'Strip Plot': case 'Swarm Plot': return <> <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
+                        case 'Box Plot': return <> <ControlSelect label="Category (X-Axis)" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Value (Y-Axis)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
                         case 'Histogram': return <> <ControlSelect label="Variable" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <div><label className="block text-sm font-medium text-text-secondary mb-1.5">Bins</label><input type="range" min="5" max="50" value={currentControls.bins} onChange={e => handleControlChange(chartKey, 'bins', +e.target.value)} className="w-full" /></div> </>;
-                        case 'Pair Plot': return <> <ControlSelect label="Hue" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} /> <div className="text-sm text-text-secondary">Select 3-5 variables for best results.</div></>;
-                        case 'Joint Plot': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> </>;
                         case '3D Scatter': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={numericCols} /> <ControlSelect label="Y-Axis" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Z-Axis" value={currentControls.z} onChange={e => handleControlChange(chartKey, 'z', e.target.value)} options={numericCols} /> <ControlSelect label="Color By (Hue)" value={currentControls.hue} onChange={e => handleControlChange(chartKey, 'hue', e.target.value)} options={categoricalCols} /> </>;
+                        case '3D Bar Chart': return <> <ControlSelect label="X-Axis" value={currentControls.x} onChange={e => handleControlChange(chartKey, 'x', e.target.value)} options={categoricalCols} /> <ControlSelect label="Y-Axis (Height)" value={currentControls.y} onChange={e => handleControlChange(chartKey, 'y', e.target.value)} options={numericCols} /> <ControlSelect label="Z-Axis" value={currentControls.z} onChange={e => handleControlChange(chartKey, 'z', e.target.value)} options={categoricalCols} /> </>;
                         default: return <div className="text-text-secondary col-span-full text-center py-4">No configurable options for this chart.</div>;
                     }
                 };
@@ -1056,10 +945,143 @@
                 );
             };
 
+            const StoryPanel = () => {
+                const currentStepData = story[storyStep];
+                return (
+                     <div className="flex flex-col justify-between h-full">
+                        <div>
+                            <h3 className="text-lg font-bold text-text-primary mb-1">{currentStepData.title}</h3>
+                            <p className="text-sm text-text-secondary mb-4">Step {storyStep + 1} of {story.length}</p>
+                            <p className="text-base text-text-primary leading-relaxed">{currentStepData.narrative}</p>
+                        </div>
+                        <div className="mt-6 flex items-center justify-between">
+                            <button 
+                                onClick={() => setStoryStep(s => Math.max(0, s - 1))}
+                                disabled={storyStep === 0}
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-bg-tertiary hover:bg-bg-inset disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {ICONS.Prev}
+                                <span>Prev</span>
+                            </button>
+                             <button 
+                                onClick={() => setStoryStep(s => Math.min(story.length - 1, s + 1))}
+                                disabled={storyStep === story.length - 1}
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-accent-primary text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <span>Next</span>
+                                {ICONS.Next}
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+            
+            const GeminiStoryPanel = () => {
+                const [geminiStory, setGeminiStory] = useState("");
+                const [geminiLoading, setGeminiLoading] = useState(false);
+                const [geminiError, setGeminiError] = useState(null);
+
+                const generateStory = async () => {
+                    setGeminiLoading(true);
+                    setGeminiError(null);
+                    setGeminiStory("");
+
+                    const chartKey = activeChart.toLowerCase().replace(/ /g, '');
+                    const currentControls = controls[chartKey];
+
+                    // Summarize data to keep prompt concise
+                    let dataSummary = `The dataset contains ${data.length} vehicles from 1985.`;
+                    const controlEntries = Object.entries(currentControls);
+                    if(controlEntries.length > 0) {
+                        dataSummary += " The current chart variables are: ";
+                        dataSummary += controlEntries.map(([key, value]) => `${key}: ${value}`).join(', ');
+                    }
+                    
+                    const prompt = `You are an expert data analyst. Your task is to provide a short, insightful narrative based on a visualization of a 1985 automobile dataset.
+                    
+                    Current Visualization:
+                    - Chart Type: ${activeChart}
+                    - Data Summary: ${dataSummary}
+                    
+                    Based on this context, write a 2-3 sentence story that explains a key insight, pattern, or relationship revealed by this specific view of the data. Be concise and clear. Start your story with a clear topic sentence.`;
+
+                    try {
+                         let chatHistory = [];
+                         chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                         const payload = { contents: chatHistory };
+                         const apiKey = "" // API key will be injected by the environment
+                         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                         const response = await fetch(apiUrl, {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify(payload)
+                         });
+                         
+                         if (!response.ok) {
+                             throw new Error(`API request failed with status ${response.status}`);
+                         }
+
+                         const result = await response.json();
+                         
+                         if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            setGeminiStory(text);
+                         } else {
+                            throw new Error("Invalid response structure from API.");
+                         }
+
+                    } catch (err) {
+                        console.error("Gemini API error:", err);
+                        setGeminiError("Sorry, I couldn't generate a story right now. Please try again.");
+                    } finally {
+                        setGeminiLoading(false);
+                    }
+                };
+
+                return (
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-bold text-text-primary flex items-center">
+                            <span className="text-transparent bg-clip-text mr-2" style={{backgroundImage: 'var(--accent-gradient)'}}>
+                                <ICONS.Gemini />
+                            </span>
+                            Ask Gemini
+                        </h3>
+                        <p className="text-sm text-text-secondary">Let Gemini analyze the current chart and generate a story about the data's insights.</p>
+                        <button 
+                            onClick={generateStory}
+                            disabled={geminiLoading}
+                            className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg bg-accent-primary text-white font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                            {geminiLoading ? (
+                                <>
+                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                 <span>Generating...</span>
+                                </>
+                            ) : (
+                                <>
+                                 <ICONS.Gemini />
+                                 <span>Generate Story with Gemini</span>
+                                </>
+                            )}
+                        </button>
+                        
+                        {geminiStory && (
+                             <div className="gemini-story-panel mt-4">
+                                <div className="gemini-story-content">
+                                    <p className="text-base text-text-primary leading-relaxed">{geminiStory}</p>
+                                </div>
+                            </div>
+                        )}
+                        {geminiError && <p className="text-sm text-red-500 mt-2">{geminiError}</p>}
+                    </div>
+                );
+            };
+
             const Sidebar = () => (
                 <aside className={`fixed top-0 left-0 z-40 w-64 h-screen bg-bg-secondary border-r border-border-color flex flex-col flex-shrink-0 sidebar-transition md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                     <div className="flex items-center justify-between h-20 px-4 border-b border-border-color flex-shrink-0">
-                        <h1 className="text-xl font-bold text-text-primary">Auto<span className="text-transparent bg-clip-text" style={{backgroundImage: 'var(--accent-gradient)'}}>Analytics</span></h1>
+                        <h1 className="text-xl font-bold text-text-primary">Auto<span className="text-transparent bg-clip-text" style={{backgroundImage: 'var(--accent-gradient)'}}>Story</span></h1>
                         <button onClick={() => setSidebarOpen(false)} className="md:hidden text-text-secondary hover:text-text-primary">
                             {ICONS.Close}
                         </button>
@@ -1072,14 +1094,14 @@
                                     {groupedCharts.get(family).map(chart => (
                                         <li key={chart.name}>
                                             <button
-                                                onClick={() => { setActiveChart(chart.name); setSidebarOpen(false); }}
+                                                onClick={() => { setActiveChart(chart.name); setSidebarOpen(false); setViewMode('explore'); }}
                                                 className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                                    activeChart === chart.name
+                                                    activeChart === chart.name && viewMode === 'explore'
                                                         ? 'bg-accent-primary/10 text-accent-primary font-semibold'
                                                         : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
                                                 }`}
                                             >
-                                                {ICONS[chart.name]}
+                                                {ICONS[chart.name.replace(/ /g, '')]}
                                                 <span>{chart.name}</span>
                                             </button>
                                         </li>
@@ -1090,20 +1112,18 @@
                     </nav>
                 </aside>
             );
-            
-            const GlobalFilters = () => {
-                const makeOptions = useMemo(() => ['all', ...new Set(data.map(d => d.make))].sort(), [data]);
-                const bodyStyleOptions = useMemo(() => ['all', ...new Set(data.map(d => d.body_style))].sort(), [data]);
 
-                return (
-                    <div className="bg-bg-secondary border border-border-color rounded-xl p-4 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <ControlSelect label="Filter by Make" value={filters.make} onChange={e => handleFilterChange('make', e.target.value)} options={makeOptions} />
-                        <ControlSelect label="Filter by Body Style" value={filters.body_style} onChange={e => handleFilterChange('body_style', e.target.value)} options={bodyStyleOptions} />
-                        <button onClick={resetFilters} className="w-full md:w-auto h-10 px-4 bg-accent-primary/20 text-accent-primary font-semibold rounded-lg hover:bg-accent-primary/30 transition-colors">
-                            Reset Filters
-                        </button>
-                    </div>
-                );
+            useEffect(() => {
+                const savedTheme = localStorage.getItem('dashboard-theme') || 'dark';
+                setTheme(savedTheme);
+                document.documentElement.className = savedTheme;
+            }, []);
+
+            const toggleTheme = () => {
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+                document.documentElement.className = newTheme;
+                localStorage.setItem('dashboard-theme', newTheme);
             };
 
             return (
@@ -1112,7 +1132,7 @@
                     <div className={`fixed inset-0 bg-black/60 z-30 md:hidden sidebar-transition ${isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
                     
                     <main className="flex-1 flex flex-col md:pl-64 transition-all duration-300">
-                        <header className="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8 flex-shrink-0 border-b border-border-color bg-bg-secondary/50 backdrop-blur-sm">
+                        <header className="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8 flex-shrink-0 border-b border-border-color bg-bg-secondary/50 backdrop-blur-sm z-10">
                            <div className="flex items-center space-x-4">
                                 <button onClick={() => setSidebarOpen(true)} className="md:hidden text-text-secondary hover:text-text-primary">
                                     {ICONS.Menu}
@@ -1120,18 +1140,35 @@
                                 <div>
                                     <h2 className="text-2xl font-bold text-text-primary flex items-center">
                                         {activeChart}
-                                        <InfoTooltip text={CHART_DESCRIPTIONS[activeChart]} />
+                                        {CHART_DESCRIPTIONS[activeChart] && <InfoTooltip text={CHART_DESCRIPTIONS[activeChart]} />}
                                     </h2>
                                     <p className="text-sm text-text-secondary">Visualizing the 1985 Automobile Dataset</p>
                                 </div>
                            </div>
-                            <button onClick={toggleTheme} className="p-2 rounded-full bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-inset transition-colors">
-                                {theme === 'light' ? ICONS.Moon : ICONS.Sun}
-                            </button>
+                           <div className="flex items-center space-x-2">
+                                <div className="flex items-center rounded-lg bg-bg-tertiary p-1">
+                                    <button 
+                                        onClick={() => setViewMode('story')}
+                                        className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${viewMode === 'story' ? 'bg-bg-secondary shadow-sm text-accent-primary' : 'text-text-secondary hover:text-text-primary'}`}
+                                    >
+                                        {ICONS.Story}
+                                        <span>Story</span>
+                                    </button>
+                                     <button 
+                                        onClick={() => setViewMode('explore')}
+                                        className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${viewMode === 'explore' ? 'bg-bg-secondary shadow-sm text-accent-primary' : 'text-text-secondary hover:text-text-primary'}`}
+                                    >
+                                        {ICONS.Explore}
+                                        <span>Explore</span>
+                                    </button>
+                                </div>
+                                <button onClick={toggleTheme} className="p-2 rounded-full bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-bg-inset transition-colors">
+                                    {theme === 'light' ? ICONS.Moon : ICONS.Sun}
+                                </button>
+                           </div>
                         </header>
 
                         <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-                            <GlobalFilters />
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
                                 <KpiCard title="Vehicle Count" value={loading ? '...' : kpiData.count} icon={ICONS.Car} />
                                 <KpiCard title="Average Price" value={loading ? '...' : kpiData.avgPrice} format={v => `$${v.toLocaleString(undefined, {maximumFractionDigits: 0})}`} icon={ICONS.Dollar} />
@@ -1140,11 +1177,17 @@
                             </div>
 
                             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                                <div className="xl:col-span-2 h-[65vh] chart-container">
+                                <div className="xl:col-span-2 min-h-[65vh] chart-container">
                                    {renderChart()}
                                 </div>
                                 <div className="xl:col-span-1 chart-container">
-                                    <ControlPanel />
+                                    {viewMode === 'story' ? <StoryPanel /> : 
+                                        <div className="flex flex-col space-y-6 h-full">
+                                            <div className="flex-shrink-0"><ControlPanel /></div>
+                                            <div className="border-t border-border-color my-4"></div>
+                                            <div className="flex-grow"><GeminiStoryPanel /></div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
