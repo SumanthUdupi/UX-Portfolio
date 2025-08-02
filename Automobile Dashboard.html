@@ -128,17 +128,6 @@
             background-color: var(--bg-tertiary);
             color: var(--text-primary);
         }
-        .gemini-story-panel {
-            background: var(--accent-gradient);
-            padding: 1px;
-            border-radius: 0.75rem;
-        }
-        .gemini-story-content {
-            background-color: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: 0.7rem;
-            height: 100%;
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -226,7 +215,6 @@
             Explore: <Icon path={<><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="8"/></>} />,
             Next: <Icon path={<><polyline points="9 18 15 12 9 6"></polyline></>} className="w-5 h-5"/>,
             Prev: <Icon path={<><polyline points="15 18 9 12 15 6"></polyline></>} className="w-5 h-5"/>,
-            Gemini: <Icon path={<><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></>} />,
         };
 
         const CHART_DESCRIPTIONS = {
@@ -975,121 +963,6 @@
                     </div>
                 );
             };
-            
-            const GeminiStoryPanel = () => {
-                const [geminiStory, setGeminiStory] = useState("");
-                const [geminiLoading, setGeminiLoading] = useState(false);
-                const [geminiError, setGeminiError] = useState(null);
-
-                const generateStory = async () => {
-                    setGeminiLoading(true);
-                    setGeminiError(null);
-                    setGeminiStory("");
-
-                    const chartKey = activeChart.toLowerCase().replace(/ /g, '');
-                    const currentControls = controls[chartKey];
-
-                    let dataSummary = `The dataset contains ${data.length} vehicles from 1985.`;
-                    const controlEntries = Object.entries(currentControls);
-                    if(controlEntries.length > 0) {
-                        dataSummary += " The current chart variables are: ";
-                        dataSummary += controlEntries.map(([key, value]) => `${key}: ${value}`).join(', ');
-                    }
-                    
-                    const prompt = `You are an expert data analyst. Your task is to provide a short, insightful narrative based on a visualization of a 1985 automobile dataset.
-                    
-                    Current Visualization:
-                    - Chart Type: ${activeChart}
-                    - Data Summary: ${dataSummary}
-                    
-                    Based on this context, write a 2-3 sentence story that explains a key insight, pattern, or relationship revealed by this specific view of the data. Be concise and clear. Start your story with a clear topic sentence.`;
-
-                    const maxRetries = 3;
-                    let attempt = 0;
-                    while (attempt < maxRetries) {
-                        try {
-                            let chatHistory = [];
-                            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                            const payload = { contents: chatHistory };
-                            const apiKey = "";
-                            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                            const response = await fetch(apiUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            });
-                            
-                            if (!response.ok) {
-                                // Throw an error to be caught by the catch block for retrying
-                                throw new Error(`API request failed with status ${response.status}`);
-                            }
-
-                            const result = await response.json();
-                            
-                            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                                const text = result.candidates[0].content.parts[0].text;
-                                setGeminiStory(text);
-                                break; // Success, exit the loop
-                            } else {
-                                throw new Error("Invalid response structure from API.");
-                            }
-                        } catch (err) {
-                            attempt++;
-                            if (attempt >= maxRetries) {
-                                console.error("Gemini API error after max retries:", err);
-                                if (err.message.includes("403")) {
-                                    setGeminiError("API request forbidden. Please check your API key and permissions.");
-                                } else {
-                                    setGeminiError("Sorry, I couldn't generate a story right now. Please try again later.");
-                                }
-                                break;
-                            }
-                            const delay = Math.pow(2, attempt) * 1000;
-                            await new Promise(res => setTimeout(res, delay));
-                        }
-                    }
-                    setGeminiLoading(false);
-                };
-
-                return (
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-text-primary flex items-center">
-                            <span className="text-transparent bg-clip-text mr-2" style={{backgroundImage: 'var(--accent-gradient)'}}>
-                                {ICONS.Gemini}
-                            </span>
-                            Ask Gemini
-                        </h3>
-                        <p className="text-sm text-text-secondary">Let Gemini analyze the current chart and generate a story about the data's insights.</p>
-                        <button 
-                            onClick={generateStory}
-                            disabled={geminiLoading}
-                            className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg bg-accent-primary text-white font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                        >
-                            {geminiLoading ? (
-                                <>
-                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                 <span>Generating...</span>
-                                </>
-                            ) : (
-                                <>
-                                 {ICONS.Gemini}
-                                 <span>Generate Story with Gemini</span>
-                                </>
-                            )}
-                        </button>
-                        
-                        {geminiStory && (
-                             <div className="gemini-story-panel mt-4">
-                                <div className="gemini-story-content">
-                                    <p className="text-base text-text-primary leading-relaxed">{geminiStory}</p>
-                                </div>
-                            </div>
-                        )}
-                        {geminiError && <p className="text-sm text-red-500 mt-2">{geminiError}</p>}
-                    </div>
-                );
-            };
 
             const Sidebar = () => (
                 <aside className={`fixed top-0 left-0 z-40 w-64 h-screen bg-bg-secondary border-r border-border-color flex flex-col flex-shrink-0 sidebar-transition md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -1194,13 +1067,7 @@
                                    {renderChart()}
                                 </div>
                                 <div className="xl:col-span-1 chart-container">
-                                    {viewMode === 'story' ? <StoryPanel /> : 
-                                        <div className="flex flex-col space-y-6 h-full">
-                                            <div className="flex-shrink-0"><ControlPanel /></div>
-                                            <div className="border-t border-border-color my-4"></div>
-                                            <div className="flex-grow"><GeminiStoryPanel /></div>
-                                        </div>
-                                    }
+                                    {viewMode === 'story' ? <StoryPanel /> : <ControlPanel /> }
                                 </div>
                             </div>
                         </div>
