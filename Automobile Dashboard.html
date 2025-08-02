@@ -204,29 +204,29 @@
         );
         
         const ICONS = {
-            'Line Chart': <Icon path={<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></>} />,
-            'Scatter Plot': <Icon path={<><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="5" r="1"></circle><circle cx="5" cy="19" r="1"></circle><circle cx="5" cy="5" r="1"></circle><circle cx="19" cy="19" r="1"></circle></>} />,
-            'Bar Chart': <Icon path={<><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></>} />,
-            'Box Plot': <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></>} />,
-            'Heatmap': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></>} />,
-            '3D Scatter': <Icon path={<><path d="m21 16-4-4-4 4-4-4-4 4"/><path d="m7 12 4 4 4-4 4 4"/><path d="M3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8Z"/></>} />,
-            '3D Bar Chart': <Icon path={<><rect x="5" y="5" width="14" height="14" rx="2" /><path d="M12 3v18" /><path d="M3 12h18" /></>} />,
-            'Count Plot': <Icon path={<><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></>} />,
-            'Histogram': <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /></>} />,
-            'Menu': <Icon path={<><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>} />,
-            'Close': <Icon path={<><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>} />,
-            'Sun': <Icon path={<><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></>} className="w-5 h-5" />,
-            'Moon': <Icon path={<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>} className="w-5 h-5" fill="currentColor"/>,
-            'Car': <Icon path={<><path d="M14 16.5V15a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1.5"></path><path d="M20 10h-2.34a2 2 0 0 0-1.97 1.66l-1.39 5.57a2 2 0 0 1-1.97 1.66H9.67a2 2 0 0 1-1.97-1.66L6.31 11.66A2 2 0 0 0 4.34 10H2"></path><path d="M17.5 10.5c.36.14.7.4.95.74.25.34.4.76.4 1.21v3.05"></path><path d="M6.5 10.5c-.36.14-.7.4-.95.74-.25.34-.4.76-.4 1.21v3.05"></path><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="19" r="2"></circle></>} />,
-            'Dollar': <Icon path={<><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></>} />,
-            'Trophy': <Icon path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></>} />,
-            'Zap': <Icon path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>} />,
-            'Info': <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></>} className="w-5 h-5" />,
-            'Story': <Icon path={<><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M8 12h8"/><path d="M8 16h5"/><path d="m12 8-2 2 2 2"/></>} />,
-            'Explore': <Icon path={<><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="8"/></>} />,
-            'Next': <Icon path={<><polyline points="9 18 15 12 9 6"></polyline></>} className="w-5 h-5"/>,
-            'Prev': <Icon path={<><polyline points="15 18 9 12 15 6"></polyline></>} className="w-5 h-5"/>,
-            'Gemini': <Icon path={<><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></>} />,
+            LineChart: <Icon path={<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></>} />,
+            ScatterPlot: <Icon path={<><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="5" r="1"></circle><circle cx="5" cy="19" r="1"></circle><circle cx="5" cy="5" r="1"></circle><circle cx="19" cy="19" r="1"></circle></>} />,
+            BarChart: <Icon path={<><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></>} />,
+            BoxPlot: <Icon path={<><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></>} />,
+            Heatmap: <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></>} />,
+            '3DScatter': <Icon path={<><path d="m21 16-4-4-4 4-4-4-4 4"/><path d="m7 12 4 4 4-4 4 4"/><path d="M3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8Z"/></>} />,
+            '3DBarChart': <Icon path={<><rect x="5" y="5" width="14" height="14" rx="2" /><path d="M12 3v18" /><path d="M3 12h18" /></>} />,
+            CountPlot: <Icon path={<><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></>} />,
+            Histogram: <Icon path={<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" /></>} />,
+            Menu: <Icon path={<><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></>} />,
+            Close: <Icon path={<><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></>} />,
+            Sun: <Icon path={<><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></>} className="w-5 h-5" />,
+            Moon: <Icon path={<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>} className="w-5 h-5" fill="currentColor"/>,
+            Car: <Icon path={<><path d="M14 16.5V15a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1.5"></path><path d="M20 10h-2.34a2 2 0 0 0-1.97 1.66l-1.39 5.57a2 2 0 0 1-1.97 1.66H9.67a2 2 0 0 1-1.97-1.66L6.31 11.66A2 2 0 0 0 4.34 10H2"></path><path d="M17.5 10.5c.36.14.7.4.95.74.25.34.4.76.4 1.21v3.05"></path><path d="M6.5 10.5c-.36.14-.7.4-.95.74-.25.34-.4.76-.4 1.21v3.05"></path><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="19" r="2"></circle></>} />,
+            Dollar: <Icon path={<><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></>} />,
+            Trophy: <Icon path={<><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></>} />,
+            Zap: <Icon path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>} />,
+            Info: <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></>} className="w-5 h-5" />,
+            Story: <Icon path={<><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M8 12h8"/><path d="M8 16h5"/><path d="m12 8-2 2 2 2"/></>} />,
+            Explore: <Icon path={<><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="8"/></>} />,
+            Next: <Icon path={<><polyline points="9 18 15 12 9 6"></polyline></>} className="w-5 h-5"/>,
+            Prev: <Icon path={<><polyline points="15 18 9 12 15 6"></polyline></>} className="w-5 h-5"/>,
+            Gemini: <Icon path={<><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></>} />,
         };
 
         const CHART_DESCRIPTIONS = {
@@ -1101,7 +1101,7 @@
                                                         : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
                                                 }`}
                                             >
-                                                {ICONS[chart.name]}
+                                                {ICONS[chart.name.replace(/ /g, '')]}
                                                 <span>{chart.name}</span>
                                             </button>
                                         </li>
