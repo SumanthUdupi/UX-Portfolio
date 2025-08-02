@@ -1043,7 +1043,7 @@
                     <div className="space-y-4">
                         <h3 className="text-lg font-bold text-text-primary flex items-center">
                             <span className="text-transparent bg-clip-text mr-2" style={{backgroundImage: 'var(--accent-gradient)'}}>
-                                <ICONS.Gemini />
+                                {ICONS.Gemini}
                             </span>
                             Ask Gemini
                         </h3>
@@ -1060,7 +1060,7 @@
                                 </>
                             ) : (
                                 <>
-                                 <ICONS.Gemini />
+                                 {ICONS.Gemini}
                                  <span>Generate Story with Gemini</span>
                                 </>
                             )}
@@ -1101,7 +1101,7 @@
                                                         : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
                                                 }`}
                                             >
-                                                {ICONS[chart.name.replace(/ /g, '')]}
+                                                {ICONS[chart.name]}
                                                 <span>{chart.name}</span>
                                             </button>
                                         </li>
