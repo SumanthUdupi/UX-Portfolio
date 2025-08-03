@@ -3,122 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upgraded Poké-Strategist AI</title>
+    <title>Enhanced Poké-Strategist AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #111827; --bg-secondary: #1F2937; --bg-tertiary: #374151;
+            --text-primary: #F9FAFB; --text-secondary: #D1D5DB; --text-accent: #FBBF24;
+            --border-color: #4B5563;
+        }
+        html.light {
+            --bg-primary: #F9FAFB; --bg-secondary: #F3F4F6; --bg-tertiary: #E5E7EB;
+            --text-primary: #111827; --text-secondary: #374151; --text-accent: #F59E0B;
+            --border-color: #D1D5DB;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827; /* bg-gray-900 */
-            color: #F9FAFB; /* text-gray-50 */
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1F2937; }
-        ::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6B7280; }
-
-        /* Transitions and Effects */
-        .pokedex-grid-item {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s;
-        }
-        .pokedex-grid-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5); /* yellow-400 glow */
-            background-color: #4B5563;
-        }
-        .pokedex-grid-item.selected {
-            transform: scale(0.95);
-            background-color: #1a202c;
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        .team-member-card {
-            transition: transform 0.2s ease-in-out;
-        }
-        .team-member-card:hover {
-            transform: translateY(-4px);
-        }
-        .recommendation-card {
-            background-color: #374151;
-            border-left: 4px solid #FBBF24;
-            transition: background-color 0.2s, transform 0.2s;
-        }
-        .recommendation-card:hover {
-            background-color: #4B5563;
-            transform: translateX(4px);
-        }
-
-        /* Type Badges */
-        .type-badge {
-            padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;
-            font-weight: 600; text-transform: uppercase; color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-        }
-        .type-normal { background-color: #A8A77A; } .type-fire { background-color: #EE8130; }
-        .type-water { background-color: #6390F0; } .type-electric { background-color: #F7D02C; }
-        .type-grass { background-color: #7AC74C; } .type-ice { background-color: #96D9D6; }
-        .type-fighting { background-color: #C22E28; } .type-poison { background-color: #A33EA1; }
-        .type-ground { background-color: #E2BF65; } .type-flying { background-color: #A98FF3; }
-        .type-psychic { background-color: #F95587; } .type-bug { background-color: #A6B91A; }
-        .type-rock { background-color: #B6A136; } .type-ghost { background-color: #735797; }
-        .type-dragon { background-color: #6F35FC; } .type-dark { background-color: #705746; }
-        .type-steel { background-color: #B7B7CE; } .type-fairy { background-color: #D685AD; }
-
-        /* Custom Toast Notification */
-        #toast {
-            position: fixed; top: 20px; right: 20px;
-            background-color: #1F2937; color: white;
-            padding: 1rem 1.5rem; border-radius: 0.5rem;
-            border-left: 4px solid #FBBF24;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            transform: translateX(120%);
-            transition: transform 0.5s ease-in-out;
-            z-index: 100;
-        }
+        /* Custom UI Elements */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6B7280; }
+        .pokedex-grid-item { transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s; }
+        .pokedex-grid-item:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--text-accent); background-color: var(--bg-tertiary); }
+        .pokedex-grid-item.selected { transform: scale(0.95); background-color: #1a202c; opacity: 0.6; pointer-events: none; }
+        .team-member-card { transition: transform 0.2s ease-in-out; }
+        .team-member-card:hover { transform: translateY(-4px); }
+        .recommendation-card { background-color: var(--bg-tertiary); border-left: 4px solid var(--text-accent); transition: background-color 0.2s, transform 0.2s; }
+        .recommendation-card:hover { background-color: var(--border-color); transform: translateX(4px); }
+        .type-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
+        .type-normal { background-color: #A8A77A; } .type-fire { background-color: #EE8130; } .type-water { background-color: #6390F0; } .type-electric { background-color: #F7D02C; } .type-grass { background-color: #7AC74C; } .type-ice { background-color: #96D9D6; } .type-fighting { background-color: #C22E28; } .type-poison { background-color: #A33EA1; } .type-ground { background-color: #E2BF65; } .type-flying { background-color: #A98FF3; } .type-psychic { background-color: #F95587; } .type-bug { background-color: #A6B91A; } .type-rock { background-color: #B6A136; } .type-ghost { background-color: #735797; } .type-dragon { background-color: #6F35FC; } .type-dark { background-color: #705746; } .type-steel { background-color: #B7B7CE; } .type-fairy { background-color: #D685AD; }
+        #toast { position: fixed; top: 20px; right: 20px; background-color: var(--bg-secondary); color: var(--text-primary); padding: 1rem 1.5rem; border-radius: 0.5rem; border-left: 4px solid var(--text-accent); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transform: translateX(120%); transition: transform 0.5s ease-in-out; z-index: 100; }
         #toast.show { transform: translateX(0); }
-        
-        /* Modal for Pokémon Details */
-        #details-modal-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none; justify-content: center; align-items: center;
-            z-index: 50;
-        }
-        #details-modal-content {
-            background-color: #1F2937;
-            padding: 2rem; border-radius: 0.75rem;
-            width: 90%; max-width: 500px;
-        }
+        #details-modal-bg, #share-modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 50; }
+        #details-modal-content, #share-modal-content { background-color: var(--bg-secondary); padding: 2rem; border-radius: 0.75rem; width: 90%; max-width: 600px; }
+        .custom-select { background-color: var(--bg-tertiary); }
+        .theme-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--text-accent); }
+        input:checked + .slider:before { transform: translateX(26px); }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- Main Container -->
+    <!-- Header -->
     <div class="container mx-auto p-4 lg:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-yellow-400">Upgraded Poké-Strategist AI</h1>
-            <p class="text-lg text-gray-300 mt-2">Build your core team and get AI-powered recommendations.</p>
+        <header class="text-center mb-4">
+            <div class="flex justify-center items-center gap-4">
+                <h1 class="text-4xl md:text-5xl font-bold" style="color: var(--text-accent);">Enhanced Poké-Strategist AI</h1>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <p class="text-lg mt-2" style="color: var(--text-secondary);">Build your ultimate team with advanced analytics and AI-powered insights.</p>
         </header>
 
         <!-- Loader -->
         <div id="loader" class="text-center py-16">
-            <svg class="mx-auto h-12 w-12 text-yellow-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="mx-auto h-12 w-12 animate-spin" style="color: var(--text-accent);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p id="loader-message" class="text-lg text-gray-400 mt-4">Loading Pokédex data...</p>
+            <p id="loader-message" class="text-lg mt-4" style="color: var(--text-secondary);">Loading Pokédex data...</p>
         </div>
 
         <!-- Main Content Grid -->
         <main id="main-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Left Panel: Pokédex Selector -->
-            <div class="lg:col-span-1 bg-gray-800 p-4 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-bold mb-4 text-yellow-400 border-b-2 border-gray-700 pb-2">Select Your Pokémon</h2>
-                <input type="text" id="pokedex-search" placeholder="Search by name..." class="w-full p-2 mb-4 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
-                <div id="pokedex-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 gap-2 h-[60vh] overflow-y-auto pr-2">
+            <div class="lg:col-span-1 p-4 rounded-lg shadow-lg" style="background-color: var(--bg-secondary);">
+                <h2 class="text-2xl font-bold mb-4 pb-2" style="color: var(--text-accent); border-bottom: 2px solid var(--border-color);">Select Your Pokémon</h2>
+                <input type="text" id="pokedex-search" placeholder="Search by name..." class="w-full p-2 mb-2 rounded focus:outline-none focus:ring-2" style="background-color: var(--bg-tertiary); ring-color: var(--text-accent);">
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <select id="type-filter" class="w-full p-2 rounded custom-select focus:outline-none focus:ring-2" style="ring-color: var(--text-accent);"><option value="">All Types</option></select>
+                    <select id="generation-filter" class="w-full p-2 rounded custom-select focus:outline-none focus:ring-2" style="ring-color: var(--text-accent);"><option value="">All Generations</option></select>
+                </div>
+                <div id="pokedex-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 gap-2 h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                     <!-- Pokémon sprites populated by JS -->
                 </div>
             </div>
@@ -126,19 +94,41 @@
             <!-- Right Panel: Team Analysis -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Current Team Section -->
-                <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <div class="flex justify-between items-center mb-4 border-b-2 border-gray-700 pb-2">
-                        <h2 class="text-2xl font-bold text-yellow-400">Your Core Team</h2>
-                        <button id="clear-team-btn" class="text-sm bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Clear Team</button>
+                <div class="p-4 rounded-lg shadow-lg" style="background-color: var(--bg-secondary);">
+                    <div class="flex justify-between items-center mb-4 pb-2" style="border-bottom: 2px solid var(--border-color);">
+                        <h2 class="text-2xl font-bold" style="color: var(--text-accent);">Your Core Team</h2>
+                        <div class="flex gap-2">
+                            <button id="share-team-btn" class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded transition-colors">Share</button>
+                            <button id="save-team-btn" class="text-sm bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded transition-colors">Save</button>
+                            <button id="clear-team-btn" class="text-sm bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded transition-colors disabled:opacity-50" disabled>Clear</button>
+                        </div>
                     </div>
-                    <div id="team-display" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 min-h-[150px]">
-                         <div id="team-placeholder" class="col-span-full flex items-center justify-center text-gray-500"><p>Select up to 6 Pokémon to start.</p></div>
+                    <div id="team-display" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[150px]">
+                         <div id="team-placeholder" class="col-span-full flex items-center justify-center" style="color: var(--text-secondary);"><p>Select up to 6 Pokémon to start.</p></div>
+                    </div>
+                </div>
+                
+                <!-- NEW: Synergy & Threat Section -->
+                <div class="p-4 rounded-lg shadow-lg" style="background-color: var(--bg-secondary);">
+                    <h2 class="text-2xl font-bold mb-4 pb-2" style="color: var(--text-accent); border-bottom: 2px solid var(--border-color);">Advanced Metrics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2 text-center" style="color: var(--text-secondary);">Team Synergy Score</h3>
+                            <div id="synergy-score-display" class="text-5xl font-bold text-center" style="color: var(--text-accent);">N/A</div>
+                            <p id="synergy-breakdown" class="text-xs text-center mt-2" style="color: var(--text-secondary);">Add Pokémon to calculate.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2 text-center" style="color: var(--text-secondary);">Top Threats</h3>
+                            <div id="threat-list-display" class="space-y-2 text-center">
+                                <p style="color: var(--text-secondary);">Analysis requires a team.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Analysis Dashboard -->
-                <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4 text-yellow-400 border-b-2 border-gray-700 pb-2">Strategic Analysis</h2>
+                <div class="p-4 rounded-lg shadow-lg" style="background-color: var(--bg-secondary);">
+                    <h2 class="text-2xl font-bold mb-4 pb-2" style="color: var(--text-accent); border-bottom: 2px solid var(--border-color);">Strategic Analysis</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                             <h3 class="text-xl font-semibold mb-2 text-center text-red-400">Team Vulnerability Profile</h3>
@@ -152,62 +142,55 @@
                 </div>
                 
                 <!-- Recommendations Section -->
-                <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4 text-yellow-400 border-b-2 border-gray-700 pb-2">Top Recommendations</h2>
+                <div class="p-4 rounded-lg shadow-lg" style="background-color: var(--bg-secondary);">
+                    <h2 class="text-2xl font-bold mb-4 pb-2" style="color: var(--text-accent); border-bottom: 2px solid var(--border-color);">Top Recommendations</h2>
                     <div id="recommendations-panel" class="space-y-3 min-h-[200px]">
-                         <div id="reco-placeholder" class="flex items-center justify-center h-full text-gray-500"><p>Add 1-5 Pokémon to see recommendations.</p></div>
+                         <div id="reco-placeholder" class="flex items-center justify-center h-full" style="color: var(--text-secondary);"><p>Add 1-5 Pokémon to see recommendations.</p></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast">
-        <p id="toast-message"></p>
-    </div>
-
-    <!-- Pokémon Details Modal -->
-    <div id="details-modal-bg">
-        <div id="details-modal-content">
-            <!-- Content injected by JS -->
+    <!-- Modals -->
+    <div id="toast"><p id="toast-message"></p></div>
+    <div id="details-modal-bg"><div id="details-modal-content"></div></div>
+    <div id="share-modal-bg">
+        <div id="share-modal-content" class="text-center">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Share Your Team</h2>
+            <p class="mb-4" style="color: var(--text-secondary);">Copy the link below to share your current team!</p>
+            <input type="text" id="share-url-input" readonly class="w-full p-2 mb-4 rounded text-center" style="background-color: var(--bg-tertiary); color: var(--text-primary);">
+            <button id="copy-share-url-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Copy Link</button>
+            <button id="close-share-modal-btn" class="absolute top-4 right-4 text-2xl" style="color: var(--text-secondary);">&times;</button>
         </div>
     </div>
 
 <script>
     // --- GLOBAL STATE & CONFIG ---
     let masterPokemonData = [];
-    let currentTeam = [];
-    const allTypes = [
-        'normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison',
-        'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'
-    ];
+    let currentTeam = []; // Now stores objects with {pokemon, nickname}
+    const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+    const generations = [1, 2, 3, 4, 5, 6, 7, 8];
 
     // --- DOM ELEMENTS ---
-    const loader = document.getElementById('loader');
-    const loaderMessage = document.getElementById('loader-message');
-    const mainContent = document.getElementById('main-content');
-    const pokedexGrid = document.getElementById('pokedex-grid');
-    const teamDisplay = document.getElementById('team-display');
-    const teamPlaceholder = document.getElementById('team-placeholder');
-    const recoPlaceholder = document.getElementById('reco-placeholder');
-    const searchInput = document.getElementById('pokedex-search');
-    const recommendationsPanel = document.getElementById('recommendations-panel');
-    const vulnerabilityChartContainer = document.getElementById('vulnerability-chart-container');
-    const coverageChartContainer = document.getElementById('coverage-chart-container');
-    const clearTeamBtn = document.getElementById('clear-team-btn');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
-    const detailsModalBg = document.getElementById('details-modal-bg');
-    const detailsModalContent = document.getElementById('details-modal-content');
+    const loader = document.getElementById('loader'), mainContent = document.getElementById('main-content');
+    const pokedexGrid = document.getElementById('pokedex-grid'), searchInput = document.getElementById('pokedex-search');
+    const typeFilter = document.getElementById('type-filter'), generationFilter = document.getElementById('generation-filter');
+    const teamDisplay = document.getElementById('team-display'), teamPlaceholder = document.getElementById('team-placeholder');
+    const recoPlaceholder = document.getElementById('reco-placeholder'), recommendationsPanel = document.getElementById('recommendations-panel');
+    const vulnerabilityChartContainer = document.getElementById('vulnerability-chart-container'), coverageChartContainer = document.getElementById('coverage-chart-container');
+    const clearTeamBtn = document.getElementById('clear-team-btn'), saveTeamBtn = document.getElementById('save-team-btn'), shareTeamBtn = document.getElementById('share-team-btn');
+    const toast = document.getElementById('toast'), toastMessage = document.getElementById('toast-message');
+    const detailsModalBg = document.getElementById('details-modal-bg'), detailsModalContent = document.getElementById('details-modal-content');
+    const shareModalBg = document.getElementById('share-modal-bg'), shareUrlInput = document.getElementById('share-url-input');
+    const themeToggle = document.getElementById('theme-toggle');
+    const synergyScoreDisplay = document.getElementById('synergy-score-display'), synergyBreakdown = document.getElementById('synergy-breakdown');
+    const threatListDisplay = document.getElementById('threat-list-display');
 
     // --- DATA LOADING ---
     async function loadData() {
         try {
-            // Using a reliable public CSV file for Pokémon data.
             const response = await d3.csv("public/Rawdata/pokemon.csv");
-            
-            // Clean and parse data, ensuring numeric types are correct.
             masterPokemonData = response.map(d => {
                 const pokemon = {};
                 for (const key in d) {
@@ -215,15 +198,15 @@
                     const isNumeric = !isNaN(parseFloat(d[key])) && isFinite(d[key]);
                     pokemon[cleanKey] = isNumeric ? +d[key] : d[key];
                 }
-                // Add a direct sprite URL for performance.
                 pokemon.sprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokedex_number}.png`;
+                // Add abilities - simplified for this example
+                pokemon.abilities = [d.ability1, d.ability2].filter(Boolean);
                 return pokemon;
             });
-            
             initializeApp();
         } catch (error) {
             console.error("Error loading data:", error);
-            loader.innerHTML = `<p class="text-2xl text-red-500">Error: Could not load data.</p><p class="text-gray-400 mt-2">Please check your internet connection and try again.</p>`;
+            loader.innerHTML = `<p class="text-2xl text-red-500">Error: Could not load data.</p>`;
         }
     }
 
@@ -231,8 +214,26 @@
     function initializeApp() {
         loader.style.display = 'none';
         mainContent.classList.remove('hidden');
-        renderPokedexGrid(masterPokemonData);
+        populateFilters();
         setupEventListeners();
+        loadTheme();
+        
+        // Feature: Load team from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamIds = urlParams.get('team');
+        if (teamIds) {
+            const ids = teamIds.split(',').map(Number);
+            currentTeam = ids.map(id => ({
+                pokemon: masterPokemonData.find(p => p.pokedex_number === id),
+                nickname: ''
+            })).filter(member => member.pokemon);
+            showToast(`Shared team loaded!`);
+        } else {
+            // Feature: Load last saved team
+            loadTeamFromStorage();
+        }
+        
+        renderPokedexGrid(masterPokemonData);
         updateDashboard();
     }
 
@@ -242,16 +243,13 @@
         const fragment = document.createDocumentFragment();
         pokemonList.forEach(p => {
             const item = document.createElement('div');
-            item.className = 'pokedex-grid-item cursor-pointer p-2 bg-gray-700 rounded-lg flex flex-col items-center';
-            // Check if this pokemon is already in the team to apply the 'selected' class
-            if (currentTeam.some(teamMember => teamMember.pokedex_number === p.pokedex_number)) {
+            item.className = 'pokedex-grid-item cursor-pointer p-2 rounded-lg flex flex-col items-center';
+            item.style.backgroundColor = 'var(--bg-tertiary)';
+            if (currentTeam.some(tm => tm.pokemon.pokedex_number === p.pokedex_number)) {
                 item.classList.add('selected');
             }
             item.dataset.id = p.pokedex_number;
-            item.innerHTML = `
-                <img src="${p.sprite}" alt="${p.name}" class="w-16 h-16 pointer-events-none" loading="lazy" onerror="this.src='https://placehold.co/64x64/374151/F9FAFB?text=?'; this.onerror=null;">
-                <span class="text-xs text-center mt-1 pointer-events-none">${p.name}</span>
-            `;
+            item.innerHTML = `<img src="${p.sprite}" alt="${p.name}" class="w-16 h-16 pointer-events-none" loading="lazy" onerror="this.src='https://placehold.co/64x64/374151/F9FAFB?text=?'; this.onerror=null;"><span class="text-xs text-center mt-1 pointer-events-none">${p.name}</span>`;
             fragment.appendChild(item);
         });
         pokedexGrid.appendChild(fragment);
@@ -266,17 +264,17 @@
         } else {
             teamPlaceholder.style.display = 'none';
             clearTeamBtn.disabled = false;
-            currentTeam.forEach(p => {
+            currentTeam.forEach((member, index) => {
+                const p = member.pokemon;
                 const card = document.createElement('div');
-                card.className = 'team-member-card bg-gray-700 rounded-lg p-2 flex flex-col items-center';
+                card.className = 'team-member-card rounded-lg p-3 flex flex-col items-center';
+                card.style.backgroundColor = 'var(--bg-tertiary)';
                 card.dataset.id = p.pokedex_number;
                 card.innerHTML = `
                     <img src="${p.sprite}" alt="${p.name}" class="w-20 h-20" onerror="this.src='https://placehold.co/80x80/374151/F9FAFB?text=?'; this.onerror=null;">
-                    <p class="font-bold mt-1 text-sm">${p.name}</p>
-                    <div class="flex gap-1 mt-1">
-                        ${getTypeBadge(p.type1)}
-                        ${p.type2 ? getTypeBadge(p.type2) : ''}
-                    </div>
+                    <input type="text" class="nickname-input w-full text-center font-bold mt-1 text-sm bg-transparent border-b" style="border-color: var(--border-color); color: var(--text-primary);" value="${member.nickname || p.name}" data-index="${index}" placeholder="Nickname">
+                    <div class="flex gap-1 mt-1">${getTypeBadge(p.type1)}${p.type2 ? getTypeBadge(p.type2) : ''}</div>
+                    <div class="text-xs mt-1" style="color: var(--text-secondary);">${p.abilities.join(' / ')}</div>
                     <div class="flex gap-2 mt-2">
                          <button class="view-details-btn text-xs text-blue-400 hover:underline" data-id="${p.pokedex_number}">Details</button>
                          <button class="remove-team-btn text-xs text-red-400 hover:underline" data-id="${p.pokedex_number}">Remove</button>
@@ -289,66 +287,29 @@
     
     function getTypeBadge(type) {
         if (!type) return '';
-        const typeClass = `type-${type.toLowerCase()}`;
-        return `<span class="type-badge ${typeClass}">${type}</span>`;
+        return `<span class="type-badge type-${type.toLowerCase()}">${type}</span>`;
     }
 
     function renderAnalysisCharts() {
-        // Render Vulnerability Chart
         const vulnerabilityProfile = calculateProfile('vulnerability');
         renderBarChart(vulnerabilityChartContainer, vulnerabilityProfile, d => d.count > 1 ? "#EF4444" : (d.count === 1 ? "#FBBF24" : "#22C55E"));
-
-        // Render Coverage Chart
         const coverageProfile = calculateProfile('coverage');
         renderBarChart(coverageChartContainer, coverageProfile, d => d.count > 1 ? "#22C55E" : (d.count === 1 ? "#A3E635" : "#6B7280"));
     }
     
     function renderBarChart(container, profileData, colorScale) {
         const data = Object.entries(profileData).map(([type, count]) => ({ type, count }));
-
         container.innerHTML = '';
         const margin = { top: 10, right: 10, bottom: 80, left: 30 };
         const width = container.clientWidth - margin.left - margin.right;
         const height = 250 - margin.top - margin.bottom;
-
-        const svg = d3.select(container).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        const x = d3.scaleBand()
-            .range([0, width])
-            .domain(data.map(d => d.type))
-            .padding(0.2);
-
-        svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end")
-            .style("fill", "#9CA3AF");
-
+        const svg = d3.select(container).append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+        const x = d3.scaleBand().range([0, width]).domain(data.map(d => d.type)).padding(0.2);
+        svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).selectAll("text").attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end").style("fill", "var(--text-secondary)");
         const yMax = Math.max(1, d3.max(data, d => d.count));
-        const y = d3.scaleLinear()
-            .domain([0, yMax])
-            .range([height, 0]);
-
-        svg.append("g")
-            .call(d3.axisLeft(y).ticks(Math.min(yMax, 6)).tickFormat(d3.format("d")))
-            .selectAll("text, line")
-            .style("fill", "#9CA3AF");
-
-        svg.selectAll("rect")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("x", d => x(d.type))
-            .attr("y", d => y(d.count))
-            .attr("width", x.bandwidth())
-            .attr("height", d => height - y(d.count))
-            .attr("fill", colorScale);
+        const y = d3.scaleLinear().domain([0, yMax]).range([height, 0]);
+        svg.append("g").call(d3.axisLeft(y).ticks(Math.min(yMax, 6)).tickFormat(d3.format("d"))).selectAll("text, line, path").style("stroke", "var(--text-secondary)").style("fill", "var(--text-secondary)");
+        svg.selectAll("rect").data(data).enter().append("rect").attr("x", d => x(d.type)).attr("y", d => y(d.count)).attr("width", x.bandwidth()).attr("height", d => height - y(d.count)).attr("fill", colorScale);
     }
 
     function renderRecommendations() {
@@ -357,31 +318,14 @@
         if (recommendations.length === 0 || currentTeam.length === 0 || currentTeam.length >= 6) {
             recommendationsPanel.appendChild(recoPlaceholder);
             recoPlaceholder.style.display = 'flex';
-            if(currentTeam.length >= 6) {
-                 recoPlaceholder.innerHTML = '<p>Your team is full!</p>';
-            } else {
-                 recoPlaceholder.innerHTML = '<p>Add 1-5 Pokémon to see recommendations.</p>';
-            }
+            recoPlaceholder.innerHTML = currentTeam.length >= 6 ? '<p>Your team is full!</p>' : '<p>Add 1-5 Pokémon to see recommendations.</p>';
         } else {
-            recoPlaceholder.style.display = 'block';
+            recoPlaceholder.style.display = 'none';
             recommendations.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'recommendation-card p-3 rounded-lg flex items-center gap-4 cursor-pointer';
                 card.dataset.id = r.pokemon.pokedex_number;
-                card.innerHTML = `
-                    <img src="${r.pokemon.sprite}" alt="${r.pokemon.name}" class="w-16 h-16 bg-gray-800 rounded-full pointer-events-none" onerror="this.src='https://placehold.co/64x64/1F2937/F9FAFB?text=?'; this.onerror=null;">
-                    <div class="flex-grow pointer-events-none">
-                        <p class="font-bold text-lg text-white">${r.pokemon.name}</p>
-                        <p class="text-sm text-gray-300">${r.reason}</p>
-                    </div>
-                    <div class="text-right pointer-events-none">
-                         <div class="flex gap-1 justify-end">
-                            ${getTypeBadge(r.pokemon.type1)}
-                            ${r.pokemon.type2 ? getTypeBadge(r.pokemon.type2) : ''}
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1">Power: ${r.pokemon.base_total}</p>
-                    </div>
-                `;
+                card.innerHTML = `<img src="${r.pokemon.sprite}" alt="${r.pokemon.name}" class="w-16 h-16 rounded-full pointer-events-none" style="background-color: var(--bg-secondary);" onerror="this.src='https://placehold.co/64x64/1F2937/F9FAFB?text=?'; this.onerror=null;"><div class="flex-grow pointer-events-none"><p class="font-bold text-lg">${r.pokemon.name}</p><p class="text-sm" style="color: var(--text-secondary);">${r.reason}</p></div><div class="text-right pointer-events-none"><div class="flex gap-1 justify-end">${getTypeBadge(r.pokemon.type1)}${r.pokemon.type2 ? getTypeBadge(r.pokemon.type2) : ''}</div><p class="text-xs mt-1" style="color: var(--text-secondary);">Power: ${r.pokemon.base_total}</p></div>`;
                 recommendationsPanel.appendChild(card);
             });
         }
@@ -390,89 +334,91 @@
     function renderDetailsModal(pokemon) {
         detailsModalContent.innerHTML = `
             <div class="flex justify-between items-start">
-                <h2 class="text-3xl font-bold text-yellow-400 mb-4">${pokemon.name}</h2>
-                <button id="close-modal-btn" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+                <h2 class="text-3xl font-bold mb-4" style="color: var(--text-accent);">${pokemon.name}</h2>
+                <button id="close-modal-btn" class="text-2xl" style="color: var(--text-secondary);">&times;</button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col items-center">
-                    <img src="${pokemon.sprite}" alt="${pokemon.name}" class="w-32 h-32 bg-gray-800 rounded-full mb-2">
-                     <div class="flex gap-2">
-                        ${getTypeBadge(pokemon.type1)}
-                        ${pokemon.type2 ? getTypeBadge(pokemon.type2) : ''}
+                    <img src="${pokemon.sprite}" alt="${pokemon.name}" class="w-32 h-32 rounded-full mb-2" style="background-color: var(--bg-primary);">
+                    <div class="flex gap-2">${getTypeBadge(pokemon.type1)}${pokemon.type2 ? getTypeBadge(pokemon.type2) : ''}</div>
+                    <div class="mt-2 text-center"><p class="font-bold">Abilities</p><p class="text-sm" style="color: var(--text-secondary);">${pokemon.abilities.join(' / ')}</p></div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-2 text-center">Base Stats</h4>
+                    <div id="stats-radar-chart"></div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <h4 class="font-bold text-lg mb-2" style="color: var(--text-accent);">Strategic Suggestions</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="p-3 rounded" style="background-color: var(--bg-primary);">
+                        <p class="font-semibold">Suggested Natures</p>
+                        <p style="color: var(--text-secondary);">${getSuggestedNatures(pokemon)}</p>
+                    </div>
+                    <div class="p-3 rounded" style="background-color: var(--bg-primary);">
+                        <p class="font-semibold">Sample Moveset</p>
+                        <p style="color: var(--text-secondary);">${getSampleMoveset(pokemon)}</p>
                     </div>
                 </div>
-                <div id="stats-radar-chart"></div>
             </div>
         `;
         detailsModalBg.style.display = 'flex';
-
-        // Radar Chart for Stats
-        const statsData = [
-            { axis: "HP", value: pokemon.hp }, { axis: "Attack", value: pokemon.attack },
-            { axis: "Defense", value: pokemon.defense }, { axis: "Sp. Atk", value: pokemon.sp_attack },
-            { axis: "Sp. Def", value: pokemon.sp_defense }, { axis: "Speed", value: pokemon.speed }
-        ];
+        const statsData = [{ axis: "HP", value: pokemon.hp }, { axis: "Attack", value: pokemon.attack }, { axis: "Defense", value: pokemon.defense }, { axis: "Sp. Atk", value: pokemon.sp_attack }, { axis: "Sp. Def", value: pokemon.sp_defense }, { axis: "Speed", value: pokemon.speed }];
         renderRadarChart("#stats-radar-chart", statsData);
-
         document.getElementById('close-modal-btn').addEventListener('click', () => detailsModalBg.style.display = 'none');
     }
 
     function renderRadarChart(selector, data) {
+        const container = d3.select(selector);
+        container.select("svg").remove();
         const margin = { top: 40, right: 40, bottom: 40, left: 40 },
-            width = Math.min(200, window.innerWidth / 4) - margin.left - margin.right,
-            height = Math.min(width, window.innerHeight / 4) - margin.top - margin.bottom;
-
-        const maxValue = d3.max(data, d => d.value);
-        const allAxis = data.map(i => i.axis),
-            total = allAxis.length,
-            radius = Math.min(width / 2, height / 2),
-            angleSlice = Math.PI * 2 / total;
-
+            width = Math.min(250, container.node().getBoundingClientRect().width) - margin.left - margin.right,
+            height = Math.min(width, 250) - margin.top - margin.bottom;
+        const maxValue = 160; // A reasonable max for base stats
+        const allAxis = data.map(i => i.axis), total = allAxis.length, radius = Math.min(width / 2, height / 2), angleSlice = Math.PI * 2 / total;
         const rScale = d3.scaleLinear().range([0, radius]).domain([0, maxValue]);
-
-        d3.select(selector).select("svg").remove();
-        const svg = d3.select(selector).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
-
-        const radarLine = d3.lineRadial()
-            .curve(d3.curveLinearClosed)
-            .radius(d => rScale(d.value))
-            .angle((d, i) => i * angleSlice);
-        
-        svg.selectAll(".axisLabel")
-            .data(allAxis).enter().append("text")
-            .attr("class", "text-xs fill-current text-gray-300")
-            .attr("text-anchor", "middle")
-            .attr("dy", "0.35em")
-            .attr("x", (d, i) => rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2))
-            .attr("y", (d, i) => rScale(maxValue * 1.1) * Math.sin(angleSlice * i - Math.PI / 2))
-            .text(d => d);
-
-        svg.append("path")
-            .datum(data)
-            .attr("class", "stroke-current text-yellow-400 fill-current text-yellow-400 opacity-50")
-            .attr("d", radarLine)
-            .style("stroke-width", "2px");
+        const svg = container.append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
+        svg.selectAll(".axisLabel").data(allAxis).enter().append("text").attr("class", "text-xs").style("fill", "var(--text-secondary)").attr("text-anchor", "middle").attr("dy", "0.35em").attr("x", (d, i) => rScale(maxValue * 1.1) * Math.cos(angleSlice * i - Math.PI / 2)).attr("y", (d, i) => rScale(maxValue * 1.1) * Math.sin(angleSlice * i - Math.PI / 2)).text(d => d);
+        const radarLine = d3.lineRadial().curve(d3.curveLinearClosed).radius(d => rScale(d.value)).angle((d, i) => i * angleSlice);
+        svg.append("path").datum(data).style("stroke-width", "2px").style("stroke", "var(--text-accent)").style("fill", "var(--text-accent)").style("fill-opacity", 0.5).attr("d", radarLine);
     }
 
+    function renderAdvancedMetrics() {
+        if (currentTeam.length === 0) {
+            synergyScoreDisplay.textContent = 'N/A';
+            synergyBreakdown.textContent = 'Add Pokémon to calculate.';
+            threatListDisplay.innerHTML = `<p style="color: var(--text-secondary);">Analysis requires a team.</p>`;
+            return;
+        }
+        // Synergy Score
+        const synergy = calculateSynergy();
+        synergyScoreDisplay.textContent = `${synergy.totalScore}%`;
+        synergyBreakdown.innerHTML = `Type Balance: ${synergy.typeBalanceScore}% &nbsp;&bull;&nbsp; Stat Balance: ${synergy.statBalanceScore}%`;
+        // Threat List
+        const threats = generateThreatList();
+        threatListDisplay.innerHTML = '';
+        if (threats.length > 0) {
+            threats.forEach(threat => {
+                const threatEl = document.createElement('div');
+                threatEl.className = 'flex items-center justify-center gap-2';
+                threatEl.innerHTML = `<img src="${threat.sprite}" class="w-8 h-8 rounded-full" style="background-color: var(--bg-primary);"> <span class="font-semibold">${threat.name}</span>`;
+                threatListDisplay.appendChild(threatEl);
+            });
+        } else {
+            threatListDisplay.innerHTML = `<p class="text-green-400">No critical threats detected!</p>`;
+        }
+    }
 
     // --- LOGIC & CALCULATIONS ---
-    function calculateProfile(mode) { // mode = 'vulnerability' or 'coverage'
+    function calculateProfile(mode) {
         const profile = {};
         allTypes.forEach(type => profile[type] = 0);
         if (currentTeam.length === 0) return profile;
-
         currentTeam.forEach(member => {
             allTypes.forEach(attackType => {
-                const multiplier = member[`against_${attackType}`];
-                if (mode === 'vulnerability' && multiplier > 1) {
-                    profile[attackType]++;
-                } else if (mode === 'coverage' && multiplier < 1) {
-                    profile[attackType]++;
-                }
+                const multiplier = member.pokemon[`against_${attackType}`];
+                if (mode === 'vulnerability' && multiplier > 1) profile[attackType]++;
+                else if (mode === 'coverage' && multiplier < 1) profile[attackType]++;
             });
         });
         return profile;
@@ -480,87 +426,122 @@
 
     function generateRecommendations() {
         if (currentTeam.length === 0 || currentTeam.length >= 6) return [];
-
         const profile = calculateProfile('vulnerability');
-        const weaknesses = Object.entries(profile)
-            .filter(([, count]) => count > 0)
-            .sort((a, b) => b[1] - a[1]);
-
+        const weaknesses = Object.entries(profile).filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1]);
         if (weaknesses.length === 0) {
-            return masterPokemonData
-                .filter(p => !currentTeam.find(tm => tm.pokedex_number === p.pokedex_number))
-                .sort((a, b) => b.base_total - a.base_total)
-                .slice(0, 5)
-                .map(p => ({ pokemon: p, reason: "Adds overall power to your strong core.", score: p.base_total }));
+            return masterPokemonData.filter(p => !currentTeam.find(tm => tm.pokemon.pokedex_number === p.pokedex_number)).sort((a, b) => b.base_total - a.base_total).slice(0, 5).map(p => ({ pokemon: p, reason: "Adds overall power to your strong core.", score: p.base_total }));
         }
-
         const primaryWeaknessType = weaknesses[0][0];
-        const candidatePool = masterPokemonData.filter(p => !currentTeam.find(tm => tm.pokedex_number === p.pokedex_number));
-
+        const candidatePool = masterPokemonData.filter(p => !currentTeam.find(tm => tm.pokemon.pokedex_number === p.pokedex_number));
         const scoredCandidates = candidatePool.map(candidate => {
             let score = 0;
             const defenseMultiplier = candidate[`against_${primaryWeaknessType}`];
-            if (defenseMultiplier < 1) score += 1000 * (1 - defenseMultiplier); 
+            if (defenseMultiplier < 1) score += 1000 * (1 - defenseMultiplier);
             score += candidate.base_total;
-            return {
-                pokemon: candidate,
-                score: score,
-                reason: `Covers team weakness to <span class="font-bold capitalize text-yellow-300">${primaryWeaknessType}</span> attacks.`
-            };
+            return { pokemon: candidate, score: score, reason: `Covers team weakness to <span class="font-bold capitalize text-yellow-300">${primaryWeaknessType}</span> attacks.` };
         }).sort((a, b) => b.score - a.score);
-
         return scoredCandidates.slice(0, 5);
+    }
+    
+    // --- NEW FEATURE LOGIC ---
+    function calculateSynergy() {
+        if (currentTeam.length < 2) return { totalScore: 0, typeBalanceScore: 0, statBalanceScore: 0 };
+        // Type Balance (less shared weaknesses is better)
+        const vulns = calculateProfile('vulnerability');
+        const sharedWeaknesses = Object.values(vulns).filter(v => v > 1).length;
+        const typeBalanceScore = Math.max(0, Math.round((1 - (sharedWeaknesses / allTypes.length)) * 100));
+        // Stat Balance (diversity in high stats)
+        const statRoles = { attack: 0, sp_attack: 0, defense: 0, sp_defense: 0, speed: 0 };
+        currentTeam.forEach(m => {
+            const p = m.pokemon;
+            if (p.attack > 100) statRoles.attack = 1; if (p.sp_attack > 100) statRoles.sp_attack = 1;
+            if (p.defense > 100) statRoles.defense = 1; if (p.sp_defense > 100) statRoles.sp_defense = 1;
+            if (p.speed > 100) statRoles.speed = 1;
+        });
+        const filledRoles = Object.values(statRoles).reduce((a, b) => a + b, 0);
+        const statBalanceScore = Math.round((filledRoles / Object.keys(statRoles).length) * 100);
+        const totalScore = Math.round(typeBalanceScore * 0.6 + statBalanceScore * 0.4);
+        return { totalScore, typeBalanceScore, statBalanceScore };
+    }
+
+    function generateThreatList() {
+        if (currentTeam.length === 0) return [];
+        const vulns = calculateProfile('vulnerability');
+        const topWeaknesses = Object.entries(vulns).filter(([, count]) => count >= Math.max(2, currentTeam.length / 2)).map(([type]) => type);
+        if (topWeaknesses.length === 0) return [];
+        const threats = masterPokemonData.filter(p => {
+            return (p.base_total > 500 && (topWeaknesses.includes(p.type1.toLowerCase()) || (p.type2 && topWeaknesses.includes(p.type2.toLowerCase()))));
+        }).sort((a, b) => b.base_total - a.base_total);
+        return threats.slice(0, 3);
+    }
+
+    function getSuggestedNatures(pokemon) {
+        if (pokemon.attack > pokemon.sp_attack + 10) return "Adamant (+Atk, -SpA), Jolly (+Spe, -SpA)";
+        if (pokemon.sp_attack > pokemon.attack + 10) return "Modest (+SpA, -Atk), Timid (+Spe, -Atk)";
+        if (pokemon.speed > 100) return "Jolly or Timid for speed control.";
+        return "Balanced natures like Hardy, Docile, Bashful.";
+    }
+
+    function getSampleMoveset(pokemon) {
+        // This is a simplified placeholder. A real implementation would need a move database.
+        const moves = [`${pokemon.type1} STAB`, 'Coverage Move', 'Status/Setup Move', 'Utility Move'];
+        return moves.join(', ');
     }
 
     // --- UI INTERACTION & EVENT HANDLING ---
     function showToast(message) {
         toastMessage.textContent = message;
         toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function handlePokedexClick(event) {
         const target = event.target.closest('.pokedex-grid-item');
         if (!target || target.classList.contains('selected')) return;
-
         if (currentTeam.length >= 6) {
             showToast("Your team is full! Remove a Pokémon to add another.");
             return;
         }
-
         const pokemonId = +target.dataset.id;
         const pokemon = masterPokemonData.find(p => p.pokedex_number === pokemonId);
-        currentTeam.push(pokemon);
+        currentTeam.push({ pokemon, nickname: '' });
         target.classList.add('selected');
-        
         updateDashboard();
     }
 
     function handleTeamAction(event) {
         const removeBtn = event.target.closest('.remove-team-btn');
         const detailsBtn = event.target.closest('.view-details-btn');
-
+        const nicknameInput = event.target.closest('.nickname-input');
         if (removeBtn) {
             const pokemonId = +removeBtn.dataset.id;
-            currentTeam = currentTeam.filter(p => p.pokedex_number !== pokemonId);
-            
-            // Un-select from the Pokédex grid
+            currentTeam = currentTeam.filter(m => m.pokemon.pokedex_number !== pokemonId);
             const gridItem = pokedexGrid.querySelector(`.pokedex-grid-item[data-id='${pokemonId}']`);
             if (gridItem) gridItem.classList.remove('selected');
-            
             updateDashboard();
         } else if (detailsBtn) {
             const pokemonId = +detailsBtn.dataset.id;
             const pokemon = masterPokemonData.find(p => p.pokedex_number === pokemonId);
             renderDetailsModal(pokemon);
+        } else if (nicknameInput) {
+            nicknameInput.addEventListener('change', (e) => {
+                const index = e.target.dataset.index;
+                currentTeam[index].nickname = e.target.value;
+                showToast('Nickname updated!');
+            });
         }
     }
     
-    function handleSearch() {
+    function handleFilters() {
         const query = searchInput.value.toLowerCase();
-        const filtered = masterPokemonData.filter(p => p.name.toLowerCase().includes(query));
+        const type = typeFilter.value;
+        const gen = generationFilter.value;
+        const filtered = masterPokemonData.filter(p => {
+            const nameMatch = p.name.toLowerCase().includes(query);
+            const typeMatch = !type || p.type1.toLowerCase() === type || (p.type2 && p.type2.toLowerCase() === type);
+            const genMatch = !gen || p.generation == gen;
+            return nameMatch && typeMatch && genMatch;
+        });
         renderPokedexGrid(filtered);
     }
 
@@ -573,47 +554,105 @@
     function handleRecommendationClick(event) {
         const target = event.target.closest('.recommendation-card');
         if (!target) return;
-        
         if (currentTeam.length >= 6) {
-            showToast("Your team is full! Remove a Pokémon to add another.");
+            showToast("Your team is full!");
             return;
         }
-        
         const pokemonId = +target.dataset.id;
-        if (currentTeam.find(p => p.pokedex_number === pokemonId)) {
+        if (currentTeam.some(m => m.pokemon.pokedex_number === pokemonId)) {
              showToast("This Pokémon is already on your team.");
             return;
         }
-
         const pokemon = masterPokemonData.find(p => p.pokedex_number === pokemonId);
-        currentTeam.push(pokemon);
-        
+        currentTeam.push({ pokemon, nickname: '' });
         const gridItem = pokedexGrid.querySelector(`.pokedex-grid-item[data-id='${pokemonId}']`);
         if (gridItem) gridItem.classList.add('selected');
-
         updateDashboard();
+    }
+    
+    function handleSaveTeam() {
+        if (currentTeam.length === 0) {
+            showToast("Your team is empty!");
+            return;
+        }
+        localStorage.setItem('pokeTeam', JSON.stringify(currentTeam));
+        showToast('Team saved successfully!');
+    }
+
+    function loadTeamFromStorage() {
+        const savedTeam = localStorage.getItem('pokeTeam');
+        if (savedTeam) {
+            currentTeam = JSON.parse(savedTeam);
+            showToast('Loaded your last saved team.');
+        }
+    }
+
+    function handleShareTeam() {
+        if (currentTeam.length === 0) {
+            showToast("Your team is empty!");
+            return;
+        }
+        const teamIds = currentTeam.map(m => m.pokemon.pokedex_number).join(',');
+        const url = `${window.location.origin}${window.location.pathname}?team=${teamIds}`;
+        shareUrlInput.value = url;
+        shareModalBg.style.display = 'flex';
     }
 
     function updateDashboard() {
         renderTeamDisplay();
         renderAnalysisCharts();
         renderRecommendations();
+        renderAdvancedMetrics();
+    }
+
+    function populateFilters() {
+        allTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            typeFilter.appendChild(option);
+        });
+        generations.forEach(gen => {
+            const option = document.createElement('option');
+            option.value = gen;
+            option.textContent = `Generation ${gen}`;
+            generationFilter.appendChild(option);
+        });
     }
 
     function setupEventListeners() {
         pokedexGrid.addEventListener('click', handlePokedexClick);
         teamDisplay.addEventListener('click', handleTeamAction);
-        searchInput.addEventListener('input', handleSearch);
+        teamDisplay.addEventListener('focusin', handleTeamAction); // For nickname inputs
+        searchInput.addEventListener('input', handleFilters);
+        typeFilter.addEventListener('change', handleFilters);
+        generationFilter.addEventListener('change', handleFilters);
         clearTeamBtn.addEventListener('click', handleClearTeam);
+        saveTeamBtn.addEventListener('click', handleSaveTeam);
+        shareTeamBtn.addEventListener('click', handleShareTeam);
         recommendationsPanel.addEventListener('click', handleRecommendationClick);
-        detailsModalBg.addEventListener('click', (e) => {
-            if (e.target === detailsModalBg) {
-                detailsModalBg.style.display = 'none';
-            }
+        detailsModalBg.addEventListener('click', (e) => { if (e.target === detailsModalBg) detailsModalBg.style.display = 'none'; });
+        shareModalBg.addEventListener('click', (e) => { if (e.target === shareModalBg) shareModalBg.style.display = 'none'; });
+        document.getElementById('close-share-modal-btn').addEventListener('click', () => shareModalBg.style.display = 'none');
+        document.getElementById('copy-share-url-btn').addEventListener('click', () => {
+            shareUrlInput.select();
+            document.execCommand('copy');
+            showToast('Link copied to clipboard!');
         });
-        window.addEventListener('resize', () => {
-            if(masterPokemonData.length > 0) updateDashboard();
+        themeToggle.addEventListener('change', (e) => {
+            document.documentElement.classList.toggle('light', e.target.checked);
+            localStorage.setItem('pokeTheme', e.target.checked ? 'light' : 'dark');
+            updateDashboard(); // Redraw charts with new theme colors
         });
+        window.addEventListener('resize', () => { if(masterPokemonData.length > 0) updateDashboard(); });
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('pokeTheme');
+        if (savedTheme === 'light') {
+            themeToggle.checked = true;
+            document.documentElement.classList.add('light');
+        }
     }
 
     // --- START THE APP ---
