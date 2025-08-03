@@ -232,7 +232,8 @@
             masterPokemonData = data.results.map(p => {
                 const types = p.type.map(t => t.toLowerCase());
                 return {
-                    pokedex_number: p.national_number,
+                    // BUG FIX: Parse national_number to an integer for consistent ID handling.
+                    pokedex_number: parseInt(p.national_number, 10),
                     name: p.name,
                     hp: p.hp, attack: p.attack, defense: p.defense,
                     sp_attack: p.sp_atk, sp_defense: p.sp_def, speed: p.speed,
@@ -240,7 +241,7 @@
                     type1: types[0], type2: types[1] || null,
                     abilities: p.abilities,
                     sprite: p.sprites.normal, shiny_sprite: p.sprites.shiny,
-                    generation: getGeneration(p.national_number),
+                    generation: getGeneration(parseInt(p.national_number, 10)),
                     ...calculateTypeEffectiveness(types)
                 };
             });
@@ -274,14 +275,16 @@
         loader.style.display = 'none';
         mainContent.classList.remove('hidden');
         populateFilters();
-        setupEventListeners();
         loadState();
         
         const urlParams = new URLSearchParams(window.location.search);
         const teamIds = urlParams.get('team');
         if (teamIds) {
             const ids = teamIds.split(',').map(Number);
-            currentTeam = ids.map(id => ({ pokemon: masterPokemonData.find(p => p.pokedex_number === id), nickname: '' })).filter(member => member.pokemon);
+            currentTeam = ids.map(id => {
+                const pokemon = masterPokemonData.find(p => p.pokedex_number === id);
+                return pokemon ? { pokemon, nickname: '' } : null;
+            }).filter(Boolean);
             showToast(`Shared team loaded!`);
         } else {
             loadTeamFromStorage();
@@ -289,6 +292,7 @@
         
         renderPokedexGrid(masterPokemonData);
         updateDashboard();
+        setupEventListeners(); // BUG FIX: Setup listeners after initial data load and rendering
     }
 
     // --- GAMIFICATION LOGIC ---
@@ -586,13 +590,15 @@
         }
         const pokemonId = +target.dataset.id;
         const pokemon = masterPokemonData.find(p => p.pokedex_number === pokemonId);
-        currentTeam.push({ pokemon, nickname: '' });
-        target.classList.add('selected');
-        addXp(xpGains.addPokemon, 'Added Pokémon');
-        if (currentTeam.length === 6) {
-            addXp(xpGains.completeTeam, 'Team Completed');
+        if (pokemon) {
+            currentTeam.push({ pokemon, nickname: '' });
+            target.classList.add('selected');
+            addXp(xpGains.addPokemon, 'Added Pokémon');
+            if (currentTeam.length === 6) {
+                addXp(xpGains.completeTeam, 'Team Completed');
+            }
+            updateDashboard();
         }
-        updateDashboard();
     }
 
     function handleTeamAction(event) {
@@ -609,11 +615,11 @@
             const pokemonId = +detailsBtn.dataset.id;
             const pokemon = masterPokemonData.find(p => p.pokedex_number === pokemonId);
             renderDetailsModal(pokemon);
-        } else if (nicknameInput && event.type === 'change') { // BUG FIX: Only trigger on change, not focus
+        } else if (nicknameInput && event.type === 'change') {
             const index = event.target.dataset.index;
             if (currentTeam[index]) {
                 currentTeam[index].nickname = event.target.value;
-                handleSaveTeam(true); // Pass flag to prevent toast spam
+                handleSaveTeam(true);
             }
         }
     }
@@ -661,7 +667,7 @@
         if (!isSilent) {
             addXp(xpGains.saveTeam, 'Team Saved');
         } else {
-            saveState(); // Still save profile state silently
+            saveState();
         }
     }
 
@@ -670,12 +676,14 @@
         if (savedTeam) {
             try {
                 const parsedTeam = JSON.parse(savedTeam);
-                // BUG FIX: Re-map saved team to master data to get full objects
                 currentTeam = parsedTeam.map(member => {
-                    const pokemon = masterPokemonData.find(p => p.pokedex_number === member.pokemon.pokedex_number);
-                    // Return the full member object from storage, but with the complete pokemon object
-                    return pokemon ? { ...member, pokemon: pokemon } : null;
-                }).filter(member => member !== null); // Filter out any pokemon that might not exist in the new dataset
+                    // BUG FIX: Robustly find Pokémon and handle malformed data.
+                    if (!member || !member.pokemon || typeof member.pokemon.pokedex_number === 'undefined') {
+                        return null;
+                    }
+                    const fullPokemonData = masterPokemonData.find(p => p.pokedex_number === member.pokemon.pokedex_number);
+                    return fullPokemonData ? { pokemon: fullPokemonData, nickname: member.nickname || '' } : null;
+                }).filter(Boolean); // .filter(Boolean) removes any null entries
 
                 if (currentTeam.length > 0) {
                     showToast('Loaded your last saved team.');
@@ -708,7 +716,7 @@
         renderRecommendations();
         renderAdvancedMetrics();
         updateTrainerProfileUI();
-        saveState();
+        handleSaveTeam(true); // Auto-save on every update
     }
 
     function populateFilters() {
@@ -729,7 +737,7 @@
     function setupEventListeners() {
         pokedexGrid.addEventListener('click', handlePokedexClick);
         teamDisplay.addEventListener('click', handleTeamAction);
-        teamDisplay.addEventListener('change', handleTeamAction); // Use event delegation for nickname changes
+        teamDisplay.addEventListener('change', handleTeamAction);
         searchInput.addEventListener('input', handleFilters);
         typeFilter.addEventListener('change', handleFilters);
         generationFilter.addEventListener('change', handleFilters);
