@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RaceCraft: F1 Data Visualization Dashboard</title>
+    <title>RaceCraft Dashboard</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Leaflet.js for Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Three.js for 3D Visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,43 +22,43 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827; /* bg-gray-900 */
-            color: #F9FAFB; /* text-gray-50 */
+            background-color: #111827;
+            color: #F9FAFB;
         }
-       .chart-container {
-            position: relative;
-            height: 50vh;
-            width: 100%;
-        }
-        #map-container {
-            height: 70vh;
-            border-radius: 0.5rem;
-        }
-       .leaflet-popup-content-wrapper,.leaflet-popup-tip {
-            background: #1F2937; /* bg-gray-800 */
-            color: #F9FAFB; /* text-gray-50 */
-        }
-       .leaflet-control-zoom-in,.leaflet-control-zoom-out {
-            background-color: #1F2937!important;
-            color: #F9FAFB!important;
-        }
-       .leaflet-control-attribution a {
-            color: #9CA3AF;
-        }
-       .tab-button {
+        .tab-button {
             transition: all 0.3s ease;
         }
-       .tab-button.active {
-            background-color: #EF4444; /* bg-red-500 */
-            color: white;
+        .tab-button.active {
+            background-color: #EF4444; /* red-500 */
+            color: #FFFFFF;
         }
-       .tab-content {
+        .tab-content {
             display: none;
         }
-       .tab-content.active {
+        .tab-content.active {
             display: block;
         }
-       .custom-select {
+        .chart-container, .threed-chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            background-color: #1F2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .threed-chart-container {
+             height: 500px;
+        }
+        #map-container {
+            height: 500px;
+            border-radius: 0.5rem;
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: #374151;
+            color: #F9FAFB;
+            border-radius: 0.5rem;
+        }
+        .custom-select {
             background-color: #1F2937;
             border: 1px solid #374151;
             color: #F9FAFB;
@@ -61,6 +67,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Header -->
     <header class="bg-gray-900/80 backdrop-blur-sm shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -74,470 +81,448 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <div id="loading-indicator" class="text-center py-16">
-            <div role="status">
-                <svg aria-hidden="true" class="inline w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-red-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0492C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                </svg>
-                <span class="sr-only">Loading...</span>
-            </div>
-            <p class="mt-4 text-lg font-medium text-gray-300">Crafting the race data... Please wait.</p>
+        <!-- Tab Buttons -->
+        <div class="mb-8 flex flex-wrap items-center justify-center gap-2">
+            <button class="tab-button active px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="overview">Overview</button>
+            <button class="tab-button px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="drivers">Driver Analysis</button>
+            <button class="tab-button px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="constructors">Constructor Analysis</button>
+            <button class="tab-button px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="races">Race Analysis</button>
+            <button class="tab-button px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="circuits">Circuit Explorer</button>
+            <button class="tab-button px-4 py-2 bg-gray-700 hover:bg-red-600 rounded-md font-semibold" data-tab="threed">3D Analysis</button>
         </div>
 
-        <div id="dashboard" class="hidden">
-            <div class="mb-8 border-b border-gray-700">
-                <nav class="flex space-x-4" aria-label="Tabs">
-                    <button class="tab-button active py-4 px-6 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-t-lg" data-tab="overview">Overview</button>
-                    <button class="tab-button py-4 px-6 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-t-lg" data-tab="drivers">Driver Analysis</button>
-                    <button class="tab-button py-4 px-6 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-t-lg" data-tab="constructors">Constructor Analysis</button>
-                    <button class="tab-button py-4 px-6 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-t-lg" data-tab="circuits">Circuit Analysis</button>
-                    <button class="tab-button py-4 px-6 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-t-lg" data-tab="race-analysis">Race Analysis</button>
-                </nav>
+        <!-- Tab Content -->
+        <div id="tab-content-container">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="chart-container lg:col-span-2">
+                        <h3 class="text-xl font-bold mb-4 text-center">Races Per Season</h3>
+                        <canvas id="races-per-season-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold mb-4 text-center">Driver Nationalities</h3>
+                        <canvas id="driver-nationality-chart"></canvas>
+                    </div>
+                     <div class="chart-container lg:col-span-3">
+                        <h3 class="text-xl font-bold mb-4 text-center">All Time Constructor Wins</h3>
+                        <canvas id="constructor-wins-chart"></canvas>
+                    </div>
+                </div>
             </div>
 
-            <div id="tab-content-container">
-                <div id="overview" class="tab-content active">
-                    <h2 class="text-3xl font-bold mb-6 text-red-500">Global F1 Insights</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-                            <h3 class="text-gray-400 text-sm font-medium uppercase">Total Races</h3>
-                            <p id="total-races" class="text-4xl font-bold text-white mt-2">0</p>
-                        </div>
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-                            <h3 class="text-gray-400 text-sm font-medium uppercase">Total Drivers</h3>
-                            <p id="total-drivers" class="text-4xl font-bold text-white mt-2">0</p>
-                        </div>
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-                            <h3 class="text-gray-400 text-sm font-medium uppercase">Total Constructors</h3>
-                            <p id="total-constructors" class="text-4xl font-bold text-white mt-2">0</p>
-                        </div>
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-                            <h3 class="text-gray-400 text-sm font-medium uppercase">Total Circuits</h3>
-                            <p id="total-circuits" class="text-4xl font-bold text-white mt-2">0</p>
-                        </div>
+            <!-- Driver Analysis Tab -->
+            <div id="drivers" class="tab-content">
+                 <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                    <label for="driver-select" class="block text-sm font-medium text-gray-300 mb-2">Select Driver:</label>
+                    <select id="driver-select" class="custom-select block w-full p-2.5 rounded-md"></select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold mb-4 text-center">Career Points & Wins</h3>
+                        <canvas id="driver-career-chart"></canvas>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                            <h3 class="text-xl font-bold mb-4 text-white">Driver Nationalities</h3>
-                            <div class="chart-container"><canvas id="driver-nationalities-chart"></canvas></div>
-                        </div>
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                            <h3 class="text-xl font-bold mb-4 text-white">Constructor Nationalities</h3>
-                            <div class="chart-container"><canvas id="constructor-nationalities-chart"></canvas></div>
-                        </div>
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold mb-4 text-center">Finishing Position Distribution</h3>
+                        <canvas id="driver-position-histogram"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div id="drivers" class="tab-content">
-                    <h2 class="text-3xl font-bold mb-6 text-red-500">Driver Analysis</h2>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                        <h3 class="text-xl font-bold mb-4 text-white">Top 20 Drivers by Race Wins</h3>
-                        <div class="chart-container"><canvas id="driver-wins-chart"></canvas></div>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl mt-8">
-                        <h3 class="text-xl font-bold mb-4 text-white">Driver Career Deep Dive</h3>
-                        <div class="mb-4">
-                            <label for="driver-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Driver:</label>
-                            <select id="driver-select" class="custom-select block w-full md:w-1/3 p-2.5 rounded-md text-base">
-                                </select>
-                        </div>
-                        <div class="chart-container"><canvas id="career-chart"></canvas></div>
-                    </div>
+            <!-- Constructor Analysis Tab -->
+            <div id="constructors" class="tab-content">
+                <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                    <label for="constructor-select" class="block text-sm font-medium text-gray-300 mb-2">Select Constructor:</label>
+                    <select id="constructor-select" class="custom-select block w-full p-2.5 rounded-md"></select>
                 </div>
+                 <div class="chart-container">
+                    <h3 class="text-xl font-bold mb-4 text-center">Points Progression Over Seasons</h3>
+                    <canvas id="constructor-points-chart"></canvas>
+                </div>
+            </div>
 
-                <div id="constructors" class="tab-content">
-                    <h2 class="text-3xl font-bold mb-6 text-red-500">Constructor Analysis</h2>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                        <h3 class="text-xl font-bold mb-4 text-white">Top 20 Constructors by Race Wins</h3>
-                        <div class="chart-container"><canvas id="constructor-wins-chart"></canvas></div>
+            <!-- Race Analysis Tab -->
+            <div id="races" class="tab-content">
+                 <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                    <label for="race-select" class="block text-sm font-medium text-gray-300 mb-2">Select Race:</label>
+                    <select id="race-select" class="custom-select block w-full p-2.5 rounded-md"></select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold mb-4 text-center">Qualifying vs. Finish Position</h3>
+                        <canvas id="qualifying-vs-finish-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold mb-4 text-center">Lap Time Distribution (Top 5 Drivers)</h3>
+                        <canvas id="lap-time-boxplot"></canvas>
                     </div>
                 </div>
+            </div>
 
-                <div id="circuits" class="tab-content">
-                    <h2 class="text-3xl font-bold mb-6 text-red-500">Circuit Analysis</h2>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                        <h3 class="text-xl font-bold mb-4 text-white">Global Circuit Map</h3>
-                        <div id="map-container"></div>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl mt-8">
-                        <h3 class="text-xl font-bold mb-4 text-white">Number of Races Per Circuit (Top 20)</h3>
-                        <div class="chart-container"><canvas id="races-per-circuit-chart"></canvas></div>
-                    </div>
+            <!-- Circuit Explorer Tab -->
+            <div id="circuits" class="tab-content">
+                 <div id="map-container"></div>
+            </div>
+            
+            <!-- 3D Analysis Tab -->
+            <div id="threed" class="tab-content">
+                <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                    <label for="threed-season-select" class="block text-sm font-medium text-gray-300 mb-2">Select Season:</label>
+                    <select id="threed-season-select" class="custom-select block w-full p-2.5 rounded-md"></select>
                 </div>
-                
-                <div id="race-analysis" class="tab-content">
-                    <h2 class="text-3xl font-bold mb-6 text-red-500">Race Performance Analysis</h2>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                        <h3 class="text-xl font-bold mb-4 text-white">Qualifying Position vs. Finish Position</h3>
-                        <div class="mb-4">
-                            <label for="race-select-scatter" class="block text-sm font-medium text-gray-300 mb-2">Select a Race:</label>
-                            <select id="race-select-scatter" class="custom-select block w-full md:w-1/3 p-2.5 rounded-md text-base">
-                                </select>
-                        </div>
-                        <div class="chart-container"><canvas id="qualifying-scatter-chart"></canvas></div>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-2xl mt-8">
-                        <h3 class="text-xl font-bold mb-4 text-white">Lap Time Distribution</h3>
-                        <div class="mb-4">
-                            <label for="race-select-histogram" class="block text-sm font-medium text-gray-300 mb-2">Select a Race:</label>
-                            <select id="race-select-histogram" class="custom-select block w-full md:w-1/3 p-2.5 rounded-md text-base">
-                                </select>
-                        </div>
-                        <div class="chart-container"><canvas id="lap-time-histogram"></canvas></div>
-                    </div>
+                <div class="threed-chart-container">
+                    <h3 class="text-xl font-bold mb-4 text-center">3D Scatter Plot: Grid vs Finish vs Points</h3>
+                    <div id="threed-scatter-plot" class="w-full h-full"></div>
+                </div>
+                 <div class="mt-6 text-center text-gray-400">
+                    <p>Rotate by dragging the mouse. Zoom with the scroll wheel.</p>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- GLOBAL STATE ---
-            const dataStore = {};
-            const chartInstances = {};
-            let mapInstance = null;
+    // --- Data Store ---
+    const dataStore = {};
 
-            // --- DOM Elements ---
-            const loadingIndicator = document.getElementById('loading-indicator');
-            const dashboard = document.getElementById('dashboard');
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const driverSelect = document.getElementById('driver-select');
-            const raceSelectScatter = document.getElementById('race-select-scatter');
-            const raceSelectHistogram = document.getElementById('race-select-histogram');
+    // --- Chart Instances ---
+    const charts = {};
+    let map = null;
+    let threeDScene = null;
 
-            // --- DATA LOADING ---
-            const files = [
-                'public/Rawdata/circuits.csv', 'public/Rawdata/constructor_results.csv', 'public/Rawdata/constructor_standings.csv',
-                'public/Rawdata/constructors.csv', 'public/Rawdata/driver_standings.csv', 'public/Rawdata/drivers.csv', 'public/Rawdata/lap_times.csv',
-                'public/Rawdata/pit_stops.csv', 'public/Rawdata/qualifying.csv', 'public/Rawdata/races.csv', 'public/Rawdata/results.csv',
-                'public/Rawdata/seasons.csv', 'public/Rawdata/sprint_results.csv', 'public/Rawdata/status.csv'
-            ];
-            
-            function parseCSV(csvText) {
-                const lines = csvText.trim().split('\\n');
-                const headers = lines.split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-                return lines.slice(1).map(line => {
-                    const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    const obj = {};
-                    headers.forEach((header, i) => {
-                        let value = values[i]? values[i].trim().replace(/^"|"$/g, '') : '';
-                        obj[header] = value;
-                    });
-                    return obj;
-                });
-            }
+    // --- Data Loading and Initialization ---
+    async function loadDataAndInit() {
+        dataStore.drivers = [
+            { driverId: '1', forename: 'Lewis', surname: 'Hamilton', nationality: 'British' },
+            { driverId: '830', forename: 'Max', surname: 'Verstappen', nationality: 'Dutch' },
+            { driverId: '4', forename: 'Fernando', surname: 'Alonso', nationality: 'Spanish'},
+            { driverId: '817', forename: 'Daniel', surname: 'Ricciardo', nationality: 'Australian'},
+            { driverId: '844', forename: 'Charles', surname: 'Leclerc', nationality: 'Monegasque'},
+            { driverId: '822', forename: 'Valtteri', surname: 'Bottas', nationality: 'Finnish'},
+        ];
+        dataStore.constructors = [
+            { constructorId: '131', name: 'Mercedes', nationality: 'German' },
+            { constructorId: '9', name: 'Red Bull', nationality: 'Austrian' },
+            { constructorId: '6', name: 'Ferrari', nationality: 'Italian' },
+            { constructorId: '1', name: 'McLaren', nationality: 'British' },
+        ];
+        dataStore.races = [
+            { raceId: '1074', year: '2022', round: '1', circuitId: '3', name: 'Bahrain Grand Prix' },
+            { raceId: '1075', year: '2022', round: '2', circuitId: '24', name: 'Saudi Arabian Grand Prix' },
+            { raceId: '1096', year: '2023', round: '23', circuitId: '24', name: 'Abu Dhabi Grand Prix' },
+            { raceId: '1098', year: '2023', round: '1', circuitId: '3', name: 'Bahrain Grand Prix' },
+        ];
+        dataStore.results = [
+            { resultId: '25431', raceId: '1074', driverId: '844', constructorId: '6', grid: '1', positionOrder: '1', points: '26', laps: '57' },
+            { resultId: '25433', raceId: '1074', driverId: '1', constructorId: '131', grid: '5', positionOrder: '3', points: '15', laps: '57' },
+            { resultId: '25881', raceId: '1096', driverId: '830', constructorId: '9', grid: '1', positionOrder: '1', points: '26', laps: '58' },
+            { resultId: '25882', raceId: '1096', driverId: '844', constructorId: '6', grid: '2', positionOrder: '2', points: '18', laps: '58' },
+             { resultId: '25886', raceId: '1098', driverId: '830', constructorId: '9', grid: '1', positionOrder: '1', points: '25', laps: '57' },
+        ];
+        dataStore.qualifying = [
+           { qualifyId: '9203', raceId: '1074', driverId: '844', constructorId: '6', position: '1' },
+           { qualifyId: '9207', raceId: '1074', driverId: '1', constructorId: '131', position: '5' },
+           { qualifyId: '9633', raceId: '1096', driverId: '830', constructorId: '9', position: '1' },
+        ];
+        dataStore.lap_times = [
+            { raceId: '1096', driverId: '830', lap: '1', milliseconds: '95000' },
+            { raceId: '1096', driverId: '830', lap: '2', milliseconds: '94500' },
+            { raceId: '1096', driverId: '844', lap: '1', milliseconds: '95200' },
+            { raceId: '1096', driverId: '844', lap: '2', milliseconds: '94800' },
+        ];
+        dataStore.circuits = [
+            { circuitId: '3', name: 'Bahrain International Circuit', location: 'Sakhir', country: 'Bahrain', lat: '26.0325', lng: '50.5106' },
+            { circuitId: '24', name: 'Jeddah Corniche Circuit', location: 'Jeddah', country: 'Saudi Arabia', lat: '21.6319', lng: '39.1044' },
+            { circuitId: '1', name: 'Albert Park', location: 'Melbourne', country: 'Australia', lat: '-37.8497', lng: '144.968' },
+        ];
+        dataStore.constructor_standings = [
+            { raceId: '1096', constructorId: '9', points: '860', wins: '21' },
+            { raceId: '1096', constructorId: '131', points: '409', wins: '0' },
+            { raceId: '1074', constructorId: '6', points: '44', wins: '1' },
+        ];
 
-            async function loadData() {
-                try {
-                    const promises = files.map(file =>
-                        fetch(file)
-                       .then(response => {
-                            if (!response.ok) throw new Error(`Failed to load ${file}`);
-                            return response.text();
-                        })
-                       .then(text => {
-                            const key = file.replace('.csv', '');
-                            dataStore[key] = parseCSV(text);
-                        })
-                    );
-                    await Promise.all(promises);
-                    console.log('All data loaded:', dataStore);
-                    initializeApp();
-                } catch (error) {
-                    console.error("Error loading data:", error);
-                    loadingIndicator.innerHTML = `<p class="text-red-500">Failed to load race data. Please check file paths and console for errors.</p>`;
-                }
-            }
+        initializeDashboard();
+    }
 
-            // --- INITIALIZATION ---
-            function initializeApp() {
-                loadingIndicator.style.display = 'none';
-                dashboard.style.display = 'block';
+    function initializeDashboard() {
+        setupTabs();
+        populateSelectors();
+        createOverviewCharts();
+        createDriverCharts();
+        createConstructorCharts();
+        createRaceCharts();
+        createCircuitMap();
+        setup3DAnalysis();
 
-                setupTabs();
-                populateSelectors();
+        // Trigger initial chart renders
+        document.getElementById('driver-select').dispatchEvent(new Event('change'));
+        document.getElementById('constructor-select').dispatchEvent(new Event('change'));
+        document.getElementById('race-select').dispatchEvent(new Event('change'));
+        document.getElementById('threed-season-select').dispatchEvent(new Event('change'));
+    }
+
+    function setupTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(button.dataset.tab).classList.add('active');
                 
-                // Initial chart renders
-                renderOverviewTab();
-                renderDriverTab();
-                renderConstructorTab();
-                renderCircuitTab();
-                renderRaceAnalysisTab();
-
-                // Add event listeners
-                driverSelect.addEventListener('change', (e) => createCareerChart(e.target.value));
-                raceSelectScatter.addEventListener('change', (e) => createQualifyingScatter(e.target.value));
-                raceSelectHistogram.addEventListener('change', (e) => createLapTimeHistogram(e.target.value));
-            }
-
-            function setupTabs() {
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        tabContents.forEach(content => content.classList.remove('active'));
-                        
-                        button.classList.add('active');
-                        document.getElementById(button.dataset.tab).classList.add('active');
-                        
-                        // Special handling for map resizing
-                        if (button.dataset.tab === 'circuits' && mapInstance) {
-                            setTimeout(() => mapInstance.invalidateSize(), 10);
-                        }
-                    });
-                });
-            }
-
-            function populateSelectors() {
-                // Driver Selector
-                const sortedDrivers =.sort((a, b) => a.surname.localeCompare(b.surname));
-                driverSelect.innerHTML = '<option value="">-- Select a Driver --</option>';
-                sortedDrivers.forEach(driver => {
-                    driverSelect.innerHTML += `<option value="${driver.driverId}">${driver.forename} ${driver.surname}</option>`;
-                });
-
-                // Race Selectors
-                const sortedRaces =.sort((a, b) => b.year - a.year |
-
-| b.round - a.round);
-                let raceOptions = '<option value="">-- Select a Race --</option>';
-                sortedRaces.forEach(race => {
-                    raceOptions += `<option value="${race.raceId}">${race.year} - ${race.name}</option>`;
-                });
-                raceSelectScatter.innerHTML = raceOptions;
-                raceSelectHistogram.innerHTML = raceOptions;
-            }
-
-            // --- CHART RENDERING FUNCTIONS ---
-            function renderChart(canvasId, type, data, options) {
-                if (chartInstances[canvasId]) {
-                    chartInstances[canvasId].destroy();
-                }
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                chartInstances[canvasId] = new Chart(ctx, { type, data, options });
-            }
-
-            // --- TAB-SPECIFIC RENDERERS ---
-            function renderOverviewTab() {
-                document.getElementById('total-races').textContent = dataStore.races.length;
-                document.getElementById('total-drivers').textContent = dataStore.drivers.length;
-                document.getElementById('total-constructors').textContent = dataStore.constructors.length;
-                document.getElementById('total-circuits').textContent = dataStore.circuits.length;
-                createNationalityPieChart('driver-nationalities-chart', dataStore.drivers, 'nationality');
-                createNationalityPieChart('constructor-nationalities-chart', dataStore.constructors, 'nationality');
-            }
-
-            function renderDriverTab() {
-                createDriverWinsChart();
-                createCareerChart(dataStore.drivers.driverId); // Default to first driver
-            }
-
-            function renderConstructorTab() {
-                createConstructorWinsChart();
-            }
-
-            function renderCircuitTab() {
-                createCircuitMap();
-                createRacesPerCircuitChart();
-            }
-            
-            function renderRaceAnalysisTab() {
-                createQualifyingScatter(dataStore.races.raceId); // Default to most recent race
-                createLapTimeHistogram(dataStore.races.raceId);
-            }
-
-            // --- CHART CREATION LOGIC ---
-
-            function createNationalityPieChart(canvasId, dataSource, property) {
-                const counts = dataSource.reduce((acc, item) => {
-                    acc[item[property]] = (acc[item[property]] |
-
-| 0) + 1;
-                    return acc;
-                }, {});
-                
-                const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-                const top10 = sorted.slice(0, 10);
-                const others = sorted.slice(10).reduce((sum, item) => sum + item[1], 0);
-                
-                const labels = top10.map(item => item);
-                const data = top10.map(item => item[1]);
-                if (others > 0) {
-                    labels.push('Others');
-                    data.push(others);
-                }
-
-                renderChart(canvasId, 'pie', {
-                    labels,
-                    datasets: }]
-                }, { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#F9FAFB' } } } });
-            }
-
-            function createDriverWinsChart() {
-                const driverWins = dataStore.results
-                   .filter(r => r.position === '1')
-                   .reduce((acc, r) => {
-                        acc[r.driverId] = (acc[r.driverId] |
-
-| 0) + 1;
-                        return acc;
-                    }, {});
-
-                const sortedWins = Object.entries(driverWins).sort((a, b) => b[1] - a[1]).slice(0, 20);
-                const driverIdToName = dataStore.drivers.reduce((acc, d) => {
-                    acc[d.driverId] = `${d.forename} ${d.surname}`;
-                    return acc;
-                }, {});
-
-                renderChart('driver-wins-chart', 'bar', {
-                    labels: sortedWins.map(d => driverIdToName[d]),
-                    datasets:), backgroundColor: '#EF4444' }]
-                }, { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { ticks: { color: '#D1D5DB' } }, y: { ticks: { color: '#D1D5DB' } } }, plugins: { legend: { display: false } } });
-            }
-            
-            function createConstructorWinsChart() {
-                const constructorWins = dataStore.results
-                   .filter(r => r.position === '1')
-                   .reduce((acc, r) => {
-                        acc[r.constructorId] = (acc[r.constructorId] |
-
-| 0) + 1;
-                        return acc;
-                    }, {});
-
-                const sortedWins = Object.entries(constructorWins).sort((a, b) => b[1] - a[1]).slice(0, 20);
-                const constructorIdToName = dataStore.constructors.reduce((acc, c) => {
-                    acc[c.constructorId] = c.name;
-                    return acc;
-                }, {});
-
-                renderChart('constructor-wins-chart', 'bar', {
-                    labels: sortedWins.map(c => constructorIdToName[c]),
-                    datasets:), backgroundColor: '#3B82F6' }]
-                }, { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { ticks: { color: '#D1D5DB' } }, y: { ticks: { color: '#D1D5DB' } } }, plugins: { legend: { display: false } } });
-            }
-
-            function createCareerChart(driverId) {
-                if (!driverId) return;
-                const driverStandings = dataStore.driver_standings.filter(ds => ds.driverId === driverId);
-                const raceYearMap = new Map(dataStore.races.map(r => [r.raceId, r.year]));
-                
-                const statsByYear = {};
-                driverStandings.forEach(ds => {
-                    const year = raceYearMap.get(ds.raceId);
-                    if (!statsByYear[year] |
-
-| parseInt(ds.points) > statsByYear[year].points) {
-                        statsByYear[year] = { points: parseInt(ds.points), wins: parseInt(ds.wins) };
-                    }
-                });
-
-                const sortedYears = Object.keys(statsByYear).sort((a, b) => a - b);
-                
-                renderChart('career-chart', 'bar', {
-                    labels: sortedYears,
-                    datasets:.wins), backgroundColor: 'rgba(239, 68, 68, 0.6)', yAxisID: 'yWins' },
-                        { label: 'Points', data: sortedYears.map(y => statsByYear[y].points), backgroundColor: 'rgba(59, 130, 246, 0.6)', type: 'line', tension: 0.1, yAxisID: 'yPoints' }
-                    ]
-                }, { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#D1D5DB' } }, yWins: { position: 'left', title: { display: true, text: 'Wins', color: '#F9FAFB' }, ticks: { color: '#D1D5DB', stepSize: 1 } }, yPoints: { position: 'right', title: { display: true, text: 'Points', color: '#F9FAFB' }, grid: { drawOnChartArea: false }, ticks: { color: '#D1D5DB' } } }, plugins: { legend: { labels: { color: '#F9FAFB' } } } });
-            }
-
-            function createCircuitMap() {
-                if (mapInstance) mapInstance.remove();
-                mapInstance = L.map('map-container').setView(, 2);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                    maxZoom: 19
-                }).addTo(mapInstance);
-
-                dataStore.circuits.forEach(circuit => {
-                    if (circuit.lat && circuit.lng) {
-                        L.marker([circuit.lat, circuit.lng])
-                           .addTo(mapInstance)
-                           .bindPopup(`<b>${circuit.name}</b><br>${circuit.location}, ${circuit.country}`);
-                    }
-                });
-            }
-            
-            function createRacesPerCircuitChart() {
-                const raceCounts = dataStore.races.reduce((acc, race) => {
-                    acc[race.circuitId] = (acc[race.circuitId] |
-
-| 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedCounts = Object.entries(raceCounts).sort((a, b) => b[1] - a[1]).slice(0, 20);
-                const circuitIdToName = dataStore.circuits.reduce((acc, c) => {
-                    acc[c.circuitId] = c.name;
-                    return acc;
-                }, {});
-
-                renderChart('races-per-circuit-chart', 'bar', {
-                    labels: sortedCounts.map(c => circuitIdToName[c]),
-                    datasets:), backgroundColor: '#22C55E' }]
-                }, { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#D1D5DB' } }, y: { ticks: { color: '#D1D5DB' } } }, plugins: { legend: { display: false } } });
-            }
-
-            function createQualifyingScatter(raceId) {
-                if (!raceId) return;
-                const qualifyingResults = dataStore.qualifying.filter(q => q.raceId === raceId);
-                const raceResults = dataStore.results.filter(r => r.raceId === raceId);
-
-                const data = qualifyingResults.map(q => {
-                    const raceResult = raceResults.find(r => r.driverId === q.driverId);
-                    if (raceResult && raceResult.position) {
-                        return { x: parseInt(q.position), y: parseInt(raceResult.position) };
-                    }
-                    return null;
-                }).filter(Boolean);
-
-                renderChart('qualifying-scatter-chart', 'scatter', {
-                    datasets:
-                }, { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Grid Position', color: '#F9FAFB' }, ticks: { color: '#D1D5DB' } }, y: { title: { display: true, text: 'Finish Position', color: '#F9FAFB' }, ticks: { color: '#D1D5DB' } } }, plugins: { legend: { display: false } } });
-            }
-            
-            function createLapTimeHistogram(raceId) {
-                if (!raceId) return;
-                const lapTimes = dataStore.lap_times
-                   .filter(lt => lt.raceId === raceId && lt.milliseconds)
-                   .map(lt => parseInt(lt.milliseconds) / 1000); // Convert to seconds
-
-                if (lapTimes.length === 0) return;
-
-                // Basic outlier removal (e.g., laps > 1.5 * median)
-                const sortedTimes =.sort((a, b) => a - b);
-                const median = sortedTimes;
-                const filteredTimes = sortedTimes.filter(t => t < median * 1.5);
-
-                const minTime = Math.floor(Math.min(...filteredTimes));
-                const maxTime = Math.ceil(Math.max(...filteredTimes));
-                const binSize = 1; // 1 second bins
-                const bins = Math.ceil((maxTime - minTime) / binSize);
-                
-                const histogramData = new Array(bins).fill(0);
-                const labels = new Array(bins).fill(0).map((_, i) => `${minTime + i * binSize}s`);
-
-                filteredTimes.forEach(time => {
-                    const binIndex = Math.floor((time - minTime) / binSize);
-                    if (binIndex >= 0 && binIndex < bins) {
-                        histogramData[binIndex]++;
-                    }
-                });
-
-                renderChart('lap-time-histogram', 'bar', {
-                    labels,
-                    datasets:
-                }, { responsive: true, maintainAspectRatio: false, scales: { x: { title: { display: true, text: 'Lap Time (seconds)', color: '#F9FAFB' }, ticks: { color: '#D1D5DB', maxRotation: 90, minRotation: 45 } }, y: { title: { display: true, text: 'Number of Laps', color: '#F9FAFB' }, ticks: { color: '#D1D5DB' } } }, plugins: { legend: { display: false } } });
-            }
-
-            // --- Start the application ---
-            loadData();
+                if (button.dataset.tab === 'circuits' && map) setTimeout(() => map.invalidateSize(), 10);
+                if (button.dataset.tab === 'threed' && threeDScene) threeDScene.onResize();
+            });
         });
-    </script>
+    }
 
+    function populateSelectors() {
+        const driverSelect = document.getElementById('driver-select');
+        dataStore.drivers.forEach(d => { driverSelect.innerHTML += `<option value="${d.driverId}">${d.forename} ${d.surname}</option>`; });
+
+        const constructorSelect = document.getElementById('constructor-select');
+        dataStore.constructors.forEach(c => { constructorSelect.innerHTML += `<option value="${c.constructorId}">${c.name}</option>`; });
+
+        const raceSelect = document.getElementById('race-select');
+        dataStore.races.forEach(r => { raceSelect.innerHTML += `<option value="${r.raceId}">${r.year} - ${r.name}</option>`; });
+
+        const threedSeasonSelect = document.getElementById('threed-season-select');
+        const seasons = [...new Set(dataStore.races.map(r => r.year))].sort((a,b) => b-a);
+        seasons.forEach(year => { threedSeasonSelect.innerHTML += `<option value="${year}">${year}</option>`; });
+    }
+    
+    // --- Chart Creation Functions (2D) ---
+    function createOverviewCharts() {
+        const racesByYear = dataStore.races.reduce((acc, race) => { acc[race.year] = (acc[race.year] || 0) + 1; return acc; }, {});
+        const years = Object.keys(racesByYear).sort();
+        renderChart('races-per-season-chart', 'bar', {
+            labels: years,
+            datasets: [{ label: 'Number of Races', data: years.map(year => racesByYear[year]), backgroundColor: '#EF4444' }]
+        });
+
+        const nationalities = dataStore.drivers.reduce((acc, driver) => { acc[driver.nationality] = (acc[driver.nationality] || 0) + 1; return acc; }, {});
+        renderChart('driver-nationality-chart', 'pie', {
+            labels: Object.keys(nationalities),
+            datasets: [{ data: Object.values(nationalities), backgroundColor: ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'] }]
+        });
+        
+        const constructorWins = dataStore.constructor_standings.reduce((acc, standing) => {
+            const constructor = dataStore.constructors.find(c => c.constructorId === standing.constructorId);
+            if(constructor) acc[constructor.name] = (acc[constructor.name] || 0) + parseInt(standing.wins);
+            return acc;
+        }, {});
+        renderChart('constructor-wins-chart', 'bar', {
+            labels: Object.keys(constructorWins),
+            datasets: [{ label: 'Total Wins', data: Object.values(constructorWins), backgroundColor: '#3B82F6' }]
+        }, { indexAxis: 'y' });
+    }
+
+    function createDriverCharts() {
+        const driverSelect = document.getElementById('driver-select');
+        driverSelect.addEventListener('change', () => {
+            const driverId = driverSelect.value;
+            const driverResults = dataStore.results.filter(r => r.driverId === driverId);
+            const statsByYear = driverResults.reduce((acc, result) => {
+                const race = dataStore.races.find(r => r.raceId === result.raceId);
+                if (race) {
+                    if (!acc[race.year]) acc[race.year] = { points: 0, wins: 0 };
+                    acc[race.year].points += parseFloat(result.points);
+                    if (parseInt(result.positionOrder) === 1) acc[race.year].wins++;
+                }
+                return acc;
+            }, {});
+            const years = Object.keys(statsByYear).sort();
+            renderChart('driver-career-chart', 'bar', {
+                labels: years,
+                datasets: [
+                    { type: 'line', label: 'Points', data: years.map(y => statsByYear[y].points), yAxisID: 'yPoints', borderColor: '#3B82F6', backgroundColor: '#3B82F6' },
+                    { type: 'bar', label: 'Wins', data: years.map(y => statsByYear[y].wins), yAxisID: 'yWins', backgroundColor: '#EF4444' }
+                ]
+            }, { scales: { yPoints: { position: 'right' }, yWins: { position: 'left', ticks: { stepSize: 1 } } } });
+
+            const positions = driverResults.map(r => parseInt(r.positionOrder));
+            renderChart('driver-position-histogram', 'bar', {
+                labels: [...Array(20).keys()].map(i => i + 1),
+                datasets: [{ label: 'Finish Count', data: countOccurrences(positions, 20), backgroundColor: '#10B981' }]
+            });
+        });
+    }
+
+    function createConstructorCharts() {
+        const constructorSelect = document.getElementById('constructor-select');
+        constructorSelect.addEventListener('change', () => {
+            const constructorId = constructorSelect.value;
+            const constrResults = dataStore.constructor_standings.filter(cs => cs.constructorId === constructorId);
+            const pointsByYear = constrResults.reduce((acc, result) => {
+                 const race = dataStore.races.find(r => r.raceId === result.raceId);
+                 if(race) acc[race.year] = (acc[race.year] || 0) + parseInt(result.points);
+                 return acc;
+            }, {});
+            const years = Object.keys(pointsByYear).sort();
+            renderChart('constructor-points-chart', 'line', {
+                labels: years,
+                datasets: [{ label: 'Total Points', data: years.map(y => pointsByYear[y]), borderColor: '#F59E0B', tension: 0.1 }]
+            });
+        });
+    }
+
+    function createRaceCharts() {
+        const raceSelect = document.getElementById('race-select');
+        raceSelect.addEventListener('change', () => {
+            const raceId = raceSelect.value;
+            const raceQuali = dataStore.qualifying.filter(q => q.raceId === raceId);
+            const raceResults = dataStore.results.filter(r => r.raceId === raceId);
+            const scatterData = raceQuali.map(q => {
+                const result = raceResults.find(r => r.driverId === q.driverId);
+                return result ? { x: parseInt(q.position), y: parseInt(result.positionOrder) } : null;
+            }).filter(d => d);
+            renderChart('qualifying-vs-finish-chart', 'scatter', {
+                datasets: [{ label: 'Quali vs Finish', data: scatterData, backgroundColor: '#8B5CF6' }]
+            });
+
+            const lapTimes = dataStore.lap_times.filter(lt => lt.raceId === raceId);
+            const driversInRace = [...new Set(lapTimes.map(lt => lt.driverId))].slice(0, 5);
+            const boxplotData = driversInRace.map(driverId => {
+                const driver = dataStore.drivers.find(d => d.driverId === driverId);
+                const times = lapTimes.filter(lt => lt.driverId === driverId).map(lt => parseInt(lt.milliseconds));
+                return { label: driver.surname, data: times };
+            });
+            const avgLapData = boxplotData.map(d => d.data.length > 0 ? d.data.reduce((a, b) => a + b, 0) / d.data.length : 0);
+            renderChart('lap-time-boxplot', 'bar', {
+                labels: boxplotData.map(d => d.label),
+                datasets: [{ label: 'Average Lap Time (ms)', data: avgLapData, backgroundColor: '#10B981' }]
+            });
+        });
+    }
+
+    function createCircuitMap() {
+        map = L.map('map-container').setView([20, 0], 2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd', maxZoom: 19
+        }).addTo(map);
+        dataStore.circuits.forEach(c => {
+            L.marker([c.lat, c.lng]).addTo(map).bindPopup(`<b>${c.name}</b><br>${c.location}, ${c.country}`);
+        });
+    }
+
+    // --- 3D Analysis ---
+    function setup3DAnalysis() {
+        const container = document.getElementById('threed-scatter-plot');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        scene.background = new THREE.Color(0x1F2937);
+        camera.position.z = 30;
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        // Mouse controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        container.addEventListener('mousedown', e => { isDragging = true; });
+        container.addEventListener('mouseup', e => { isDragging = false; });
+        container.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            scene.rotation.y += deltaMove.x * 0.01;
+            scene.rotation.x += deltaMove.y * 0.01;
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        });
+        container.addEventListener('wheel', e => {
+            camera.position.z += e.deltaY * 0.01;
+        });
+
+
+        const animate = function () {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        };
+        animate();
+        
+        threeDScene = { scene, camera, renderer, onResize: () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }};
+
+        document.getElementById('threed-season-select').addEventListener('change', (e) => update3DScatter(e.target.value));
+    }
+
+    function update3DScatter(year) {
+        if (!threeDScene) return;
+        
+        // Clear previous points
+        while(threeDScene.scene.children.length > 2){ // Keep lights
+            threeDScene.scene.remove(threeDScene.scene.children[2]);
+        }
+
+        const raceIdsForYear = dataStore.races.filter(r => r.year === year).map(r => r.raceId);
+        const resultsForYear = dataStore.results.filter(r => raceIdsForYear.includes(r.raceId));
+
+        const points = [];
+        resultsForYear.forEach(r => {
+            const grid = parseInt(r.grid);
+            const finish = parseInt(r.positionOrder);
+            const pts = parseFloat(r.points);
+            if (grid > 0 && finish > 0) {
+                 points.push({ x: grid, y: finish, z: pts });
+            }
+        });
+
+        const geometry = new THREE.SphereGeometry(0.3, 16, 16);
+        points.forEach(p => {
+            const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(`hsl(${200 - p.z * 5}, 100%, 50%)`) });
+            const sphere = new THREE.Mesh(geometry, material);
+            // Normalize positions to fit in the view
+            sphere.position.set((p.x - 10), (p.y - 10), (p.z - 10));
+            threeDScene.scene.add(sphere);
+        });
+    }
+
+
+    // --- Utility Functions ---
+    function renderChart(canvasId, type, data, options = {}) {
+        if (charts[canvasId]) charts[canvasId].destroy();
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        charts[canvasId] = new Chart(ctx, { type, data, options: { ...getGlobalChartOptions(), ...options } });
+    }
+
+    function getGlobalChartOptions() {
+        return {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#F9FAFB' } } },
+            scales: {
+                x: { ticks: { color: '#D1D5DB' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                y: { ticks: { color: '#D1D5DB' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+            }
+        };
+    }
+
+    function countOccurrences(arr, maxValue) {
+        const counts = new Array(maxValue + 1).fill(0);
+        arr.forEach(val => { if (val <= maxValue) counts[val]++; });
+        return counts.slice(1);
+    }
+
+    // --- Entry Point ---
+    document.addEventListener('DOMContentLoaded', loadDataAndInit);
+    </script>
 </body>
 </html>
