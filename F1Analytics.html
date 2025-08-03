@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaceCraft: A Visual Dive into F1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            color: #F9FAFB; /* text-gray-50 */
+        }
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937; /* bg-gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563; /* bg-gray-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280; /* bg-gray-500 */
+        }
+        /* Style for the select dropdown */
+        .custom-select {
+            background-color: #1F2937;
+            border: 1px solid #374151;
+            color: #F9FAFB;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-gray-900/80 backdrop-blur-sm shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12M3.75 3h16.5M3.75 3v1.5M16.5 3v1.5M3.75 16.5a3 3 0 003 3h6a3 3 0 003-3M6.75 19.5v-3h10.5v3M12 12.75a1.125 1.125 0 110-2.25 1.125 1.125 0 010 2.25z" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-white ml-2">RaceCraft</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-16">
+            <div role="status">
+                <svg aria-hidden="true" class="inline w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-red-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0492C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                </svg>
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-4 text-lg font-medium text-gray-300">Crafting the race data... Please wait.</p>
+        </div>
+
+        <!-- Main Dashboard (hidden until loaded) -->
+        <div id="dashboard" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Panel: Controls and Driver Info -->
+                <div class="lg:col-span-1 bg-gray-800 p-6 rounded-lg shadow-2xl">
+                    <h2 class="text-2xl font-bold mb-4 text-red-500">Driver Deep Dive</h2>
+                    
+                    <!-- Driver Selector -->
+                    <div>
+                        <label for="driver-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Driver:</label>
+                        <select id="driver-select" class="custom-select block w-full p-2.5 rounded-md text-base transition duration-150 ease-in-out">
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Driver Info Card -->
+                    <div id="driver-info" class="mt-6 bg-gray-900 p-4 rounded-md hidden">
+                        <h3 id="driver-name" class="text-xl font-bold text-white"></h3>
+                        <p id="driver-nationality" class="text-gray-400"></p>
+                        <p id="driver-dob" class="text-gray-400"></p>
+                        <a id="driver-url" href="#" target="_blank" class="text-red-400 hover:text-red-300 transition duration-150 ease-in-out text-sm">Read more on Wikipedia</a>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Visualizations -->
+                <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-2xl">
+                    <h2 class="text-2xl font-bold mb-4 text-white">Career Performance</h2>
+                    <div id="chart-wrapper" class="chart-container">
+                         <canvas id="career-chart"></canvas>
+                    </div>
+                     <p id="chart-placeholder" class="text-center text-gray-400 py-16">Select a driver to see their career stats.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const dashboard = document.getElementById('dashboard');
+            const driverSelect = document.getElementById('driver-select');
+            const driverInfo = document.getElementById('driver-info');
+            const driverName = document.getElementById('driver-name');
+            const driverNationality = document.getElementById('driver-nationality');
+            const driverDob = document.getElementById('driver-dob');
+            const driverUrl = document.getElementById('driver-url');
+            const chartWrapper = document.getElementById('chart-wrapper');
+            const chartPlaceholder = document.getElementById('chart-placeholder');
+
+            // --- Chart.js Instance ---
+            let careerChart = null;
+
+            // --- Data Storage ---
+            const dataStore = {};
+
+            // --- File Paths ---
+            // NOTE: These paths assume the CSV files are in the same directory.
+            // In a real application, you might fetch these from a server or API.
+            const files = [
+                'public/Rawdata/circuits.csv', 'public/Rawdata/constructor_results.csv', 'public/Rawdata/constructor_standings.csv',
+                'public/Rawdata/constructors.csv', 'public/Rawdata/driver_standings.csv', 'public/Rawdata/drivers.csv', 'public/Rawdata/lap_times.csv',
+                'public/Rawdata/pit_stops.csv', 'public/Rawdata/qualifying.csv', 'public/Rawdata/races.csv', 'public/Rawdata/results.csv',
+                'public/Rawdata/seasons.csv', 'public/Rawdata/sprint_results.csv', 'public/Rawdata/status.csv'
+            ];
+            
+            // --- Data Loading and Parsing ---
+
+            /**
+             * Parses CSV text into an array of objects.
+             * @param {string} csvText The raw CSV string.
+             * @returns {Array<Object>} An array of objects.
+             */
+            function parseCSV(csvText) {
+                const lines = csvText.trim().split('\\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                return lines.slice(1).map(line => {
+                    const values = line.split(',');
+                    const obj = {};
+                    headers.forEach((header, i) => {
+                        let value = values[i] ? values[i].trim() : '';
+                        // Clean up quotes if they exist
+                        if (value.startsWith('"') && value.endsWith('"')) {
+                            value = value.slice(1, -1);
+                        }
+                        obj[header] = value;
+                    });
+                    return obj;
+                });
+            }
+
+            /**
+             * Fetches and parses all required CSV files.
+             */
+            async function loadData() {
+                try {
+                    const promises = files.map(file =>
+                        fetch(file)
+                        .then(response => {
+                            if (!response.ok) throw new Error(`Failed to load ${file}`);
+                            return response.text();
+                        })
+                        .then(text => {
+                            const key = file.replace('.csv', '');
+                            dataStore[key] = parseCSV(text);
+                        })
+                    );
+                    await Promise.all(promises);
+                    console.log('All data loaded and parsed:', dataStore);
+                    initializeApp();
+                } catch (error) {
+                    console.error("Error loading data:", error);
+                    loadingIndicator.innerHTML = `<p class="text-red-500">Failed to load race data. Please check the console for errors.</p>`;
+                }
+            }
+
+            // --- Application Initialization ---
+
+            /**
+             * Initializes the application after data is loaded.
+             */
+            function initializeApp() {
+                // Hide loading indicator and show dashboard
+                loadingIndicator.style.display = 'none';
+                dashboard.style.display = 'block';
+
+                populateDriverSelect();
+                driverSelect.addEventListener('change', handleDriverSelection);
+            }
+
+            /**
+             * Populates the driver selection dropdown.
+             */
+            function populateDriverSelect() {
+                // Sort drivers by surname
+                const sortedDrivers = [...dataStore.drivers].sort((a, b) => {
+                    return a.surname.localeCompare(b.surname);
+                });
+
+                driverSelect.innerHTML = '<option value="">-- Select a Driver --</option>';
+                sortedDrivers.forEach(driver => {
+                    const option = document.createElement('option');
+                    option.value = driver.driverId;
+                    option.textContent = `${driver.forename} ${driver.surname}`;
+                    driverSelect.appendChild(option);
+                });
+            }
+
+
+            // --- Event Handlers & Data Processing ---
+
+            /**
+             * Handles the selection of a new driver.
+             * @param {Event} event The change event from the select element.
+             */
+            function handleDriverSelection(event) {
+                const selectedDriverId = event.target.value;
+                if (!selectedDriverId) {
+                    driverInfo.classList.add('hidden');
+                    chartPlaceholder.style.display = 'block';
+                    if(careerChart) careerChart.destroy();
+                    return;
+                }
+                
+                updateDriverInfo(selectedDriverId);
+                generateCareerChart(selectedDriverId);
+            }
+
+            /**
+             * Updates the driver information card.
+             * @param {string} driverId The ID of the selected driver.
+             */
+            function updateDriverInfo(driverId) {
+                const driver = dataStore.drivers.find(d => d.driverId === driverId);
+                if (driver) {
+                    driverName.textContent = `${driver.forename} ${driver.surname}`;
+                    driverNationality.textContent = `Nationality: ${driver.nationality}`;
+                    driverDob.textContent = `Born: ${driver.dob}`;
+                    driverUrl.href = driver.url;
+                    driverInfo.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Generates and renders the career performance chart for a driver.
+             * @param {string} driverId The ID of the selected driver.
+             */
+            function generateCareerChart(driverId) {
+                // Find all results for the selected driver
+                const driverResults = dataStore.results.filter(r => r.driverId === driverId);
+
+                if (driverResults.length === 0) {
+                    chartPlaceholder.textContent = 'No race data found for this driver.';
+                    chartPlaceholder.style.display = 'block';
+                    if(careerChart) careerChart.destroy();
+                    return;
+                }
+
+                // Create a map of raceId to year for quick lookup
+                const raceYearMap = new Map();
+                dataStore.races.forEach(race => {
+                    raceYearMap.set(race.raceId, parseInt(race.year));
+                });
+
+                // Aggregate stats by year
+                const statsByYear = {};
+                driverResults.forEach(result => {
+                    const year = raceYearMap.get(result.raceId);
+                    if (!year) return;
+
+                    if (!statsByYear[year]) {
+                        statsByYear[year] = { wins: 0, points: 0 };
+                    }
+                    
+                    // Add points
+                    statsByYear[year].points += parseFloat(result.points) || 0;
+
+                    // Check for a win (position 1)
+                    if (parseInt(result.position) === 1) {
+                        statsByYear[year].wins += 1;
+                    }
+                });
+
+                const sortedYears = Object.keys(statsByYear).sort((a, b) => a - b);
+                const labels = sortedYears;
+                const winsData = sortedYears.map(year => statsByYear[year].wins);
+                const pointsData = sortedYears.map(year => statsByYear[year].points);
+                
+                // --- Render Chart ---
+                chartPlaceholder.style.display = 'none';
+                const ctx = document.getElementById('career-chart').getContext('2d');
+
+                if (careerChart) {
+                    careerChart.destroy();
+                }
+
+                careerChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Wins',
+                                data: winsData,
+                                backgroundColor: 'rgba(239, 68, 68, 0.6)', // Red
+                                borderColor: 'rgba(239, 68, 68, 1)',
+                                borderWidth: 1,
+                                yAxisID: 'yWins',
+                            },
+                            {
+                                label: 'Points',
+                                data: pointsData,
+                                backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                type: 'line',
+                                tension: 0.1,
+                                yAxisID: 'yPoints',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#D1D5DB' // text-gray-300
+                                }
+                            },
+                            yWins: {
+                                type: 'linear',
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Number of Wins',
+                                    color: '#F9FAFB'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#D1D5DB',
+                                    stepSize: 1
+                                }
+                            },
+                            yPoints: {
+                                type: 'linear',
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Total Points',
+                                    color: '#F9FAFB'
+                                },
+                                grid: {
+                                    drawOnChartArea: false, // only show the grid for the left axis
+                                },
+                                ticks: {
+                                    color: '#D1D5DB'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#F9FAFB' // text-gray-50
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Start the application ---
+            loadData();
+        });
+    </script>
+
+</body>
+</html>
