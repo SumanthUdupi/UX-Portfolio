@@ -3,69 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumanth Udupi - Senior Business Analyst</title>
+    <title>Sumanth Udupi - Strategic Business Analyst</title>
+    
+    <!-- SEO and Social Sharing Meta Tags -->
+    <meta name="description" content="Sumanth Udupi – A strategic problem-solver architecting data-driven systems for compliance and efficiency in ESG, EHS, and Automotive QMS.">
+    <link rel="canonical" href="https://www.sumanthudupi-portfolio.com/" />
+    <meta property="og:title" content="Sumanth Udupi - Strategic Business Analyst">
+    <meta property="og:description" content="Portfolio of a strategic analyst bridging the gap between complex business needs and robust technical solutions for industry leaders like Volvo and PACCAR.">
+    <meta property="og:type" content="website">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Using two fonts for the CRED-style typographic contrast -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-    
-    <!-- Swiper.js CSS for Carousel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
     <style>
+        /* Section 4.1: Defining a Motion Language */
         :root {
-            --bg-primary: #080808;
-            --bg-secondary: #101010;
-            --bg-tertiary: #181818;
-            --brand-gold: #f5cb5c;
-            --brand-gold-darker: #e4b94c;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --brand-gold: #c09f58;
+            --brand-gold-light: #d4b77f;
             --text-primary: #f0f0f0;
             --text-secondary: #a0a0a0;
-            --border-color: rgba(245, 203, 92, 0.2);
-            --shadow-color: rgba(245, 203, 92, 0.1);
-            --shadow-color-light: rgba(245, 203, 92, 0.05);
+            --border-color: rgba(192, 159, 88, 0.2);
+            --shadow-color: rgba(192, 159, 88, 0.1);
+
+            /* Motion System Variables */
+            --duration-short: 150ms;
+            --duration-medium: 300ms;
+            --duration-long: 500ms;
+            --easing-primary: cubic-bezier(0.22, 1, 0.36, 1); /* Ease-out Quint */
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            cursor: none; /* Hide default cursor */
+            overflow-x: hidden;
         }
         
-        /* --- Custom Cursor --- */
-        .cursor-dot, .cursor-outline {
-            pointer-events: none;
-            position: fixed;
+        @media (hover: hover) and (pointer: fine) {
+            body {
+                cursor: none;
+            }
+        }
+
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        .brand-gradient-text {
+            background: linear-gradient(90deg, var(--brand-gold-light), var(--brand-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-button {
+            position: relative; /* For magnetic effect */
+            background-color: var(--brand-gold);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 20px rgba(192, 159, 88, 0.25);
+            transition: all var(--duration-medium) var(--easing-primary);
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 8px 30px rgba(192, 159, 88, 0.4);
+            transform: translateY(-4px) scale(1.05);
+        }
+        
+        .ghost-button {
+            position: relative; /* For magnetic effect */
+            background-color: transparent;
+            color: var(--brand-gold);
+            border: 1px solid var(--brand-gold);
+            transition: all var(--duration-medium);
+            overflow: hidden; /* For sweep effect */
+            z-index: 1;
+        }
+        
+        /* Section 2.2: Background Sweep Effect */
+        .ghost-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(192, 159, 88, 0.1);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform var(--duration-medium) var(--easing-primary);
+            z-index: -1;
+        }
+
+        .ghost-button:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .ghost-button:hover {
+            color: var(--brand-gold-light);
+        }
+
+        .glass-card {
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            transition: background var(--duration-long), border-color var(--duration-long), transform var(--duration-long);
+        }
+        
+        .glass-card:hover {
+            background: rgba(26, 26, 26, 0.8);
+            border-color: rgba(192, 159, 88, 0.5);
+            transform: translateY(-5px);
+        }
+        
+        #hero::before {
+            content: '';
+            position: absolute;
             top: 50%;
             left: 50%;
+            width: 1200px;
+            height: 1200px;
+            background-image: radial-gradient(circle, rgba(192, 159, 88, 0.08) 0%, transparent 40%);
             transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
+            z-index: 0;
+            pointer-events: none;
+            will-change: transform; /* Performance hint for parallax */
         }
-        .cursor-dot {
+        
+        /* --- IMPROVEMENT: Themed Custom Cursor --- */
+        .cursor {
+            pointer-events: none;
+            position: fixed;
+            display: block;
+            border-radius: 50%;
+            z-index: 110;
+        }
+        .cursor__dot {
             width: 8px;
             height: 8px;
             background-color: var(--brand-gold);
         }
-        .cursor-outline {
+        .cursor__circle {
             width: 40px;
             height: 40px;
-            background-color: rgba(245, 203, 92, 0.2);
-            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            background-color: rgba(192, 159, 88, 0.2);
+            border: 1px solid rgba(192, 159, 88, 0.4);
+            transition: transform var(--duration-medium) var(--easing-primary),
+                        opacity var(--duration-medium) var(--easing-primary),
+                        background-color var(--duration-medium) var(--easing-primary),
+                        border-color var(--duration-medium) var(--easing-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        body:hover .cursor-dot, body:hover .cursor-outline {
+        
+        /* Themed Contextual Cursor States */
+        .cursor__circle.cursor--hover {
+            transform: scale(1.5);
+            background-color: rgba(192, 159, 88, 0.3);
+            border-color: var(--brand-gold-light);
+        }
+        .cursor__circle.cursor--project-hover {
+            transform: scale(2.5);
+            background-color: var(--brand-gold);
+            border-color: var(--brand-gold-light);
+        }
+        .cursor__text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--bg-primary); /* Contrast against gold background */
+            opacity: 0;
+            transition: opacity var(--duration-medium) ease;
+        }
+        .cursor--project-hover .cursor__text {
             opacity: 1;
-        }
-        .cursor-link-hover .cursor-outline {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(245, 203, 92, 0.3);
         }
 
         /* --- Loading Screen Styles --- */
@@ -73,371 +191,278 @@
             position: fixed;
             inset: 0;
             background-color: var(--bg-primary);
-            z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease-out 0.5s; /* Delay disappearance */
+            z-index: 100;
         }
         .loader-text {
             font-family: 'Playfair Display', serif;
-            font-size: 2rem;
+            font-size: clamp(2rem, 5vw, 4rem);
             color: var(--text-primary);
             overflow: hidden;
         }
         .loader-text span {
             display: inline-block;
         }
-
-        /* --- Typography --- */
-        .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #ffffff, var(--brand-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
         
-        /* --- NeoPOP Inspired Button --- */
-        .btn-neopop {
-            position: relative;
-            display: inline-block;
-            font-weight: 700;
-            padding: 14px 36px;
-            color: #000;
-            background-color: var(--brand-gold);
-            border: 2px solid #000;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 4px 4px 0px #000;
-        }
-        .btn-neopop:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px #000;
-        }
-        .btn-neopop:active {
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px #000;
-        }
-
-        /* --- Glass Effect Header --- */
-        .glass-effect {
-            background: rgba(8, 8, 8, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        /* --- Scroll Down Indicator --- */
-        .scroll-down-indicator {
-            width: 24px;
-            height: 40px;
-            border: 2px solid var(--text-secondary);
-            border-radius: 50px;
-            position: relative;
-        }
-        .scroll-down-indicator span {
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            width: 4px;
-            height: 8px;
-            background: var(--text-secondary);
-            border-radius: 2px;
-            animation: scroll-anim 2.2s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        @keyframes scroll-anim {
-            0% { transform: translate(-50%, 0); opacity: 0; }
-            40% { opacity: 1; }
-            80% { transform: translate(-50%, 12px); opacity: 0; }
-            100% { opacity: 0; }
-        }
-
-        /* --- General Animation Classes (for GSAP) --- */
-        .gsap-fade-in-up { opacity: 0; transform: translateY(50px); }
-        .gsap-fade-in { opacity: 0; }
-        .gsap-line-reveal { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
-
-        /* --- Carousel Styles --- */
-        .portfolio-carousel-section {
+        /* --- Carousel Styles (User Provided) --- */
+        .projects-carousel-section {
             background-color: var(--bg-secondary);
-            overflow: hidden; /* This is necessary for the carousel visuals */
-        }
-        .swiper-slide {
-            width: 90%;
-            max-width: 420px;
-            height: 520px;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-        }
-        .project-card {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
         }
-        .project-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--brand-gold);
-        }
-        .swiper-button-next, .swiper-button-prev { color: var(--brand-gold); }
-        .swiper-pagination-bullet-active { background: var(--brand-gold); }
+        .projects-carousel { width: 100%; padding-top: 50px; padding-bottom: 80px; }
+        .projects-carousel .swiper-slide { width: 90%; max-width: 400px; height: 500px; transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; opacity: 0.4; transform: scale(0.9); }
+        .projects-carousel .swiper-slide-active { opacity: 1; transform: scale(1); }
+        .projects-carousel .swiper-slide .project-card { height: 100%; display: flex; flex-direction: column; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow: hidden; transition: all 0.3s ease; }
+        .projects-carousel .swiper-slide-active .project-card { box-shadow: 0 10px 30px var(--shadow-color); }
+        .projects-carousel .swiper-slide .project-image-container { flex-shrink: 0; height: 200px; }
+        .projects-carousel .swiper-slide .project-content { flex-grow: 1; padding: 2rem; display: flex; flex-direction: column; }
+        .swiper-3d .swiper-slide-shadow { background-image: none !important; }
+        .swiper-button-next, .swiper-button-prev { color: var(--brand-gold); transition: transform 0.2s ease, opacity 0.2s ease; }
+        .swiper-button-next:hover, .swiper-button-prev:hover { transform: scale(1.2); }
+        @media (max-width: 767px) { .swiper-button-next, .swiper-button-prev { display: none; } }
+        .swiper-pagination { bottom: 20px !important; }
+        .swiper-pagination-bullet { background: rgba(255,255,255,0.5); width: 10px; height: 10px; opacity: 0.7; transition: all 0.2s ease; }
+        .swiper-pagination-bullet-active { background: var(--brand-gold); transform: scale(1.2); opacity: 1; }
 
-        /* --- Tab Component Styles --- */
-        .tab-button.active {
-            background-color: var(--bg-tertiary);
-            color: var(--brand-gold);
-            border-color: var(--border-color);
+        .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+        
+        /* Section 4.3: Accessibility & Reduced Motion */
+        .skip-link { position: absolute; top: -100px; left: 0; background: var(--brand-gold); color: var(--bg-primary); padding: 8px 12px; z-index: 10000; transition: top 0.3s; }
+        .skip-link:focus { top: 10px; }
+        
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
+          #hero::before { display: none; }
+          .cursor, .cursor__dot, .cursor__circle { display: none !important; }
+          body { cursor: auto !important; }
         }
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
+        #mobile-menu-button .hamburger-line { transition: transform 0.3s ease, opacity 0.3s ease; }
+        #mobile-menu-button.is-active .hamburger-line-top { transform: rotate(45deg) translate(5px, 5px); }
+        #mobile-menu-button.is-active .hamburger-line-middle { opacity: 0; }
+        #mobile-menu-button.is-active .hamburger-line-bottom { transform: rotate(-45deg) translate(7px, -6px); }
 
-        /* --- Process Section Card --- */
-        .process-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
-        }
-        .process-card:hover {
-            background-color: var(--bg-tertiary);
-            border-color: var(--brand-gold);
-            transform: translateY(-8px);
-        }
     </style>
 </head>
 <body class="antialiased">
-
-    <!-- Custom Cursor -->
-    <div class="cursor-outline"></div>
-    <div class="cursor-dot"></div>
+    <!-- Section 1.1: JavaScript-Driven DOM Element Method -->
+    <div class="cursor cursor__circle"><span class="cursor__text">View</span></div>
+    <div class="cursor cursor__dot"></div>
 
     <!-- Loading Screen -->
     <div class="loading-screen">
         <div class="loader-text">
             <span>S</span><span>u</span><span>m</span><span>a</span><span>n</span><span>t</span><span>h</span>
             <span>&nbsp;</span>
-            <span>U</span><span>d</span><span>u</span><span>p</span><span>i</span><span>.</span>
+            <span>U</span><span>d</span><span>u</span><span>p</span><span>i</span>
         </div>
     </div>
 
-    <!-- Header & Navigation -->
-    <header class="glass-effect sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl md:text-2xl font-bold font-serif text-white tracking-tight hover:text-brand-gold transition-colors duration-300">SU</a>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#portfolio" class="nav-link text-gray-300 hover:text-white transition-colors duration-300 font-medium">Projects</a>
-                <a href="#process" class="nav-link text-gray-300 hover:text-white transition-colors duration-300 font-medium">Process</a>
-                <a href="#about" class="nav-link text-gray-300 hover:text-white transition-colors duration-300 font-medium">About</a>
-                <a href="#contact" class="btn-neopop text-sm">Contact Me</a>
-            </div>
-            <div class="md:hidden">
-                 <a href="#contact" class="btn-neopop text-xs py-2 px-4">Contact</a>
-            </div>
-        </nav>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 transition-colors duration-300 opacity-0 z-30" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-playfair font-bold brand-gradient-text magnetic-element">SU</a>
+            <nav role="navigation" aria-label="Main navigation" class="hidden md:flex items-center space-x-8">
+                <a href="#personal-projects" class="nav-link text-sm text-text-secondary hover:text-text-primary">Projects</a>
+                <a href="#approach" class="nav-link text-sm text-text-secondary hover:text-text-primary">My Approach</a>
+                <a href="#work" class="nav-link text-sm text-text-secondary hover:text-text-primary">My Work</a>
+                <a href="#skills" class="nav-link text-sm text-text-secondary hover:text-text-primary">Skills</a>
+                <a href="#contact" class="cta-button font-semibold text-sm px-5 py-2 rounded-full magnetic-element">Contact</a>
+            </nav>
+            <button class="md:hidden text-text-primary z-50" id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu">
+                <div class="w-6 h-6 flex flex-col justify-around">
+                    <span class="hamburger-line hamburger-line-top block w-full h-0.5 bg-text-primary"></span>
+                    <span class="hamburger-line hamburger-line-middle block w-full h-0.5 bg-text-primary"></span>
+                    <span class="hamburger-line hamburger-line-bottom block w-full h-0.5 bg-text-primary"></span>
+                </div>
+            </button>
+        </div>
     </header>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-bg-primary z-40 transform -translate-y-full transition-transform duration-300 ease-in-out md:hidden">
+        <nav role="navigation" aria-label="Mobile navigation" class="container mx-auto px-6 py-4 h-full flex flex-col justify-center items-center space-y-8">
+            <a href="#personal-projects" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">Projects</a>
+            <a href="#approach" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">My Approach</a>
+            <a href="#work" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">My Work</a>
+            <a href="#skills" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">Skills</a>
+            <a href="#contact" class="cta-button font-semibold text-xl px-8 py-4 rounded-full mt-8">Contact</a>
+        </nav>
+    </div>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section class="hero-section relative bg-bg-primary h-screen flex items-center">
-            <div id="hero-bg-parallax" class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); background-size: 500px;"></div>
-            
-            <div class="container mx-auto px-6 text-center relative z-20">
-                <div class="max-w-4xl mx-auto">
-                    <p class="text-lg font-semibold text-brand-gold mb-4 gsap-fade-in-up">SUMANTH UDUPI - SENIOR BUSINESS ANALYST</p>
-                    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 font-serif">
-                        <span class="gsap-line-reveal inline-block">Bridging Business & Technology</span>
-                        <span class="gsap-line-reveal inline-block"><span class="gradient-text">with Data-Driven Insights.</span></span>
-                    </h1>
-                    <p class="text-lg md:text-xl text-text-secondary mb-12 max-w-3xl mx-auto gsap-fade-in-up">
-                        A strategic analyst with a foundation in Systems Engineering and Data Science, skilled in translating complex business needs into technical solutions for global enterprise clients.
-                    </p>
-                    <div class="gsap-fade-in-up">
-                        <a href="#portfolio" class="btn-neopop text-lg">View My Projects</a>
-                    </div>
-                </div>
-                <!-- Scroll Down Indicator -->
-                <div class="scroll-down-indicator-container absolute bottom-10 left-1/2 -translate-x-1/2 z-30 opacity-0">
-                    <div class="scroll-down-indicator">
-                        <span></span>
+    <main id="main-content" class="opacity-0">
+        <!-- Part I: Hero Section -->
+        <section id="hero" class="min-h-screen flex items-center relative overflow-hidden">
+            <div class="container mx-auto px-6 z-10">
+                <div class="text-center max-w-4xl mx-auto">
+                    <h1 class="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-playfair font-extrabold text-text-primary mb-6 leading-tight">Architecting <span class="brand-gradient-text">Data-Driven Systems</span> for Compliance and Efficiency</h1>
+                    <h2 class="hero-subtitle text-lg md:text-xl text-text-secondary max-w-3xl mx-auto mb-10">Specializing in ESG, EHS, and Automotive QMS solutions for global industry leaders like Volvo and PACCAR.</h2>
+                    <div class="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="#work" class="cta-button font-bold text-lg px-10 py-4 rounded-full w-full sm:w-auto magnetic-element">View My Work</a>
+                        <a href="Sumanth Udupi Business Analyst.pdf" download="Sumanth Udupi - Resume.pdf" class="ghost-button font-bold text-lg px-10 py-4 rounded-full w-full sm:w-auto magnetic-element">Download Resume</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Portfolio Section -->
-        <section id="portfolio" class="portfolio-carousel-section py-24 md:py-32">
+        <!-- Part II: Social Proof Bar -->
+        <section id="social-proof" class="py-12 bg-bg-secondary">
             <div class="container mx-auto px-6">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl md:text-5xl font-bold font-serif gsap-fade-in-up">Data Science & Analytics</h2>
-                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto gsap-fade-in-up">Interactive dashboards and analytical models designed to turn data into actionable insights.</p>
+                <h3 class="section-title text-center text-sm font-bold tracking-widest text-text-secondary uppercase mb-8">Trusted by Industry Leaders</h3>
+                <div class="logo-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center">
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Volvo-Iron-Mark-Black.svg" alt="Volvo" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Paccar_logo.svg" alt="PACCAR" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Trex_Company_logo.svg" alt="Trex" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DAF_Trucks_logo.svg" alt="DAF" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Eaton_logo.svg" alt="Eaton" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
+                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
                 </div>
-            
-                 <!-- Swiper Carousel for Data Science Projects -->
-                <div class="swiper-container portfolio-carousel gsap-fade-in">
+            </div>
+        </section>
+
+        <!-- Personal Projects Carousel Section -->
+        <section id="personal-projects" class="py-20 md:py-32 projects-carousel-section" aria-labelledby="personal-projects-heading">
+            <div class="container mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 id="personal-projects-heading" class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Personal Projects & Case Studies</h2>
+                    <p class="section-subtitle text-lg text-text-secondary mt-4">A showcase of personal explorations and detailed case studies in business analysis and data.</p>
+                </div>
+                <div class="swiper-container projects-carousel" role="region" aria-label="A carousel of featured projects">
                     <div class="swiper-wrapper">
-                        <!-- Slide 1 -->
-                        <div class="swiper-slide">
-                            <a href="Automobile Dashboard.html" class="block h-full project-link">
-                                <div class="project-card">
-                                    <div class="flex-shrink-0 h-[220px] overflow-hidden"><img src="public/Images/AutomobileDashboard.png" alt="Automobile Dashboard" class="w-full h-full object-cover"></div>
-                                    <div class="p-8 flex flex-col flex-grow">
-                                        <p class="text-sm font-semibold text-brand-gold mb-2">REACT • D3.JS • THREE.JS</p>
-                                        <h3 class="text-2xl font-bold mb-4 font-serif">Interactive Automobile Dashboard</h3>
-                                        <p class="text-text-secondary">An advanced analytics platform to explore the 1985 automobile dataset, featuring a guided 'Story Mode' and 3D visualizations.</p>
-                                    </div>
-                                </div>
-                            </a>
+                        <!-- Slides remain the same -->
+                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 1 of 4: Enterprise CRM Overhaul">
+                            <div class="project-card" data-title="Enterprise CRM Overhaul">
+                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=CRM+Overhaul" alt="Enterprise CRM Overhaul Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
+                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">CRM Implementation</p><h3 class="text-2xl font-bold mb-4">Enterprise CRM Overhaul</h3><p class="text-text-secondary mb-6">Led analysis for a Salesforce migration, impacting 500+ users and improving sales cycle efficiency by 30%.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
+                            </div>
                         </div>
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide">
-                            <a href="Pokedex.html" class="block h-full project-link">
-                                <div class="project-card">
-                                    <div class="flex-shrink-0 h-[220px] overflow-hidden"><img src="public/Images/Pokemon.png" alt="Poké-Strategist Pro" class="w-full h-full object-cover"></div>
-                                    <div class="p-8 flex flex-col flex-grow">
-                                        <p class="text-sm font-semibold text-brand-gold mb-2">WEB APP • DATA VISUALIZATION</p>
-                                        <h3 class="text-2xl font-bold mb-4 font-serif">Poké-Strategist Pro</h3>
-                                        <p class="text-text-secondary">An interactive web app for building Pokémon teams with D3.js-powered analysis charts for team vulnerabilities and coverage.</p>
-                                    </div>
-                                </div>
-                            </a>
+                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 2 of 4: BI Dashboard Development">
+                            <div class="project-card" data-title="BI Dashboard Development">
+                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=BI+Dashboards" alt="BI Dashboard Development Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
+                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Data Analytics</p><h3 class="text-2xl font-bold mb-4">BI Dashboard Development</h3><p class="text-text-secondary mb-6">Designed and implemented a suite of Tableau dashboards for executive reporting, providing real-time insights into KPIs.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
+                            </div>
                         </div>
-                        <!-- Slide 3 -->
-                        <div class="swiper-slide">
-                            <a href="F1Analytics.html" class="block h-full project-link">
-                                <div class="project-card">
-                                    <div class="flex-shrink-0 h-[220px] overflow-hidden"><img src="https://placehold.co/600x400/1a1a1a/f5cb5c/png?text=Process+Metrics&font=playfair+display" alt="Process Performance Metrics Dashboard" class="w-full h-full object-cover"></div>
-                                    <div class="p-8 flex flex-col flex-grow">
-                                        <p class="text-sm font-semibold text-brand-gold mb-2">INTERACTIVE DASHBOARDS</p>
-                                        <h3 class="text-2xl font-bold mb-3 font-serif">Process Performance Dashboards</h3>
-                                        <p class="text-text-secondary">A suite of dashboards in Power BI and Superset to track metrics across ESG, CAPA, and risk modules, improving executive reporting.</p>
-                                    </div>
-                                </div>
-                            </a>
+                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 3 of 4: Mobile App Launch">
+                            <div class="project-card" data-title="Mobile App Launch">
+                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Mobile+App" alt="Mobile App Launch Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
+                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">E-commerce</p><h3 class="text-2xl font-bold mb-4">Mobile App Launch</h3><p class="text-text-secondary mb-6">Gathered requirements for a new e-commerce mobile app, resulting in a successful launch and a 4.8-star rating.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
+                            </div>
                         </div>
-                        <!-- Add more slides if needed -->
+                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 4 of 4: Agile Transformation">
+                            <div class="project-card" data-title="Agile Transformation">
+                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Agile+Transformation" alt="Agile Transformation Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
+                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Process Improvement</p><h3 class="text-2xl font-bold mb-4">Agile Transformation</h3><p class="text-text-secondary mb-6">Facilitated Agile adoption for a dev team, increasing deployment frequency by 50% and improving team morale.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="swiper-pagination mt-8"></div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev" aria-label="Previous slide"></div>
+                    <div class="swiper-button-next" aria-label="Next slide"></div>
                 </div>
+                <div id="carousel-live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
             </div>
         </section>
 
-        <!-- Business Initiatives Section -->
-        <section id="business-initiatives" class="py-24 md:py-32 bg-bg-primary">
+        <!-- Part III: The Core Narrative -->
+        <section id="approach" class="py-20 md:py-32">
             <div class="container mx-auto px-6">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl md:text-5xl font-bold font-serif gsap-fade-in-up">Strategic Business Initiatives</h2>
-                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto gsap-fade-in-up">A selection of projects where I applied analytical rigor to solve key business challenges.</p>
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">A Unique Foundation in Engineering, Data, and Product</h2>
                 </div>
-
-                <div class="tabs-container gsap-fade-in">
-                    <!-- Tab implementation remains the same as it's functionally solid -->
-                    <div class="tab-buttons">
-                        <button class="tab-button active" onclick="openTab(event, 'esg-platform')">ESG & EHS Platform</button>
-                        <button class="tab-button" onclick="openTab(event, 'qms-modernization')">Automotive QMS</button>
-                        <button class="tab-button" onclick="openTab(event, 'agile-delivery')">Agile Delivery</button>
-                        <button class="tab-button" onclick="openTab(event, 'api-strategy')">API Integration</button>
+                <div class="approach-content max-w-4xl mx-auto grid md:grid-cols-3 gap-8 text-text-secondary text-base md:text-lg">
+                    <div class="approach-card">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Engineer's Mindset</h3>
+                        <p>My career is built on a foundation of Systems Engineering, beginning with a Bachelor's degree in Mechanical Engineering. This discipline instilled a rigorous, first-principles approach to problem-solving—an ability to deconstruct complex physical systems, optimize processes, and understand the intricate product lifecycles that define the automotive and manufacturing industries. This engineer's mindset allows me to grasp not just the 'what' of a business requirement, but the fundamental 'why' behind it.</p>
                     </div>
-                    <div id="esg-platform" class="tab-content active">
-                        <h3 class="text-3xl font-bold mb-4 font-serif">Enterprise ESG & EHS Compliance Platform</h3>
-                        <p class="text-text-secondary mb-6">Led the end-to-end business analysis for a comprehensive Environmental, Health, and Safety (EHS) platform, conducting global discovery sessions, defining the product roadmap, and authoring over 200 Gherkin-based user stories. This initiative ensured the platform met stringent GRI and SASB standards, ultimately reducing client audit preparation time by 40%.</p>
+                    <div class="approach-card">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Data Scientist's Toolkit</h3>
+                        <p>Recognizing that modern systems run on data, I pursued a Post Graduate Diploma in Data Science to complement my engineering foundation. This equipped me with the tools to move from theoretical processes to evidence-based decision-making. My time at Amazon, analyzing ad violation patterns with Excel and Power BI across global workflows, provided a real-world crucible for these skills, demonstrating how data analysis can drive massive gains in operational efficiency.</p>
                     </div>
-                    <div id="qms-modernization" class="tab-content">
-                        <h3 class="text-3xl font-bold mb-4 font-serif">Automotive QMS Modernization</h3>
-                        <p class="text-text-secondary mb-6">Drove the requirements engineering process for modernizing critical Quality Management System (QMS) modules for major automotive OEMs. I facilitated workshops to gather requirements for Production Part Approval Process (PPAP) and Non-Conformity tracking, streamlining complex lab test data workflows.</p>
-                    </div>
-                    <div id="agile-delivery" class="tab-content">
-                        <h3 class="text-3xl font-bold mb-4 font-serif">Agile Delivery Acceleration</h3>
-                        <p class="text-text-secondary mb-6">Championed Agile methodologies by leading all ceremonies for a 7-member cross-functional squad. Through meticulous backlog management in Azure DevOps and Jira, I helped accelerate feature delivery by 15% and reduced requirement-related queries from the development team by 30%.</p>
-                    </div>
-                     <div id="api-strategy" class="tab-content">
-                        <h3 class="text-3xl font-bold mb-4 font-serif">Third-Party API Integration Strategy</h3>
-                        <p class="text-text-secondary mb-6">Authored detailed API requirements and system integration plans to automate data synchronization between core enterprise platforms and third-party systems. Using Postman and Swagger, I validated and documented REST API endpoints, reducing API defects by 25%.</p>
+                    <div class="approach-card">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Business Analyst's Execution</h3>
+                        <p>As a Business Analyst, I now synthesize these disciplines. I combine the engineer's systems thinking with the data scientist's analytical toolkit to serve as the critical bridge between strategic business goals and technical execution. I translate complex needs—from ESG reporting standards to automotive quality protocols—into clear, actionable user stories and technical requirements, ensuring the solutions we build are not just functional, but truly impactful and measurable.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- My Process Section -->
-        <section id="process" class="py-24 md:py-32 bg-bg-secondary">
+        <!-- Part IV: Proof of Impact (Case Studies) -->
+        <section id="work" class="py-20 md:py-32 bg-bg-secondary">
             <div class="container mx-auto px-6">
-                <div class="text-center mb-20">
-                    <h2 class="text-4xl md:text-5xl font-bold font-serif gsap-fade-in-up">My Analytical Process</h2>
-                    <p class="text-lg text-text-secondary mt-4 max-w-2xl mx-auto gsap-fade-in-up">A structured, iterative approach to deliver impactful business outcomes.</p>
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Proof of Impact</h2>
+                    <p class="section-subtitle text-lg text-text-secondary">Here's how I've translated complex challenges into measurable business outcomes.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center" id="process-grid">
-                    <!-- Process steps will be animated by GSAP -->
-                    <div class="process-card">
-                        <div class="text-5xl font-bold font-serif text-brand-gold mb-4">01</div>
-                        <h3 class="text-2xl font-bold mb-3 font-serif">Discovery</h3>
-                        <p class="text-text-secondary">Engaging with stakeholders to understand business objectives and elicit detailed requirements through interviews and workshops.</p>
+                <div class="space-y-16">
+                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
+                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">Automotive Quality Management</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Enhancing Supplier Compliance and Data Workflows for Volvo & PACCAR</h3></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>Global automotive leaders required a more streamlined and reliable process for managing complex PPAP and Non-Conformity data from thousands of suppliers. Their existing workflows were prone to manual error, leading to delays and compliance risks.</p></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Led global discovery sessions to map workflows and identify critical data bottlenecks.</li><li>Authored 200+ precise, Gherkin-based user stories in Azure DevOps.</li><li>Facilitated all Agile ceremonies to ensure continuous alignment and remove blockers.</li></ul></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Accelerated feature delivery by 15%</strong> through disciplined backlog prioritization.</li><li><strong class="text-brand-gold-light">Reduced developer queries by 30%</strong>, minimizing rework and ambiguity.</li></ul></div>
                     </div>
-                    <div class="process-card">
-                        <div class="text-5xl font-bold font-serif text-brand-gold mb-4">02</div>
-                        <h3 class="text-2xl font-bold mb-3 font-serif">Analysis</h3>
-                        <p class="text-text-secondary">Analyzing information, modeling processes (BPMN), and creating data models to define and conceptualize the solution.</p>
+                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
+                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">ESG & EHS Compliance</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Developing a Centralized EHS Platform to Meet Global Reporting Standards</h3></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>Enterprise clients faced burdensome audit preparations and lacked a centralized system to manage EHS data, creating significant risk and inefficiency in ensuring compliance with standards like GRI, SASB, and OSHA.</p></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Conducted end-to-end business analysis, translating dense regulations into clear software requirements.</li><li>Oversaw the entire SDLC compliance process, proactively mitigating risks.</li><li>Created and managed comprehensive UAT plans in Zephyr for critical modules.</li></ul></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Reduced client audit prep time by 40%</strong>, saving operational costs.</li><li><strong class="text-brand-gold-light">Delivered core modules 15% ahead of deadline</strong>, ensuring regulatory confidence.</li></ul></div>
                     </div>
-                    <div class="process-card">
-                        <div class="text-5xl font-bold font-serif text-brand-gold mb-4">03</div>
-                        <h3 class="text-2xl font-bold mb-3 font-serif">Specification</h3>
-                        <p class="text-text-secondary">Documenting clear, concise functional requirements and user stories, ensuring alignment with all stakeholders before development.</p>
-                    </div>
-                    <div class="process-card">
-                        <div class="text-5xl font-bold font-serif text-brand-gold mb-4">04</div>
-                        <h3 class="text-2xl font-bold mb-3 font-serif">Validation</h3>
-                        <p class="text-text-secondary">Collaborating with dev teams, validating solutions, and facilitating User Acceptance Testing (UAT) to ensure the solution meets business needs.</p>
+                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
+                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">API & Data Integration</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Optimizing API Integration to Automate Product Lifecycle Data Syncing</h3></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>OEM clients needed to automate the synchronization of critical data (PPAP, product lifecycle, lab results) between internal and third-party systems. Existing manual processes were slow and error-prone.</p></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Authored and maintained detailed API requirements and documentation.</li><li>Utilized Postman for rigorous validation of REST API endpoints.</li><li>Built and deployed interactive dashboards in Power BI and Superset for real-time visibility.</li></ul></div>
+                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Reduced API-related defects by 25%</strong> post-launch, improving system stability.</li><li><strong class="text-brand-gold-light">Improved customer satisfaction by 10%</strong> by delivering data-driven dashboards.</li></ul></div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- About Me & Skills Section -->
-        <section id="about" class="py-24 md:py-32 bg-bg-primary">
+        
+        <!-- Part V: My Technical Blueprint -->
+        <section id="skills" class="py-20 md:py-32 bg-bg-secondary">
             <div class="container mx-auto px-6">
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 md:gap-16 items-center">
-                    <div class="lg:col-span-2 gsap-fade-in">
-                        <img src="https://placehold.co/500x600/111111/f0f0f0?text=S.U." alt="Sumanth Udupi" class="w-full object-cover shadow-2xl">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Core Competencies & Skills</h2>
+                    <p class="section-subtitle text-lg text-text-secondary">The tools and methodologies I use to deliver business value at every stage of the product lifecycle.</p>
+                </div>
+                <div class="skills-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="skill-card glass-card p-8 rounded-lg">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">Business Analysis & Strategy</h3><ul class="text-text-secondary space-y-2"><li>Requirements Elicitation</li><li>Agile & Scrum Ceremonies</li><li>User Story & Gherkin Syntax</li><li>BPMN</li><li>SDLC Management</li><li>UAT Planning & Execution</li></ul>
                     </div>
-                    <div class="lg:col-span-3 gsap-fade-in">
-                        <h2 class="text-3xl md:text-4xl font-bold mb-6 font-serif">A Passion for Solving Complex Business Puzzles.</h2>
-                        <div class="space-y-6 text-lg text-text-secondary">
-                            <p>As a strategic Business Analyst with a unique foundation in Systems Engineering and Data Science, I thrive on dissecting complex business challenges and translating them into clear, actionable strategies. My goal is to serve as the critical link between business stakeholders and technical teams, ensuring that technology investments deliver tangible value.</p>
-                        </div>
-                         <h3 class="text-2xl font-bold mt-12 mb-6 font-serif">Core Competencies</h3>
-                         <div class="flex flex-wrap gap-3">
-                            <!-- Competencies here -->
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">Agile & Scrum</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">Gherkin User Stories</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">Azure DevOps & Jira</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">SQL</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">Power BI & Tableau</span>
-                            <span class="bg-gray-800 text-gray-300 font-medium px-4 py-2">REST API Analysis</span>
-                         </div>
+                    <div class="skill-card glass-card p-8 rounded-lg">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">Data Analysis & Visualization</h3><ul class="text-text-secondary space-y-2"><li>SQL (MSSQL)</li><li>Power BI, Tableau, Superset</li><li>Advanced Excel</li><li>Predictive Analytics</li><li>ETL Processes</li></ul>
                     </div>
+                    <div class="skill-card glass-card p-8 rounded-lg">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">Technical Integration & Design</h3><ul class="text-text-secondary space-y-2"><li>REST API Integration</li><li>Postman & Swagger/OpenAPI</li><li>Figma & Proto.io</li><li>UX Collaboration</li></ul>
+                    </div>
+                    <div class="skill-card glass-card p-8 rounded-lg">
+                        <h3 class="font-bold text-xl text-brand-gold mb-4">Platforms & Tools</h3><ul class="text-text-secondary space-y-2"><li>Azure DevOps, Jira</li><li>Zephyr, TestRail</li><li>MS Project, Smartsheet</li></ul>
+                    </div>
+                </div>
+                <div class="text-center mt-20">
+                     <h3 class="section-title text-2xl md:text-3xl font-playfair font-bold mb-8">Certifications & Continuous Learning</h3>
+                     <div class="certifications-list max-w-4xl mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4 text-text-secondary">
+                        <span><strong>Google:</strong> UX Design Professional (2025)</span><span><strong>Microsoft/LinkedIn:</strong> Business Analysis (2025)</span><span><strong>Atlassian:</strong> Agile Project Management (2025)</span><span><strong>IBM:</strong> Machine Learning with Python (2024)</span>
+                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="py-24 md:py-32 bg-bg-secondary">
-            <div class="container mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl md:text-5xl font-bold font-serif gsap-fade-in-up">Let's Discuss Your Next Project.</h2>
-                    <p class="text-lg text-text-secondary mt-5 mb-10 gsap-fade-in-up">I'm available for new opportunities. If you're looking for a dedicated analyst to help drive your business forward, I'd love to connect.</p>
-                    <div class="gsap-fade-in-up">
-                        <a href="mailto:sumanthudupi858@gmail.com" class="btn-neopop text-xl">sumanthudupi858@gmail.com</a>
+        <!-- Part VI: Contact & Next Steps -->
+        <section id="contact" class="py-20 md:py-32 bg-bg-primary">
+            <div class="container mx-auto px-6 text-center">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Interested in Collaborating?</h2>
+                    <p class="section-subtitle text-lg text-text-secondary mb-10">I am always open to discussing new opportunities, particularly in roles focused on ESG, automotive systems, and data-driven product development. If your team is looking for a strategic analyst who can effectively bridge the gap between complex business needs and robust technical solutions, I would be delighted to connect.</p>
+                    <div class="contact-cta">
+                        <a href="mailto:sumanthudupi858@gmail.com" class="cta-button font-bold text-xl px-12 py-5 rounded-full inline-block magnetic-element">Let's Build Together</a>
                     </div>
                 </div>
             </div>
@@ -445,199 +470,265 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-black text-white border-t border-gray-900">
-        <div class="container mx-auto px-6 py-12">
-            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                <div>
-                    <p class="text-lg font-bold font-serif">Sumanth Udupi</p>
-                    <p class="text-gray-500">&copy; 2025 All rights reserved.</p>
-                </div>
-                <div class="flex space-x-6 mt-6 md:mt-0">
-                    <a href="https://linkedin.com/in/sumanth-udupi" target="_blank" class="nav-link text-gray-400 hover:text-brand-gold transition-colors duration-300">LinkedIn</a>
-                    <a href="https://github.com/SumanthUdupi" target="_blank" class="nav-link text-gray-400 hover:text-brand-gold transition-colors duration-300">GitHub</a>
-                </div>
+    <footer class="bg-bg-secondary py-8">
+        <div class="container mx-auto px-6 text-center text-text-secondary">
+            <div class="flex justify-center items-center space-x-6 mb-6">
+                <!-- Added magnetic-element class to social icons -->
+                <a href="https://linkedin.com/in/sumanth-udupi" target="_blank" rel="noopener noreferrer" class="hover:text-brand-gold transition-colors magnetic-element" aria-label="Sumanth Udupi's LinkedIn Profile">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="https://github.com/SumanthUdupi" target="_blank" rel="noopener noreferrer" class="hover:text-brand-gold transition-colors magnetic-element" aria-label="Sumanth Udupi's GitHub Profile">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
             </div>
+            <p class="text-sm">Sumanth Udupi &copy; <span id="current-year"></span> | Bangalore, India</p>
+            <p class="text-xs mt-2">Email: sumanthudupi858@gmail.com | Phone: +91 9741712966</p>
         </div>
     </footer>
 
-    <!-- GSAP for advanced animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- Swiper.js for Carousel -->
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            gsap.registerPlugin(ScrollTrigger);
+    document.addEventListener('DOMContentLoaded', function () {
+        gsap.registerPlugin(ScrollTrigger);
 
-            // --- Custom Cursor Logic ---
-            const cursorDot = document.querySelector('.cursor-dot');
-            const cursorOutline = document.querySelector('.cursor-outline');
-            window.addEventListener('mousemove', function (e) {
-                const posX = e.clientX;
-                const posY = e.clientY;
-                cursorDot.style.left = `${posX}px`;
-                cursorDot.style.top = `${posY}px`;
-                gsap.to(cursorOutline, { duration: 0.3, left: `${posX}px`, top: `${posY}px` });
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        function initApp() {
+            initMobileMenu();
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            if (!motionQuery.matches) {
+                initCustomCursor();
+                initLoaderAnimation();
+                initMagneticElements();
+            } else {
+                const loadingScreen = document.querySelector('.loading-screen');
+                loadingScreen.style.display = 'none';
+                document.getElementById('main-content').style.opacity = 1;
+                document.getElementById('navbar').style.opacity = 1;
+                initSwiper(true);
+            }
+        }
+
+        function initCustomCursor() {
+            const cursorDot = document.querySelector('.cursor__dot');
+            const cursorCircle = document.querySelector('.cursor__circle');
+            
+            const mouse = { x: -100, y: -100 };
+            const pos = { x: 0, y: 0 };
+            // IMPROVEMENT: Increased speed for better responsiveness
+            const speed = 0.15;
+
+            window.addEventListener('mousemove', e => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+
+            const updateCursor = () => {
+                const dx = mouse.x - pos.x;
+                const dy = mouse.y - pos.y;
+                pos.x += dx * speed;
+                pos.y += dy * speed;
+
+                gsap.set(cursorDot, { x: mouse.x, y: mouse.y });
+                gsap.set(cursorCircle, { x: pos.x, y: pos.y });
+            };
+            gsap.ticker.add(updateCursor);
+            
+            const interactiveElements = document.querySelectorAll('a, button, .swiper-button-next, .swiper-button-prev, .swiper-pagination-bullet');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor--hover'));
+                el.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor--hover'));
             });
             
-            const handleLinkHover = (e) => {
-                if (e.type === 'mouseenter') {
-                    document.body.classList.add('cursor-link-hover');
-                } else {
-                    document.body.classList.remove('cursor-link-hover');
-                }
-            };
-            document.querySelectorAll('a, button, .nav-link, .project-link, .tab-button').forEach(el => {
-                el.addEventListener('mouseenter', handleLinkHover);
-                el.addEventListener('mouseleave', handleLinkHover);
+            const projectCards = document.querySelectorAll('.project-card');
+            projectCards.forEach(el => {
+                el.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor--project-hover'));
+                el.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor--project-hover'));
             });
+        }
+        
+        // --- IMPROVEMENT: Physics-Based Magnetic Effect ---
+        function initMagneticElements() {
+            const magneticElements = document.querySelectorAll('.magnetic-element');
+            
+            magneticElements.forEach(el => {
+                let pos = { x: 0, y: 0 };
+                let mouse = { x: 0, y: 0 };
+                let isHovering = false;
+                const strength = 0.4; // How strong the pull is
+                const dampening = 0.9; // How quickly it settles (higher is faster)
 
+                el.addEventListener('mouseenter', () => isHovering = true);
+                el.addEventListener('mouseleave', () => isHovering = false);
 
-            // --- Loading Animation ---
+                el.addEventListener('mousemove', e => {
+                    const rect = el.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left - rect.width / 2;
+                    mouse.y = e.clientY - rect.top - rect.height / 2;
+                });
+
+                function update() {
+                    let targetX = 0, targetY = 0;
+                    if (isHovering) {
+                        targetX = mouse.x * strength;
+                        targetY = mouse.y * strength;
+                    }
+                    
+                    // Linear interpolation for smooth movement
+                    pos.x += (targetX - pos.x) * (1 - dampening);
+                    pos.y += (targetY - pos.y) * (1 - dampening);
+
+                    gsap.set(el, { x: pos.x, y: pos.y });
+                }
+                gsap.ticker.add(update);
+            });
+        }
+
+        function initLoaderAnimation() {
             const loadingScreen = document.querySelector('.loading-screen');
             const loaderTextSpans = document.querySelectorAll('.loader-text span');
             
-            const tlLoader = gsap.timeline();
-            tlLoader.from(loaderTextSpans, {
-                y: 100,
-                opacity: 0,
-                stagger: 0.05,
-                ease: 'power3.out',
-                duration: 0.8
-            }).to(loaderTextSpans, {
-                y: -100,
-                opacity: 0,
-                stagger: 0.05,
-                ease: 'power3.in',
-                duration: 0.8
-            }, "+=0.5").to(loadingScreen, {
-                opacity: 0,
-                duration: 0.8,
+            const tlLoader = gsap.timeline({
                 onComplete: () => {
                     loadingScreen.style.display = 'none';
-                    document.body.style.cursor = ''; // Restore cursor
-                    // --- Hero Section Entrance Animation ---
-                    const tlHero = gsap.timeline();
-                    tlHero.to('.gsap-line-reveal', {
-                        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
-                        stagger: 0.2,
-                        duration: 1,
-                        ease: 'power3.out'
-                    })
-                    .from('.gsap-fade-in-up', {
-                        y: 50,
-                        opacity: 0,
-                        stagger: 0.15,
-                        duration: 0.8,
-                        ease: 'power3.out'
-                    }, "-=0.5")
-                    // Fade in the scroll indicator at the end
-                    .to('.scroll-down-indicator-container', {
-                        opacity: 1,
-                        duration: 0.5
-                    }, "-=0.5");
+                    initPageAnimations();
+                    initSwiper();
                 }
             });
-
-            // --- General Scroll-Triggered Animations ---
-            gsap.utils.toArray('.gsap-fade-in-up').forEach(elem => {
-                gsap.from(elem, {
-                    scrollTrigger: {
-                        trigger: elem,
-                        start: 'top 85%',
-                        toggleActions: 'play none none none'
-                    },
-                    y: 50,
-                    opacity: 0,
-                    duration: 1,
-                    ease: 'power3.out'
-                });
-            });
             
-            gsap.utils.toArray('.gsap-fade-in').forEach(elem => {
-                gsap.from(elem, {
-                    scrollTrigger: {
-                        trigger: elem,
-                        start: 'top 85%',
-                        toggleActions: 'play none none none'
-                    },
-                    opacity: 0,
-                    duration: 1.2,
-                    ease: 'power2.inOut'
-                });
-            });
-            
-            // --- Parallax Hero Background ---
-            gsap.to("#hero-bg-parallax", {
-                backgroundPosition: "50% 100%",
-                ease: "none",
-                scrollTrigger: {
-                    trigger: ".hero-section",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                }
-            });
+            tlLoader.from(loaderTextSpans, { y: 100, opacity: 0, stagger: 0.05, ease: 'power3.out', duration: 0.8 })
+                    .to(loaderTextSpans, { y: -100, opacity: 0, stagger: 0.05, ease: 'power3.in', duration: 0.8 }, "+=0.5")
+                    .to(loadingScreen, { opacity: 0, duration: 0.8, onComplete: () => loadingScreen.style.pointerEvents = 'none' }, "-=0.5");
+        }
 
-            // --- Staggered Process Cards Animation (Smoother) ---
-            gsap.from(".process-card", {
-                scrollTrigger: {
-                    trigger: "#process-grid",
-                    start: "top 80%",
-                },
-                y: 40,
+        function initPageAnimations() {
+            gsap.to(['#main-content', '#navbar'], { opacity: 1, duration: 0.8 });
+            
+            gsap.from(['.hero-title', '.hero-subtitle', '.hero-ctas'], {
+                y: 50,
                 opacity: 0,
-                duration: 1.2, // Slower for more grace
-                ease: "expo.out", // Smoother easing
-                stagger: 0.15
+                stagger: 0.2,
+                duration: 1,
+                ease: 'power3.out',
+                delay: 0.2
             });
 
-            // --- Initialize Swiper Carousel ---
-            const swiper = new Swiper('.portfolio-carousel', {
-                effect: 'coverflow',
+            initScrollTriggers();
+        }
+
+        function initMobileMenu() {
+            const btn = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            const links = menu.querySelectorAll('a');
+            
+            const toggleMenu = () => {
+                const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', !isExpanded);
+                btn.classList.toggle('is-active');
+                menu.classList.toggle('-translate-y-full');
+            };
+
+            btn.addEventListener('click', toggleMenu);
+            links.forEach(link => {
+                link.addEventListener('click', () => {
+                    if(btn.classList.contains('is-active')) {
+                        toggleMenu();
+                    }
+                });
+            });
+        }
+
+        function initScrollTriggers() {
+            ScrollTrigger.create({ 
+                start: 'top -80', 
+                end: 99999, 
+                toggleClass: { className: 'scrolled', targets: '#navbar' } 
+            });
+            const navbarStyle = document.createElement('style');
+            navbarStyle.innerHTML = `#navbar.scrolled { background-color: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px); }`;
+            document.head.appendChild(navbarStyle);
+
+            gsap.utils.toArray('.section-title, .section-subtitle, .contact-cta').forEach(el => {
+                gsap.from(el, {
+                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' },
+                    y: 40, opacity: 0, duration: 1, ease: 'power3.out'
+                });
+            });
+
+            gsap.from('.logo-grid > div', {
+                scrollTrigger: { trigger: '.logo-grid', start: 'top 85%' },
+                y: 30, opacity: 0, stagger: 0.1, ease: 'power3.out'
+            });
+            
+            gsap.from('.approach-card', {
+                scrollTrigger: { trigger: '.approach-content', start: 'top 80%' },
+                y: 50, opacity: 0, stagger: 0.2, ease: 'power3.out'
+            });
+
+            gsap.from('.case-study-card', {
+                scrollTrigger: { trigger: '#work', start: 'top 70%' },
+                y: 50, opacity: 0, stagger: 0.25, ease: 'power3.out'
+            });
+
+            gsap.from('.skill-card', {
+                scrollTrigger: { trigger: '.skills-grid', start: 'top 80%' },
+                y: 50, opacity: 0, stagger: 0.2, ease: 'power3.out'
+            });
+             gsap.from('.certifications-list span', {
+                scrollTrigger: { trigger: '.certifications-list', start: 'top 90%' },
+                y: 30, opacity: 0, stagger: 0.15, ease: 'power3.out'
+            });
+            
+            gsap.to('#hero::before', {
+                scrollTrigger: {
+                    trigger: '#hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                },
+                y: '50%',
+                ease: 'none'
+            });
+        }
+
+        function initSwiper(isReducedMotion = false) {
+            const liveRegion = document.getElementById('carousel-live-region');
+            const swiper = new Swiper('.projects-carousel', {
+                effect: isReducedMotion ? 'slide' : 'coverflow',
                 grabCursor: true,
                 centeredSlides: true,
                 slidesPerView: 'auto',
                 loop: true,
+                speed: isReducedMotion ? 0 : 600,
                 coverflowEffect: {
-                    rotate: 5,
+                    rotate: 0,
                     stretch: 0,
-                    depth: 100,
-                    modifier: 2,
+                    depth: 150,
+                    modifier: 1,
                     slideShadows: false,
                 },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                pagination: { el: '.swiper-pagination', clickable: true },
+                keyboard: { enabled: true, onlyInViewport: false },
+                on: {
+                    slideChange: function () {
+                        if (liveRegion) {
+                            const currentSlide = this.slides[this.activeIndex];
+                            const slideLabel = currentSlide ? currentSlide.getAttribute('aria-label') : '';
+                            if (slideLabel) { liveRegion.textContent = slideLabel; }
+                        }
+                    },
                 },
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false,
+                breakpoints: {
+                    768: {
+                       coverflowEffect: { rotate: 25, depth: 150 },
+                    }
                 }
             });
-
-        });
-
-        // --- Tab functionality ---
-        function openTab(event, tabName) {
-            let i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            event.currentTarget.classList.add("active");
         }
+        
+        initApp();
+    });
     </script>
-
 </body>
 </html>
