@@ -261,7 +261,7 @@
         <div class="loader-text">
             <span>S</span><span>u</span><span>m</span><span>a</span><span>n</span><span>t</span><span>h</span>
             <span>&nbsp;</span>
-            <span>U</span><span>d</span><span>u</span><span>p</span><span>i</span>
+            <span>U</span><span>d</span><span>u</span><span>p</span><span>i</span></span>.</span>
         </div>
     </div>
 
@@ -727,7 +727,12 @@
                 centeredSlides: true,
                 slidesPerView: 'auto',
                 loop: true,
-                speed: isReducedMotion ? 0 : 600,
+                speed: isReducedMotion ? 0 : 800, // Slightly slower for a smoother auto-scroll
+                autoplay: {
+                    delay: 3000, // Time in ms
+                    disableOnInteraction: false, // Autoplay will not be disabled after user interactions
+                    pauseOnMouseEnter: true, // Pauses autoplay on mouse enter
+                },
                 coverflowEffect: {
                     rotate: 0,
                     stretch: 0,
