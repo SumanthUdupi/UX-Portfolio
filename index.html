@@ -18,8 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     
     <style>
         /* Section 4.1: Defining a Motion Language */
@@ -206,27 +204,92 @@
             display: inline-block;
         }
         
-        /* --- Carousel Styles (User Provided) --- */
-        .projects-carousel-section {
-            background-color: var(--bg-secondary);
-            overflow: hidden;
-        }
-        .projects-carousel { width: 100%; padding-top: 50px; padding-bottom: 80px; }
-        .projects-carousel .swiper-slide { width: 90%; max-width: 400px; height: 500px; transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; opacity: 0.4; transform: scale(0.9); }
-        .projects-carousel .swiper-slide-active { opacity: 1; transform: scale(1); }
-        .projects-carousel .swiper-slide .project-card { height: 100%; display: flex; flex-direction: column; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow: hidden; transition: all 0.3s ease; }
-        .projects-carousel .swiper-slide-active .project-card { box-shadow: 0 10px 30px var(--shadow-color); }
-        .projects-carousel .swiper-slide .project-image-container { flex-shrink: 0; height: 200px; }
-        .projects-carousel .swiper-slide .project-content { flex-grow: 1; padding: 2rem; display: flex; flex-direction: column; }
-        .swiper-3d .swiper-slide-shadow { background-image: none !important; }
-        .swiper-button-next, .swiper-button-prev { color: var(--brand-gold); transition: transform 0.2s ease, opacity 0.2s ease; }
-        .swiper-button-next:hover, .swiper-button-prev:hover { transform: scale(1.2); }
-        @media (max-width: 767px) { .swiper-button-next, .swiper-button-prev { display: none; } }
-        .swiper-pagination { bottom: 20px !important; }
-        .swiper-pagination-bullet { background: rgba(255,255,255,0.5); width: 10px; height: 10px; opacity: 0.7; transition: all 0.2s ease; }
-        .swiper-pagination-bullet-active { background: var(--brand-gold); transform: scale(1.2); opacity: 1; }
-
         .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+        /* --- Interactive Projects Section --- */
+        .interactive-projects-container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            align-items: center;
+            margin-top: 4rem;
+            min-height: 60vh;
+        }
+
+        .project-list {
+            grid-column: 1 / span 5;
+        }
+
+        .project-item a {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-decoration: none;
+            line-height: 1.2;
+            transition: color 0.4s var(--easing-primary);
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .project-item a:hover,
+        .project-item.is-active a {
+            color: var(--text-primary);
+        }
+
+        .project-item a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--brand-gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s var(--easing-primary);
+        }
+
+        .project-item.is-active a::before {
+            transform: scaleX(1);
+        }
+
+        .project-visuals {
+            grid-column: 7 / span 6;
+            position: relative;
+            height: 450px;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .interactive-projects-container {
+                grid-template-columns: 1fr;
+                min-height: auto;
+            }
+            .project-list {
+                grid-column: 1 / -1;
+                margin-bottom: 2rem;
+            }
+            .project-visuals {
+                grid-column: 1 / -1;
+                height: 300px;
+            }
+            .project-item a {
+                font-size: 2rem;
+            }
+        }
         
         /* Section 4.3: Accessibility & Reduced Motion */
         .skip-link { position: absolute; top: -100px; left: 0; background: var(--brand-gold); color: var(--bg-primary); padding: 8px 12px; z-index: 10000; transition: top 0.3s; }
@@ -329,74 +392,35 @@
             </div>
         </section>
 
-        <!-- Personal Projects Carousel Section -->
-        <section id="personal-projects" class="py-20 md:py-32 projects-carousel-section" aria-labelledby="personal-projects-heading">
+        <!-- Personal Projects Section -->
+        <section id="personal-projects" class="py-20 md:py-32 bg-bg-secondary" aria-labelledby="personal-projects-heading">
             <div class="container mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 id="personal-projects-heading" class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Personal Projects & Case Studies</h2>
                     <p class="section-subtitle text-lg text-text-secondary mt-4">A showcase of personal explorations and detailed case studies in business analysis and data.</p>
                 </div>
-                <div class="swiper-container projects-carousel" role="region" aria-label="A carousel of featured projects">
-                    <div class="swiper-wrapper">
-                        <!-- Slide 1 -->
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 1 of 4: Enterprise CRM Overhaul">
-                            <div class="project-card" data-title="Enterprise CRM Overhaul">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=CRM+Overhaul" alt="Enterprise CRM Overhaul Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">CRM Implementation</p><h3 class="text-2xl font-bold mb-4">Enterprise CRM Overhaul</h3><p class="text-text-secondary mb-6">Led analysis for a Salesforce migration, impacting 500+ users and improving sales cycle efficiency by 30%.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 2 of 4: BI Dashboard Development">
-                            <div class="project-card" data-title="BI Dashboard Development">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=BI+Dashboards" alt="BI Dashboard Development Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Data Analytics</p><h3 class="text-2xl font-bold mb-4">BI Dashboard Development</h3><p class="text-text-secondary mb-6">Designed and implemented a suite of Tableau dashboards for executive reporting, providing real-time insights into KPIs.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 3 of 4: Mobile App Launch">
-                            <div class="project-card" data-title="Mobile App Launch">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Mobile+App" alt="Mobile App Launch Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">E-commerce</p><h3 class="text-2xl font-bold mb-4">Mobile App Launch</h3><p class="text-text-secondary mb-6">Gathered requirements for a new e-commerce mobile app, resulting in a successful launch and a 4.8-star rating.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <!-- Slide 4 -->
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 4 of 4: Agile Transformation">
-                            <div class="project-card" data-title="Agile Transformation">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Agile+Transformation" alt="Agile Transformation Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Process Improvement</p><h3 class="text-2xl font-bold mb-4">Agile Transformation</h3><p class="text-text-secondary mb-6">Facilitated Agile adoption for a dev team, increasing deployment frequency by 50% and improving team morale.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <!-- FIX: Duplicated slides for seamless loop -->
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 1 of 4: Enterprise CRM Overhaul">
-                            <div class="project-card" data-title="Enterprise CRM Overhaul">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=CRM+Overhaul" alt="Enterprise CRM Overhaul Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">CRM Implementation</p><h3 class="text-2xl font-bold mb-4">Enterprise CRM Overhaul</h3><p class="text-text-secondary mb-6">Led analysis for a Salesforce migration, impacting 500+ users and improving sales cycle efficiency by 30%.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 2 of 4: BI Dashboard Development">
-                            <div class="project-card" data-title="BI Dashboard Development">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=BI+Dashboards" alt="BI Dashboard Development Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Data Analytics</p><h3 class="text-2xl font-bold mb-4">BI Dashboard Development</h3><p class="text-text-secondary mb-6">Designed and implemented a suite of Tableau dashboards for executive reporting, providing real-time insights into KPIs.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 3 of 4: Mobile App Launch">
-                            <div class="project-card" data-title="Mobile App Launch">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Mobile+App" alt="Mobile App Launch Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">E-commerce</p><h3 class="text-2xl font-bold mb-4">Mobile App Launch</h3><p class="text-text-secondary mb-6">Gathered requirements for a new e-commerce mobile app, resulting in a successful launch and a 4.8-star rating.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Project 4 of 4: Agile Transformation">
-                            <div class="project-card" data-title="Agile Transformation">
-                                <div class="project-image-container"><img src="https://placehold.co/400x250/1a1a1a/c09f58?text=Agile+Transformation" alt="Agile Transformation Project" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/400x250/1a1a1a/c09f58?text=Image';"></div>
-                                <div class="project-content"><div class="flex-grow"><p class="text-sm font-semibold text-brand-gold mb-2">Process Improvement</p><h3 class="text-2xl font-bold mb-4">Agile Transformation</h3><p class="text-text-secondary mb-6">Facilitated Agile adoption for a dev team, increasing deployment frequency by 50% and improving team morale.</p></div><a href="#" class="nav-link font-semibold text-brand-gold hover:text-brand-gold-light mt-auto">View Case Study &rarr;</a></div>
-                            </div>
-                        </div>
+
+                <div class="interactive-projects-container">
+                    <div class="project-list">
+                        <ul>
+                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=CRM+Overhaul">
+                                <a href="#">Enterprise CRM Overhaul</a>
+                            </li>
+                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=BI+Dashboards">
+                                <a href="#">BI Dashboard Development</a>
+                            </li>
+                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=Mobile+App">
+                                <a href="#">Mobile App Launch</a>
+                            </li>
+                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=Agile">
+                                <a href="#">Agile Transformation</a>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="swiper-pagination"></div>
-                    <div class="swiper-button-prev" aria-label="Previous slide"></div>
-                    <div class="swiper-button-next" aria-label="Next slide"></div>
+                    <div class="project-visuals">
+                        <!-- Images will be dynamically added here by JavaScript -->
+                    </div>
                 </div>
-                <div id="carousel-live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
             </div>
         </section>
 
@@ -528,12 +552,12 @@
                 initCustomCursor();
                 initLoaderAnimation();
                 initMagneticElements();
+                initInteractiveProjects();
             } else {
                 const loadingScreen = document.querySelector('.loading-screen');
                 loadingScreen.style.display = 'none';
                 document.getElementById('main-content').style.opacity = 1;
                 document.getElementById('navbar').style.opacity = 1;
-                initSwiper(true);
             }
         }
 
@@ -562,16 +586,10 @@
             };
             gsap.ticker.add(updateCursor);
             
-            const interactiveElements = document.querySelectorAll('a, button, .swiper-button-next, .swiper-button-prev, .swiper-pagination-bullet');
+            const interactiveElements = document.querySelectorAll('a, button');
             interactiveElements.forEach(el => {
                 el.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor--hover'));
                 el.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor--hover'));
-            });
-            
-            const projectCards = document.querySelectorAll('.project-card');
-            projectCards.forEach(el => {
-                el.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor--project-hover'));
-                el.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor--project-hover'));
             });
         }
         
@@ -620,7 +638,6 @@
                 onComplete: () => {
                     loadingScreen.style.display = 'none';
                     initPageAnimations();
-                    initSwiper();
                 }
             });
             
@@ -719,45 +736,56 @@
             });
         }
 
-        function initSwiper(isReducedMotion = false) {
-            const liveRegion = document.getElementById('carousel-live-region');
-            const swiper = new Swiper('.projects-carousel', {
-                effect: isReducedMotion ? 'slide' : 'coverflow',
-                grabCursor: true,
-                centeredSlides: true,
-                slidesPerView: 'auto',
-                loop: true,
-                speed: isReducedMotion ? 0 : 800, // Slightly slower for a smoother auto-scroll
-                autoplay: {
-                    delay: 3000, // Time in ms
-                    disableOnInteraction: false, // Autoplay will not be disabled after user interactions
-                    pauseOnMouseEnter: true, // Pauses autoplay on mouse enter
-                },
-                coverflowEffect: {
-                    rotate: 0,
-                    stretch: 0,
-                    depth: 150,
-                    modifier: 1,
-                    slideShadows: false,
-                },
-                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-                pagination: { el: '.swiper-pagination', clickable: true },
-                keyboard: { enabled: true, onlyInViewport: false },
-                on: {
-                    slideChange: function () {
-                        if (liveRegion) {
-                            const currentSlide = this.slides[this.activeIndex];
-                            const slideLabel = currentSlide ? currentSlide.getAttribute('aria-label') : '';
-                            if (slideLabel) { liveRegion.textContent = slideLabel; }
-                        }
-                    },
-                },
-                breakpoints: {
-                    768: {
-                       coverflowEffect: { rotate: 25, depth: 150 },
-                    }
-                }
+        function initInteractiveProjects() {
+            const projectItems = document.querySelectorAll('.project-item');
+            const projectVisuals = document.querySelector('.project-visuals');
+            let activeItem = null;
+
+            // 1. Create and append image elements
+            projectItems.forEach((item, index) => {
+                const imageUrl = item.dataset.image;
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = item.querySelector('a').textContent;
+                img.classList.add('project-image');
+                img.dataset.index = index;
+                projectVisuals.appendChild(img);
             });
+
+            const projectImages = document.querySelectorAll('.project-image');
+
+            // 2. Set initial state
+            function setInitialState() {
+                gsap.set(projectImages, { opacity: 0, scale: 1.05 });
+                if (projectItems.length > 0) {
+                    activeItem = projectItems[0];
+                    activeItem.classList.add('is-active');
+                    const initialImage = projectImages[0];
+                    gsap.to(initialImage, { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' });
+                }
+            }
+
+            // 3. Add hover event listeners
+            projectItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', () => {
+                    if (activeItem === item) return;
+
+                    // Deactivate previous item
+                    if (activeItem) {
+                        activeItem.classList.remove('is-active');
+                        const oldImage = projectImages[Array.from(projectItems).indexOf(activeItem)];
+                        gsap.to(oldImage, { opacity: 0, duration: 0.5, ease: 'power2.inOut' });
+                    }
+
+                    // Activate new item
+                    activeItem = item;
+                    item.classList.add('is-active');
+                    const newImage = projectImages[index];
+                    gsap.to(newImage, { opacity: 1, duration: 0.5, ease: 'power2.inOut' });
+                });
+            });
+
+            setInitialState();
         }
         
         initApp();
