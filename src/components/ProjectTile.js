@@ -1,26 +1,15 @@
 import React, { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Text, Trail } from "@react-three/drei";
-import * as THREE from "three";
 
 const ProjectTile = ({ project, position }) => {
   const ref = useRef();
-  const { scene } = useThree();
+  const { camera } = useThree();
 
   useFrame(() => {
     if (ref.current) {
-      const rotatingGroup = scene.getObjectByName("rotating-group");
-      if (rotatingGroup) {
-        // Get the world quaternion of the rotating group
-        const worldQuaternion = new THREE.Quaternion();
-        rotatingGroup.getWorldQuaternion(worldQuaternion);
-
-        // Invert the quaternion to get the counter-rotation
-        const inverseQuaternion = worldQuaternion.invert();
-
-        // Apply the counter-rotation to the tile
-        ref.current.quaternion.copy(inverseQuaternion);
-      }
+      // Make the tile always face the camera
+      ref.current.lookAt(camera.position);
     }
   });
 
