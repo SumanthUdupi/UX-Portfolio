@@ -75,7 +75,7 @@
         /* --- New DNA Carousel Styles --- */
         #carousel-wrapper {
             /* This element creates the scrollable height for the animation */
-            height: 6000px;
+            height: 5000px;
         }
 
         #carousel-sticky-container {
@@ -309,9 +309,9 @@
         function setupCarousel() {
             const carousel = document.getElementById('dna-carousel');
             const numProjects = projects.length;
-            const radius = 450; // How wide the helix is
-            const angleStep = 50; // degrees between items
-            const yStep = 350; // Vertical separation
+            const radius = 400; // How wide the helix is
+            const angleStep = 40; // degrees between items
+            const yStep = 120; // Vertical separation
 
             projects.forEach((project, i) => {
                 const card = document.createElement('a');
