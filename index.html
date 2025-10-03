@@ -109,7 +109,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
             backface-visibility: hidden; /* Prevents flickering on rotated elements */
-            transition: opacity 0.5s ease, transform 0.2s ease-out; /* Add transform transition */
+            transition: opacity 0.5s ease; /* Remove transform from transition */
         }
         
         /* Glow effect for text */
@@ -309,9 +309,9 @@
         function setupCarousel() {
             const carousel = document.getElementById('dna-carousel');
             const numProjects = projects.length;
-            const radius = 300; // How wide the helix is
-            const angleStep = 45; // degrees between items
-            const yStep = 100; // Vertical separation
+            const radius = 400; // How wide the helix is
+            const angleStep = 40; // degrees between items
+            const yStep = 120; // Vertical separation
 
             projects.forEach((project, i) => {
                 const card = document.createElement('a');
@@ -330,26 +330,21 @@
                 `;
                 carousel.appendChild(card);
 
-                // Position card in a scattered, layered helix
+                // Position card in a clean, stable DNA-style helix
                 const angle = i * angleStep;
-                // Center the helix vertically
-                const yPos = (i * yStep) - ((numProjects-1) * yStep / 2) + (Math.random() - 0.5) * 50;
-                // Use a sine wave for Z and cosine for X for the circular path, add randomness
-                const xPos = Math.sin(THREE.MathUtils.degToRad(angle)) * radius + (Math.random() - 0.5) * 150;
-                const zPos = Math.cos(THREE.MathUtils.degToRad(angle)) * radius + (Math.random() - 0.5) * 250;
+                const yPos = (i * yStep) - ((numProjects - 1) * yStep / 2);
+                const xPos = Math.sin(THREE.MathUtils.degToRad(angle)) * radius;
+                const zPos = Math.cos(THREE.MathUtils.degToRad(angle)) * radius;
 
-                const randomXRot = (Math.random() - 0.5) * 20;
-                const randomZRot = (Math.random() - 0.5) * 10;
-
+                // We apply a base rotation to face the card forward from its point on the circle
+                const baseRotation = -angle;
 
                 card.style.transform = `
                     translate(-50%, -50%)
                     translateX(${xPos}px)
                     translateY(${yPos}px)
                     translateZ(${zPos}px)
-                    rotateY(${angle + 90}deg)
-                    rotateX(${randomXRot}deg)
-                    rotateZ(${randomZRot}deg)
+                    rotateY(${baseRotation}deg)
                 `;
             });
         }
@@ -366,9 +361,11 @@
 
             if (scrollTop > wrapperTop && scrollTop < wrapperTop + scrollHeight) {
                 const progress = (scrollTop - wrapperTop) / scrollHeight;
-                const rotation = -progress * 220; // Slower, less rotation
-                const zMove = -300 + progress * 200; // Move closer on scroll
-                carousel.style.transform = `translateZ(${zMove}px) rotateY(${rotation}deg)`;
+                // Adjust rotation to be smoother and match the number of items
+                const rotation = progress * (projects.length * 25);
+                const zMove = -300 + progress * 250; // Move closer on scroll, less extreme
+                // Consistent transform order with initial CSS
+                carousel.style.transform = `rotateY(${rotation}deg) translateZ(${zMove}px)`;
             }
         }
 
