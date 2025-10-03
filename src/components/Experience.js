@@ -37,7 +37,7 @@ const Experience = () => {
         const angle = (index / projects.length) * Math.PI * 2;
         // A more dramatic spiral with greater vertical separation
         const radius = 6;
-        const y = -index * 6;
+        const y = -index * 12; // Increased vertical separation
         const x = radius * Math.sin(angle);
         const z = radius * Math.cos(angle);
 
