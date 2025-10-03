@@ -16,11 +16,11 @@ const App = () => {
           height: "100vh",
         }}
         camera={{
-          position: [0, 0, 8],
-          fov: 45,
+          position: [0, 0, 10],
+          fov: 60,
         }}
       >
-        <ambientLight intensity={0.3} />
+        <ambientLight intensity={0.5} />
         <directionalLight
           castShadow
           position={[10, 20, 30]}
@@ -28,7 +28,7 @@ const App = () => {
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <ScrollControls pages={3} damping={0.25}>
+        <ScrollControls pages={4} damping={0.1}>
           <Scroll>
             <Experience />
           </Scroll>
