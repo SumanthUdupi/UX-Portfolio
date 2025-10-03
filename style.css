@@ -1,0 +1,148 @@
+:root {
+    --bg-color: #010103;
+    --text-color: #c0c0c0;
+    --primary-color: #8400ff;
+    --primary-glow: rgba(192, 72, 255, 0.7);
+    --secondary-glow: rgba(192, 72, 255, 0.3);
+    --highlight-start: #8400ff;
+    --highlight-end: #c048ff;
+    --glass-bg: rgba(10, 10, 10, 0.2);
+    --glass-border: rgba(132, 0, 255, 0.2);
+    --glass-shadow: rgba(132, 0, 255, 0.1);
+    --header-scrolled-bg: rgba(10, 10, 10, 0.4);
+}
+
+/* Custom styles for the 3D canvas and animations */
+body {
+    font-family: 'Roboto Mono', monospace;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    transition: background-color 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, var(--bg-color) 80%);
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 20px var(--glass-shadow);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#main-header.scrolled nav {
+    background: var(--header-scrolled-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+html { scroll-behavior: smooth; }
+
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    will-change: opacity, transform;
+}
+.scroll-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.project-card:hover .project-image { transform: scale(1.05); }
+.project-card:hover .project-overlay { opacity: 1; }
+.project-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
+    transition: opacity 0.3s ease;
+}
+.project-image { transition: transform 0.3s ease; }
+
+/* --- Horizontal Scroll Project Section --- */
+#projects-container {
+    /* This height determines how long the horizontal scroll lasts */
+    height: 400vh;
+}
+.project-card-horizontal {
+    flex: 0 0 auto;
+    width: 45vw;
+    height: 60vh;
+    margin: 0 2.5vw;
+    position: relative;
+    will-change: transform;
+}
+.project-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.project-image-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color);
+    z-index: 2;
+    transform-origin: left;
+}
+
+/* --- Text Highlight Animation --- */
+.highlight {
+    position: relative;
+    background-image: linear-gradient(120deg, var(--highlight-start), var(--highlight-end));
+    background-repeat: no-repeat;
+    background-size: 0% 40%;
+    background-position: 0% 90%;
+    transition: background-size 0.6s ease-in-out;
+}
+.highlight.animated {
+    background-size: 100% 40%;
+}
+
+.text-glow { text-shadow: 0 0 8px var(--primary-glow), 0 0 20px var(--secondary-glow); }
+.nav-link {
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px rgba(192, 72, 255, 0.0);
+}
+.nav-link:hover {
+     color: #ffffff;
+     text-shadow: 0 0 8px rgba(192, 72, 255, 0.9);
+}
+
+.scroll-down {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    cursor: pointer;
+    transition: opacity 0.4s ease;
+}
+.scroll-down svg { width: 30px; height: 50px; }
+.scroll-down .wheel { animation: scroll-pulse 2s infinite; }
+@keyframes scroll-pulse {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+    100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .scroll-animate, .project-card:hover .project-image, .scroll-down .wheel, #main-header, .glass-card, .nav-link {
+        transition: none;
+        animation: none;
+    }
+}
