@@ -17,6 +17,7 @@
             background-color: #010103;
             color: #c0c0c0;
             overflow-x: hidden;
+            transition: background-color 0.8s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         #bg-canvas {
@@ -26,25 +27,28 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            /* Gradient overlay for depth */
             background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #010103 80%);
         }
 
-        /* Glassmorphism effect for content containers */
         .glass-card {
             background: rgba(10, 10, 10, 0.2);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(132, 0, 255, 0.2);
             box-shadow: 0 0 20px rgba(132, 0, 255, 0.1);
-        }
-        
-        /* Smooth scroll behavior */
-        html {
-            scroll-behavior: smooth;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* Custom animation for section fade-in on scroll */
+        #main-header.scrolled nav {
+            background: rgba(10, 10, 10, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        html { scroll-behavior: smooth; }
+
         .scroll-animate {
             opacity: 0;
             transform: translateY(30px);
@@ -55,95 +59,97 @@
             transform: translateY(0);
         }
 
-        /* Project card hover effect */
-        .project-card:hover .project-image {
-            transform: scale(1.05);
-        }
-        .project-card:hover .project-overlay {
-            opacity: 1;
-        }
-        
+        .project-card:hover .project-image { transform: scale(1.05); }
+        .project-card:hover .project-overlay { opacity: 1; }
         .project-overlay {
             background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
             transition: opacity 0.3s ease;
         }
+        .project-image { transition: transform 0.3s ease; }
 
-        .project-image {
-            transition: transform 0.3s ease;
+        /* --- Horizontal Scroll Project Section --- */
+        #projects-container {
+            /* This height determines how long the horizontal scroll lasts */
+            height: 400vh;
         }
-
-        /* --- New DNA Carousel Styles --- */
-        #carousel-wrapper {
-            /* This element creates the scrollable height for the animation */
-            height: 6000px;
+        .project-card-horizontal {
+            flex: 0 0 auto;
+            width: 45vw;
+            height: 60vh;
+            margin: 0 2.5vw;
+            position: relative;
         }
-
-        #carousel-sticky-container {
-            /* This container sticks to the viewport */
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow: hidden;
-            perspective: 1200px; /* Adds depth - MOVED HERE */
-        }
-
-        #dna-carousel {
+        .project-image-wrapper {
             position: relative;
             width: 100%;
             height: 100%;
-            transform-style: preserve-3d;
-            /* perspective: 1200px;  REMOVED FROM HERE */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: rotateY(0deg) translateZ(-300px); /* Move carousel back */
+            overflow: hidden;
+        }
+        .project-image-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8400ff;
+            z-index: 2;
+            transform-origin: left;
         }
 
-        .dna-card {
-            position: absolute;
-            width: 600px;
-            max-width: 70vw;
-            height: 450px;
-            /* Center the card before applying 3D transforms */
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            backface-visibility: hidden; /* Prevents flickering on rotated elements */
-            transition: opacity 0.5s ease; /* Remove transform from transition */
+        /* --- Text Highlight Animation --- */
+        .highlight {
+            position: relative;
+            background-image: linear-gradient(120deg, #8400ff, #c048ff);
+            background-repeat: no-repeat;
+            background-size: 0% 40%;
+            background-position: 0% 90%;
+            transition: background-size 0.6s ease-in-out;
+        }
+        .highlight.animated {
+            background-size: 100% 40%;
         }
         
-        /* Glow effect for text */
-        .text-glow {
-            text-shadow: 0 0 8px rgba(192, 72, 255, 0.7), 0 0 20px rgba(192, 72, 255, 0.3);
-        }
-        
+        .text-glow { text-shadow: 0 0 8px rgba(192, 72, 255, 0.7), 0 0 20px rgba(192, 72, 255, 0.3); }
         .nav-link {
             transition: all 0.3s ease;
             text-shadow: 0 0 5px rgba(192, 72, 255, 0.0);
         }
-
         .nav-link:hover {
              color: #ffffff;
              text-shadow: 0 0 8px rgba(192, 72, 255, 0.9);
         }
 
-        /* Glassmorphism effect for content containers */
-        .glass-card {
-            background: rgba(10, 10, 10, 0.2);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(132, 0, 255, 0.2);
-            box-shadow: 0 0 20px rgba(132, 0, 255, 0.1);
+        .scroll-down {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            cursor: pointer;
+            transition: opacity 0.4s ease;
+        }
+        .scroll-down svg { width: 30px; height: 50px; }
+        .scroll-down .wheel { animation: scroll-pulse 2s infinite; }
+        @keyframes scroll-pulse {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+            100% { transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .scroll-animate, .project-card:hover .project-image, .scroll-down .wheel, #main-header, .glass-card, .nav-link {
+                transition: none;
+                animation: none;
+            }
         }
     </style>
 </head>
 <body class="w-full">
-
-    <!-- The 3D background canvas -->
+    <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-purple-500 z-50" style="width: 0%;"></div>
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Header Navigation -->
-    <header class="fixed top-0 left-0 w-full z-50 p-4">
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 p-4 transition-all duration-300">
         <nav class="container mx-auto flex justify-between items-center glass-card rounded-xl p-3 px-6">
             <a href="#" class="text-xl font-bold tracking-widest uppercase nav-link">JD</a>
             <div class="hidden md:flex space-x-8">
@@ -151,260 +157,332 @@
                 <a href="#about" class="nav-link">About</a>
                 <a href="#contact" class="nav-link">Contact</a>
             </div>
-            <div class="md:hidden">
-                <!-- Mobile menu can be added here -->
-            </div>
         </nav>
     </header>
 
     <main class="relative z-10">
-        <!-- Hero Section -->
         <section id="home" class="h-screen flex items-center justify-center text-center flex-col min-h-[600px]">
             <div class="px-4">
-                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none text-glow">
+                <h1 id="hero-headline" class="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none text-glow">
                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">John Doe</span>
                 </h1>
                 <p class="mt-4 text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
                     A Creative Developer focused on building immersive digital experiences that blend design and technology.
                 </p>
             </div>
+            <a href="#projects" class="scroll-down">
+                <svg viewBox="0 0 30 50" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0" y="0" rx="15" ry="15" width="30" height="50" stroke="#fff" stroke-width="2" fill="none"/>
+                    <rect class="wheel" x="13" y="10" width="4" height="8" rx="2" ry="2" fill="#fff"/>
+                </svg>
+            </a>
         </section>
 
-        <!-- Projects Section -->
-        <section id="projects" class="py-20 lg:py-32 scroll-animate">
-            <div class="container mx-auto px-4">
-                <h2 class="text-4xl lg:text-6xl font-bold text-center mb-16 uppercase tracking-wider text-glow">Featured Work</h2>
-            </div>
-            <!-- DNA Carousel Structure -->
-            <div id="carousel-wrapper">
-                <div id="carousel-sticky-container">
-                    <div id="dna-carousel">
-                        <!-- Project cards will be injected here by JavaScript -->
+        <section id="projects" class="py-20 lg:py-32">
+            <div id="projects-container">
+                <div id="projects-sticky-wrapper" class="sticky top-0 h-screen w-full overflow-hidden flex">
+                    <div class="w-1/3 h-full flex flex-col justify-center px-12">
+                        <div id="project-details">
+                            <!-- Project details will be injected here -->
+                        </div>
+                    </div>
+                    <div class="w-2/3 h-full flex items-center">
+                         <div id="projects-track" class="flex h-full items-center relative">
+                            <!-- Project cards injected here -->
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- About Section -->
         <section id="about" class="py-20 lg:py-32 scroll-animate">
             <div class="container mx-auto px-4 max-w-4xl text-center">
                  <h2 class="text-4xl lg:text-6xl font-bold text-center mb-8 uppercase tracking-wider text-glow">About Me</h2>
                  <p class="text-lg text-gray-300 leading-relaxed">
-                    I'm a passionate developer with a knack for creating engaging and user-friendly digital experiences. With a background in both creative design and software engineering, I bridge the gap between aesthetics and functionality. My goal is to craft solutions that are not only technically sound but also beautiful and intuitive to use. I thrive on challenges and am always eager to learn new technologies to push the boundaries of what's possible on the web.
+                    I'm a passionate developer with a knack for creating <span class="highlight">engaging and user-friendly</span> digital experiences. With a background in both <span class="highlight">creative design and software engineering</span>, I bridge the gap between aesthetics and functionality. My goal is to craft solutions that are not only technically sound but also beautiful and intuitive to use. I thrive on challenges and am always eager to learn new technologies to <span class="highlight">push the boundaries</span> of what's possible on the web.
                  </p>
             </div>
         </section>
 
-        <!-- Contact Section -->
         <section id="contact" class="py-20 lg:py-32 scroll-animate">
             <div class="container mx-auto px-4 max-w-4xl text-center">
                 <h2 class="text-4xl lg:text-6xl font-bold text-center mb-4 uppercase tracking-wider text-glow">Get In Touch</h2>
-                <p class="text-lg text-gray-400 mb-8">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
+                <p class="text-lg text-gray-400 mb-8">Have a project in mind or just want to say hello?</p>
                 <a href="mailto:hello@johndoe.com" class="inline-block bg-purple-600/50 text-white border border-purple-400 font-bold py-4 px-8 rounded-lg text-lg uppercase tracking-wider hover:bg-purple-500/80 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50">
                     hello@johndoe.com
                 </a>
-                <div class="flex justify-center space-x-6 mt-12">
-                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">LinkedIn</a>
-                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">GitHub</a>
-                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">Twitter</a>
-                </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="text-center py-8">
         <p class="text-gray-500">&copy; 2024 John Doe. All Rights Reserved.</p>
     </footer>
 
-    <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/SplitText.min.js"></script>
 
-    <!-- Main JavaScript for 3D background and animations -->
     <script type="module">
         // --- 3D INTERACTIVE BACKGROUND ---
-        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        let scene, camera, renderer, particleLayers = [], mouseX = 0, mouseY = 0;
         const windowHalfX = window.innerWidth / 2;
         const windowHalfY = window.innerHeight / 2;
 
-        function init() {
-            // Scene setup
+        function init3D() {
             scene = new THREE.Scene();
-
-            // Camera setup
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            scene.fog = new THREE.FogExp2(0x010103, 0.0007);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
             camera.position.z = 1000;
 
-            // Renderer setup
             const canvas = document.getElementById('bg-canvas');
             renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // Particle creation
-            const particleCount = 5000;
-            const particlesGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 2000;
-            }
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            
-            const particlesMaterial = new THREE.PointsMaterial({
-                color: 0x8400ff,
-                size: 3,
-                transparent: true,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
+            const layers = [
+                { count: 1500, color: 0x550088, size: 2, speed: 0.05, depth: 1500 },
+                { count: 2500, color: 0x8400ff, size: 3, speed: 0.1, depth: 1000 },
+                { count: 1000, color: 0xffaaff, size: 4, speed: 0.2, depth: 500 }
+            ];
+
+            layers.forEach(layerInfo => {
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(layerInfo.count * 3);
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * 2500;
+                    positions[i+1] = (Math.random() - 0.5) * 2500;
+                    positions[i+2] = (Math.random() - 0.5) * layerInfo.depth - 500;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const material = new THREE.PointsMaterial({ color: layerInfo.color, size: layerInfo.size, transparent: true, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+                const particles = new THREE.Points(geometry, material);
+                particles.userData.speed = layerInfo.speed;
+                scene.add(particles);
+                particleLayers.push(particles);
             });
-
-            particles = new THREE.Points(particlesGeometry, particlesMaterial);
-            scene.add(particles);
             
-            // Event Listeners
-            document.addEventListener('mousemove', onDocumentMouseMove, false);
-            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', e => {
+                mouseX = e.clientX - windowHalfX;
+                mouseY = e.clientY - windowHalfY;
+            });
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         }
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function onDocumentMouseMove(event) {
-            mouseX = event.clientX - windowHalfX;
-            mouseY = event.clientY - windowHalfY;
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            render();
-        }
-
-        function render() {
+        function animate3D() {
+            requestAnimationFrame(animate3D);
             const time = Date.now() * 0.00005;
-
-            // Animate camera and particles
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             camera.position.x += (mouseX - camera.position.x) * 0.05;
             camera.position.y += (-mouseY - camera.position.y) * 0.05;
             camera.lookAt(scene.position);
-
-            particles.rotation.x = time * 0.2;
-            particles.rotation.y = time * 0.5;
-
+            particleLayers.forEach(layer => {
+                layer.position.y = scrollTop * layer.userData.speed;
+                layer.rotation.x = time * (layer.userData.speed * 0.5);
+                layer.rotation.y = time * (layer.userData.speed * 1.2);
+            });
             renderer.render(scene, camera);
         }
 
-        // --- DNA SCROLL CAROUSEL ---
+        // --- PROJECTS DATA & SETUP ---
         const projects = [
-            { title: 'Project Title One', category: 'Web Design / Development', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+One' },
-            { title: 'Project Title Two', category: '3D Visualization', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Two' },
-            { title: 'Project Title Three', category: 'Interactive Art', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Three' },
-            { title: 'Project Title Four', category: 'Mobile Application', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Four' },
-            { title: 'Project Title Five', category: 'Branding & Identity', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Five' },
-            { title: 'Project Title Six', category: 'E-commerce Platform', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Six' },
+            { number: '01', title: 'Project Title One', category: 'Web Design', description: 'A futuristic web experience for a cutting-edge tech company, focusing on fluid animations and a dark, immersive UI.', imageUrl: 'https://placehold.co/800x600/8E2DE2/ffffff?text=Project+One', color: '#8E2DE2' },
+            { number: '02', title: 'Project Title Two', category: '3D Visualization', description: 'An interactive 3D product customizer built with Three.js, allowing users to explore and configure products in real-time.', imageUrl: 'https://placehold.co/800x600/4A00E0/ffffff?text=Project+Two', color: '#4A00E0' },
+            { number: '03', title: 'Project Title Three', category: 'Interactive Art', description: 'A generative art installation that reacts to user movement, creating a dynamic and ever-changing visual landscape.', imageUrl: 'https://placehold.co/800x600/009FFF/ffffff?text=Project+Three', color: '#009FFF' },
+            { number: '04', title: 'Project Title Four', category: 'Mobile App', description: 'A sleek and intuitive mobile application designed to streamline daily tasks and improve productivity through a minimalist interface.', imageUrl: 'https://placehold.co/800x600/EC2F4B/ffffff?text=Project+Four', color: '#EC2F4B' },
         ];
 
-        function setupCarousel() {
-            const carousel = document.getElementById('dna-carousel');
-            const numProjects = projects.length;
-            const radius = 450; // How wide the helix is
-            const angleStep = 50; // degrees between items
-            const yStep = 350; // Vertical separation
+        function setupProjects() {
+            const track = document.getElementById('projects-track');
+            const detailsContainer = document.getElementById('project-details');
+            if (!track || !detailsContainer) return;
 
-            projects.forEach((project, i) => {
+            // Set initial details
+            detailsContainer.innerHTML = `
+                <div class="text-5xl font-black text-white/20 mb-4" id="project-number">${projects[0].number}</div>
+                <h3 class="text-4xl font-bold text-white mb-4" id="project-title">${projects[0].title}</h3>
+                <p class="text-gray-300" id="project-description">${projects[0].description}</p>
+            `;
+
+            projects.forEach((project, index) => {
                 const card = document.createElement('a');
                 card.href = '#';
-                card.className = 'dna-card group project-card glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/30';
-
+                card.className = 'project-card-horizontal group project-card glass-card rounded-2xl overflow-hidden';
+                card.dataset.color = project.color;
+                card.dataset.title = project.title;
+                card.dataset.description = project.description;
+                card.dataset.number = project.number;
                 card.innerHTML = `
-                    <div class="relative overflow-hidden w-full h-full">
+                    <div class="project-image-wrapper">
+                        <div class="project-image-mask"></div>
                         <img src="${project.imageUrl}" alt="${project.title}" class="w-full h-full object-cover project-image">
-                        <div class="absolute inset-0 project-overlay opacity-0"></div>
-                        <div class="absolute bottom-0 left-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
-                            <h3 class="text-2xl font-bold text-white">${project.title}</h3>
-                            <p class="text-gray-300 mt-1">${project.category}</p>
-                        </div>
                     </div>
                 `;
-                carousel.appendChild(card);
-
-                // Position card in a clean, stable DNA-style helix
-                const angle = i * angleStep;
-                const yPos = (i * yStep) - ((numProjects - 1) * yStep / 2);
-                const xPos = Math.sin(THREE.MathUtils.degToRad(angle)) * radius;
-                const zPos = Math.cos(THREE.MathUtils.degToRad(angle)) * radius;
-
-                // We apply a base rotation to face the card forward from its point on the circle
-                const baseRotation = -angle;
-
-                card.style.transform = `
-                    translate(-50%, -50%)
-                    translateX(${xPos}px)
-                    translateY(${yPos}px)
-                    translateZ(${zPos}px)
-                    rotateY(${baseRotation}deg)
-                `;
+                track.appendChild(card);
             });
         }
 
-        function handleCarouselScroll() {
-            const wrapper = document.getElementById('carousel-wrapper');
-            const carousel = document.getElementById('dna-carousel');
-            if (!wrapper || !carousel) return;
+        // --- MAIN ANIMATION INITIALIZATION ---
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger, SplitText);
 
-            const rect = wrapper.getBoundingClientRect();
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const wrapperTop = wrapper.offsetTop;
-            const scrollHeight = wrapper.scrollHeight - window.innerHeight;
+            // Hero headline reveal
+            const split = new SplitText("#hero-headline", { type: "words,chars" });
+            gsap.from(split.chars, {
+                duration: 0.8, opacity: 0, y: 60, rotationX: -90,
+                transformOrigin: "0% 50% -50", ease: "power3.out", stagger: 0.05,
+            });
 
-            if (scrollTop > wrapperTop && scrollTop < wrapperTop + scrollHeight) {
-                const progress = (scrollTop - wrapperTop) / scrollHeight;
-                // Adjust rotation to be smoother and match the number of items
-                const rotation = progress * (projects.length * 25);
-                const zMove = -300 + progress * 250; // Move closer on scroll, less extreme
-                // Consistent transform order with initial CSS
-                carousel.style.transform = `rotateY(${rotation}deg) translateZ(${zMove}px)`;
-            }
-        }
+            // Header scroll transform
+            ScrollTrigger.create({
+                start: "top -80", end: 99999,
+                toggleClass: { className: "scrolled", targets: "#main-header" }
+            });
 
+            // Scroll-down affordance fade
+            gsap.to(".scroll-down", {
+                scrollTrigger: { trigger: "#home", start: "top top", end: "bottom center", scrub: true },
+                opacity: 0, y: 100,
+            });
 
-        // --- SCROLL ANIMATIONS ---
-        const scrollElements = document.querySelectorAll('.scroll-animate');
-
-        const elementInView = (el, dividend = 1) => {
-            const elementTop = el.getBoundingClientRect().top;
-            return (
-                elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
-            );
-        };
-
-        const displayScrollElement = (element) => {
-            element.classList.add('visible');
-        };
-
-        const handleScrollAnimation = () => {
-            scrollElements.forEach((el) => {
-                if (elementInView(el, 1.25)) {
-                    displayScrollElement(el);
+            // Horizontal scroll for projects
+            const track = document.getElementById('projects-track');
+            const amountToScroll = track.scrollWidth - window.innerWidth;
+            const horizontalScrollAnimation = gsap.to(track, {
+                x: -amountToScroll,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#projects-container",
+                    start: "top top",
+                    end: `+=${amountToScroll}`,
+                    pin: "#projects-sticky-wrapper",
+                    scrub: 1,
+                    invalidateOnRefresh: true,
                 }
             });
-        };
-        
-        // Initialize everything
-        window.onload = function() {
-            init();
-            animate();
-            setupCarousel();
-            handleCarouselScroll(); // Initial check
-            handleScrollAnimation(); // Initial check
-            window.addEventListener('scroll', () => {
-                handleScrollAnimation();
-                handleCarouselScroll();
+
+            // Image Mask Reveal & Parallax on project cards
+            gsap.utils.toArray('.project-card-horizontal').forEach(card => {
+                const mask = card.querySelector('.project-image-mask');
+                const image = card.querySelector('.project-image');
+
+                gsap.set(image, { scale: 1.2 });
+
+                const revealTimeline = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: card,
+                        containerAnimation: horizontalScrollAnimation,
+                        start: 'left 85%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+                revealTimeline.to(mask, { scaleX: 0, duration: 1, ease: 'power3.inOut' })
+                              .to(image, { scale: 1, duration: 1.2, ease: 'power3.out' }, '-=1');
+
+                gsap.to(image, {
+                    xPercent: -15,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: card,
+                        containerAnimation: horizontalScrollAnimation,
+                        start: 'left right',
+                        end: 'right left',
+                        scrub: true
+                    }
+                });
+            });
+
+            // Background color change & Sticky details update
+            const detailsContainer = document.getElementById('project-details');
+            const projectNumber = document.getElementById('project-number');
+            const projectTitle = document.getElementById('project-title');
+            const projectDescription = document.getElementById('project-description');
+
+            gsap.utils.toArray('.project-card-horizontal').forEach(card => {
+                ScrollTrigger.create({
+                    trigger: card,
+                    containerAnimation: horizontalScrollAnimation,
+                    start: 'left center',
+                    end: 'right center',
+                    onToggle: self => {
+                        if (self.isActive) {
+                            gsap.to('body', { backgroundColor: card.dataset.color, duration: 0.8 });
+
+                            // Animate details change
+                            const tl = gsap.timeline();
+                            tl.to([projectNumber, projectTitle, projectDescription], {
+                                opacity: 0,
+                                y: -20,
+                                duration: 0.4,
+                                ease: 'power2.in',
+                                onComplete: () => {
+                                    projectNumber.textContent = card.dataset.number;
+                                    projectTitle.textContent = card.dataset.title;
+                                    projectDescription.textContent = card.dataset.description;
+                                }
+                            }).to([projectNumber, projectTitle, projectDescription], {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.4,
+                                ease: 'power2.out'
+                            });
+                        }
+                    },
+                });
+            });
+
+            // Revert background color when scrolling out of the projects section
+            ScrollTrigger.create({
+                trigger: '#projects-container',
+                start: 'top bottom',
+                end: 'bottom top',
+                onLeave: () => gsap.to('body', { backgroundColor: '#010103', duration: 0.8 }),
+                onLeaveBack: () => gsap.to('body', { backgroundColor: '#010103', duration: 0.8 }),
+            });
+
+            // "About Me" text highlight
+            gsap.utils.toArray('.highlight').forEach(el => {
+                ScrollTrigger.create({
+                    trigger: el,
+                    start: 'top 80%',
+                    onEnter: () => el.classList.add('animated'),
+                });
+            });
+
+            // General section fade-in
+            gsap.utils.toArray('.scroll-animate').forEach(el => {
+                gsap.fromTo(el, { opacity: 0, y: 50 }, {
+                    opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+                    scrollTrigger: { trigger: el, start: 'top 85%' }
+                });
+            });
+
+            // Scroll progress bar
+            gsap.to("#progress-bar", {
+                width: "100%", ease: "none",
+                scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: true }
             });
         }
 
+        // --- ONLOAD ---
+        window.onload = function() {
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            init3D();
+            setupProjects();
+
+            if (!prefersReducedMotion) {
+                animate3D();
+                initAnimations();
+            } else {
+                document.querySelectorAll('.scroll-animate').forEach(el => el.classList.add('visible'));
+                document.querySelectorAll('.project-card-horizontal').forEach(el => el.style.opacity = 1);
+            }
+        }
     </script>
 </body>
 </html>
