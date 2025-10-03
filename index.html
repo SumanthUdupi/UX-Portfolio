@@ -1,795 +1,413 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumanth Udupi - Strategic Business Analyst</title>
-    
-    <!-- SEO and Social Sharing Meta Tags -->
-    <meta name="description" content="Sumanth Udupi – A strategic problem-solver architecting data-driven systems for compliance and efficiency in ESG, EHS, and Automotive QMS.">
-    <link rel="canonical" href="https://www.sumanthudupi-portfolio.com/" />
-    <meta property="og:title" content="Sumanth Udupi - Strategic Business Analyst">
-    <meta property="og:description" content="Portfolio of a strategic analyst bridging the gap between complex business needs and robust technical solutions for industry leaders like Volvo and PACCAR.">
-    <meta property="og:type" content="website">
-    
+    <title>John Doe | Creative Developer Portfolio</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Section 4.1: Defining a Motion Language */
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #141414;
-            --bg-tertiary: #1a1a1a;
-            --brand-gold: #c09f58;
-            --brand-gold-light: #d4b77f;
-            --text-primary: #f0f0f0;
-            --text-secondary: #a0a0a0;
-            --border-color: rgba(192, 159, 88, 0.2);
-            --shadow-color: rgba(192, 159, 88, 0.1);
-
-            /* Motion System Variables */
-            --duration-short: 150ms;
-            --duration-medium: 300ms;
-            --duration-long: 500ms;
-            --easing-primary: cubic-bezier(0.22, 1, 0.36, 1); /* Ease-out Quint */
-        }
-
+        /* Custom styles for the 3D canvas and animations */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Roboto Mono', monospace;
+            background-color: #010103;
+            color: #c0c0c0;
             overflow-x: hidden;
         }
-        
-        @media (hover: hover) and (pointer: fine) {
-            body {
-                cursor: none;
-            }
-        }
 
-        .font-playfair { font-family: 'Playfair Display', serif; }
-
-        .brand-gradient-text {
-            background: linear-gradient(90deg, var(--brand-gold-light), var(--brand-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .cta-button {
-            position: relative; /* For magnetic effect */
-            background-color: var(--brand-gold);
-            color: var(--bg-primary);
-            box-shadow: 0 4px 20px rgba(192, 159, 88, 0.25);
-            transition: all var(--duration-medium) var(--easing-primary);
-        }
-
-        .cta-button:hover {
-            box-shadow: 0 8px 30px rgba(192, 159, 88, 0.4);
-            transform: translateY(-4px) scale(1.05);
-        }
-        
-        .ghost-button {
-            position: relative; /* For magnetic effect */
-            background-color: transparent;
-            color: var(--brand-gold);
-            border: 1px solid var(--brand-gold);
-            transition: all var(--duration-medium);
-            overflow: hidden; /* For sweep effect */
-            z-index: 1;
-        }
-        
-        /* Section 2.2: Background Sweep Effect */
-        .ghost-button::before {
-            content: '';
-            position: absolute;
+        #bg-canvas {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(192, 159, 88, 0.1);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform var(--duration-medium) var(--easing-primary);
             z-index: -1;
+            /* Gradient overlay for depth */
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, #010103 80%);
         }
 
-        .ghost-button:hover::before {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-
-        .ghost-button:hover {
-            color: var(--brand-gold-light);
-        }
-
+        /* Glassmorphism effect for content containers */
         .glass-card {
-            background: rgba(20, 20, 20, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            transition: background var(--duration-long), border-color var(--duration-long), transform var(--duration-long);
+            background: rgba(10, 10, 10, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(132, 0, 255, 0.2);
+            box-shadow: 0 0 20px rgba(132, 0, 255, 0.1);
         }
         
-        .glass-card:hover {
-            background: rgba(26, 26, 26, 0.8);
-            border-color: rgba(192, 159, 88, 0.5);
-            transform: translateY(-5px);
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
         }
-        
-        #hero::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 1200px;
-            height: 1200px;
-            background-image: radial-gradient(circle, rgba(192, 159, 88, 0.08) 0%, transparent 40%);
-            transform: translate(-50%, -50%);
-            z-index: 0;
-            pointer-events: none;
-            will-change: transform; /* Performance hint for parallax */
-        }
-        
-        /* --- IMPROVEMENT: Themed Custom Cursor --- */
-        .cursor {
-            pointer-events: none;
-            position: fixed;
-            display: block;
-            border-radius: 50%;
-            z-index: 110;
-        }
-        .cursor__dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--brand-gold);
-        }
-        .cursor__circle {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(192, 159, 88, 0.2);
-            border: 1px solid rgba(192, 159, 88, 0.4);
-            transition: transform var(--duration-medium) var(--easing-primary),
-                        opacity var(--duration-medium) var(--easing-primary),
-                        background-color var(--duration-medium) var(--easing-primary),
-                        border-color var(--duration-medium) var(--easing-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Themed Contextual Cursor States */
-        .cursor__circle.cursor--hover {
-            transform: scale(1.5);
-            background-color: rgba(192, 159, 88, 0.3);
-            border-color: var(--brand-gold-light);
-        }
-        .cursor__circle.cursor--project-hover {
-            transform: scale(2.5);
-            background-color: var(--brand-gold);
-            border-color: var(--brand-gold-light);
-        }
-        .cursor__text {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--bg-primary); /* Contrast against gold background */
+
+        /* Custom animation for section fade-in on scroll */
+        .scroll-animate {
             opacity: 0;
-            transition: opacity var(--duration-medium) ease;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .cursor--project-hover .cursor__text {
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Project card hover effect */
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+        .project-card:hover .project-overlay {
             opacity: 1;
         }
-
-        /* --- Loading Screen Styles --- */
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            background-color: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        .loader-text {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            color: var(--text-primary);
-            overflow: hidden;
-        }
-        .loader-text span {
-            display: inline-block;
-        }
         
-        .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
-
-        /* --- Interactive Projects Section --- */
-        .interactive-projects-container {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 2rem;
-            align-items: center;
-            margin-top: 4rem;
-            min-height: 60vh;
-        }
-
-        .project-list {
-            grid-column: 1 / span 5;
-        }
-
-        .project-item a {
-            display: block;
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-decoration: none;
-            line-height: 1.2;
-            transition: color 0.4s var(--easing-primary);
-            padding: 0.5rem 0;
-            position: relative;
-        }
-
-        .project-item a:hover,
-        .project-item.is-active a {
-            color: var(--text-primary);
-        }
-
-        .project-item a::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--brand-gold);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.6s var(--easing-primary);
-        }
-
-        .project-item.is-active a::before {
-            transform: scaleX(1);
-        }
-
-        .project-visuals {
-            grid-column: 7 / span 6;
-            position: relative;
-            height: 450px;
-            overflow: hidden;
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
+        .project-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
+            transition: opacity 0.3s ease;
         }
 
         .project-image {
+            transition: transform 0.3s ease;
+        }
+
+        /* --- New DNA Carousel Styles --- */
+        #carousel-wrapper {
+            /* This element creates the scrollable height for the animation */
+            height: 5000px;
+        }
+
+        #carousel-sticky-container {
+            /* This container sticks to the viewport */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            perspective: 1200px; /* Adds depth - MOVED HERE */
+        }
+
+        #dna-carousel {
+            position: relative;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            transform-style: preserve-3d;
+            /* perspective: 1200px;  REMOVED FROM HERE */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(0deg) translateZ(-300px); /* Move carousel back */
+        }
+
+        .dna-card {
             position: absolute;
-            top: 0;
-            left: 0;
+            width: 600px;
+            max-width: 70vw;
+            height: 450px;
+            /* Center the card before applying 3D transforms */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            backface-visibility: hidden; /* Prevents flickering on rotated elements */
+            transition: opacity 0.5s ease, transform 0.2s ease-out; /* Add transform transition */
+        }
+        
+        /* Glow effect for text */
+        .text-glow {
+            text-shadow: 0 0 8px rgba(192, 72, 255, 0.7), 0 0 20px rgba(192, 72, 255, 0.3);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(192, 72, 255, 0.0);
         }
 
-        @media (max-width: 768px) {
-            .interactive-projects-container {
-                grid-template-columns: 1fr;
-                min-height: auto;
-            }
-            .project-list {
-                grid-column: 1 / -1;
-                margin-bottom: 2rem;
-            }
-            .project-visuals {
-                grid-column: 1 / -1;
-                height: 300px;
-            }
-            .project-item a {
-                font-size: 2rem;
-            }
+        .nav-link:hover {
+             color: #ffffff;
+             text-shadow: 0 0 8px rgba(192, 72, 255, 0.9);
         }
-        
-        /* Section 4.3: Accessibility & Reduced Motion */
-        .skip-link { position: absolute; top: -100px; left: 0; background: var(--brand-gold); color: var(--bg-primary); padding: 8px 12px; z-index: 10000; transition: top 0.3s; }
-        .skip-link:focus { top: 10px; }
-        
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
-          #hero::before { display: none; }
-          .cursor, .cursor__dot, .cursor__circle { display: none !important; }
-          body { cursor: auto !important; }
-        }
-        
-        #mobile-menu-button .hamburger-line { transition: transform 0.3s ease, opacity 0.3s ease; }
-        #mobile-menu-button.is-active .hamburger-line-top { transform: rotate(45deg) translate(5px, 5px); }
-        #mobile-menu-button.is-active .hamburger-line-middle { opacity: 0; }
-        #mobile-menu-button.is-active .hamburger-line-bottom { transform: rotate(-45deg) translate(7px, -6px); }
 
+        /* Glassmorphism effect for content containers */
+        .glass-card {
+            background: rgba(10, 10, 10, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(132, 0, 255, 0.2);
+            box-shadow: 0 0 20px rgba(132, 0, 255, 0.1);
+        }
     </style>
 </head>
-<body class="antialiased">
-    <!-- Section 1.1: JavaScript-Driven DOM Element Method -->
-    <div class="cursor cursor__circle"><span class="cursor__text">View</span></div>
-    <div class="cursor cursor__dot"></div>
+<body class="w-full">
 
-    <!-- Loading Screen -->
-    <div class="loading-screen">
-        <div class="loader-text">
-            <span>S</span><span>u</span><span>m</span><span>a</span><span>n</span><span>t</span><span>h</span>
-            <span>&nbsp;</span>
-            <span>U</span><span>d</span><span>u</span><span>p</span><span>i</span>
-        </div>
-    </div>
+    <!-- The 3D background canvas -->
+    <canvas id="bg-canvas"></canvas>
 
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 transition-colors duration-300 opacity-0 z-30" id="navbar">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-playfair font-bold brand-gradient-text magnetic-element">SU</a>
-            <nav role="navigation" aria-label="Main navigation" class="hidden md:flex items-center space-x-8">
-                <a href="#personal-projects" class="nav-link text-sm text-text-secondary hover:text-text-primary">Projects</a>
-                <a href="#approach" class="nav-link text-sm text-text-secondary hover:text-text-primary">My Approach</a>
-                <a href="#work" class="nav-link text-sm text-text-secondary hover:text-text-primary">My Work</a>
-                <a href="#skills" class="nav-link text-sm text-text-secondary hover:text-text-primary">Skills</a>
-                <a href="#contact" class="cta-button font-semibold text-sm px-5 py-2 rounded-full magnetic-element">Contact</a>
-            </nav>
-            <button class="md:hidden text-text-primary z-50" id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu">
-                <div class="w-6 h-6 flex flex-col justify-around">
-                    <span class="hamburger-line hamburger-line-top block w-full h-0.5 bg-text-primary"></span>
-                    <span class="hamburger-line hamburger-line-middle block w-full h-0.5 bg-text-primary"></span>
-                    <span class="hamburger-line hamburger-line-bottom block w-full h-0.5 bg-text-primary"></span>
-                </div>
-            </button>
-        </div>
-    </header>
-    
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 bg-bg-primary z-40 transform -translate-y-full transition-transform duration-300 ease-in-out md:hidden">
-        <nav role="navigation" aria-label="Mobile navigation" class="container mx-auto px-6 py-4 h-full flex flex-col justify-center items-center space-y-8">
-            <a href="#personal-projects" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">Projects</a>
-            <a href="#approach" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">My Approach</a>
-            <a href="#work" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">My Work</a>
-            <a href="#skills" class="mobile-menu-link text-2xl text-text-secondary hover:text-text-primary">Skills</a>
-            <a href="#contact" class="cta-button font-semibold text-xl px-8 py-4 rounded-full mt-8">Contact</a>
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 w-full z-50 p-4">
+        <nav class="container mx-auto flex justify-between items-center glass-card rounded-xl p-3 px-6">
+            <a href="#" class="text-xl font-bold tracking-widest uppercase nav-link">JD</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#projects" class="nav-link">Work</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <!-- Mobile menu can be added here -->
+            </div>
         </nav>
-    </div>
+    </header>
 
-    <main id="main-content" class="opacity-0">
-        <!-- Part I: Hero Section -->
-        <section id="hero" class="min-h-screen flex items-center relative overflow-hidden">
-            <div class="container mx-auto px-6 z-10">
-                <div class="text-center max-w-4xl mx-auto">
-                    <h1 class="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-playfair font-extrabold text-text-primary mb-6 leading-tight">Architecting <span class="brand-gradient-text">Data-Driven Systems</span> for Compliance and Efficiency</h1>
-                    <h2 class="hero-subtitle text-lg md:text-xl text-text-secondary max-w-3xl mx-auto mb-10">Specializing in ESG, EHS, and Automotive QMS solutions for global industry leaders like Volvo and PACCAR.</h2>
-                    <div class="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <a href="#work" class="cta-button font-bold text-lg px-10 py-4 rounded-full w-full sm:w-auto magnetic-element">View My Work</a>
-                        <a href="Sumanth Udupi Business Analyst.pdf" download="Sumanth Udupi - Resume.pdf" class="ghost-button font-bold text-lg px-10 py-4 rounded-full w-full sm:w-auto magnetic-element">Download Resume</a>
+    <main class="relative z-10">
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center text-center flex-col min-h-[600px]">
+            <div class="px-4">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none text-glow">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">John Doe</span>
+                </h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
+                    A Creative Developer focused on building immersive digital experiences that blend design and technology.
+                </p>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 lg:py-32 scroll-animate">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl lg:text-6xl font-bold text-center mb-16 uppercase tracking-wider text-glow">Featured Work</h2>
+            </div>
+            <!-- DNA Carousel Structure -->
+            <div id="carousel-wrapper">
+                <div id="carousel-sticky-container">
+                    <div id="dna-carousel">
+                        <!-- Project cards will be injected here by JavaScript -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Part II: Social Proof Bar -->
-        <section id="social-proof" class="py-12 bg-bg-secondary">
-            <div class="container mx-auto px-6">
-                <h3 class="section-title text-center text-sm font-bold tracking-widest text-text-secondary uppercase mb-8">Trusted by Industry Leaders</h3>
-                <div class="logo-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 items-center">
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Volvo-Iron-Mark-Black.svg" alt="Volvo" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/3/30/Paccar_logo.svg" alt="PACCAR" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Trex_Company_logo.svg" alt="Trex" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DAF_Trucks_logo.svg" alt="DAF" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Eaton_logo.svg" alt="Eaton" class="h-8 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                    <div class="flex justify-center"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" class="h-10 filter grayscale brightness-0 invert opacity-60 hover:opacity-100 transition-opacity"></div>
-                </div>
+        <!-- About Section -->
+        <section id="about" class="py-20 lg:py-32 scroll-animate">
+            <div class="container mx-auto px-4 max-w-4xl text-center">
+                 <h2 class="text-4xl lg:text-6xl font-bold text-center mb-8 uppercase tracking-wider text-glow">About Me</h2>
+                 <p class="text-lg text-gray-300 leading-relaxed">
+                    I'm a passionate developer with a knack for creating engaging and user-friendly digital experiences. With a background in both creative design and software engineering, I bridge the gap between aesthetics and functionality. My goal is to craft solutions that are not only technically sound but also beautiful and intuitive to use. I thrive on challenges and am always eager to learn new technologies to push the boundaries of what's possible on the web.
+                 </p>
             </div>
         </section>
 
-        <!-- Personal Projects Section -->
-        <section id="personal-projects" class="py-20 md:py-32 bg-bg-secondary" aria-labelledby="personal-projects-heading">
-            <div class="container mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-8">
-                    <h2 id="personal-projects-heading" class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Personal Projects & Case Studies</h2>
-                    <p class="section-subtitle text-lg text-text-secondary mt-4">A showcase of personal explorations and detailed case studies in business analysis and data.</p>
-                </div>
-
-                <div class="interactive-projects-container">
-                    <div class="project-list">
-                        <ul>
-                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=CRM+Overhaul">
-                                <a href="#">Enterprise CRM Overhaul</a>
-                            </li>
-                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=BI+Dashboards">
-                                <a href="#">BI Dashboard Development</a>
-                            </li>
-                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=Mobile+App">
-                                <a href="#">Mobile App Launch</a>
-                            </li>
-                            <li class="project-item" data-image="https://placehold.co/800x600/1a1a1a/c09f58?text=Agile">
-                                <a href="#">Agile Transformation</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="project-visuals">
-                        <!-- Images will be dynamically added here by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Part III: The Core Narrative -->
-        <section id="approach" class="py-20 md:py-32">
-            <div class="container mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">A Unique Foundation in Engineering, Data, and Product</h2>
-                </div>
-                <div class="approach-content max-w-4xl mx-auto grid md:grid-cols-3 gap-8 text-text-secondary text-base md:text-lg">
-                    <div class="approach-card">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Engineer's Mindset</h3>
-                        <p>My career is built on a foundation of Systems Engineering, beginning with a Bachelor's degree in Mechanical Engineering. This discipline instilled a rigorous, first-principles approach to problem-solving—an ability to deconstruct complex physical systems, optimize processes, and understand the intricate product lifecycles that define the automotive and manufacturing industries. This engineer's mindset allows me to grasp not just the 'what' of a business requirement, but the fundamental 'why' behind it.</p>
-                    </div>
-                    <div class="approach-card">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Data Scientist's Toolkit</h3>
-                        <p>Recognizing that modern systems run on data, I pursued a Post Graduate Diploma in Data Science to complement my engineering foundation. This equipped me with the tools to move from theoretical processes to evidence-based decision-making. My time at Amazon, analyzing ad violation patterns with Excel and Power BI across global workflows, provided a real-world crucible for these skills, demonstrating how data analysis can drive massive gains in operational efficiency.</p>
-                    </div>
-                    <div class="approach-card">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">The Business Analyst's Execution</h3>
-                        <p>As a Business Analyst, I now synthesize these disciplines. I combine the engineer's systems thinking with the data scientist's analytical toolkit to serve as the critical bridge between strategic business goals and technical execution. I translate complex needs—from ESG reporting standards to automotive quality protocols—into clear, actionable user stories and technical requirements, ensuring the solutions we build are not just functional, but truly impactful and measurable.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Part IV: Proof of Impact (Case Studies) -->
-        <section id="work" class="py-20 md:py-32 bg-bg-secondary">
-            <div class="container mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Proof of Impact</h2>
-                    <p class="section-subtitle text-lg text-text-secondary">Here's how I've translated complex challenges into measurable business outcomes.</p>
-                </div>
-                <div class="space-y-16">
-                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
-                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">Automotive Quality Management</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Enhancing Supplier Compliance and Data Workflows for Volvo & PACCAR</h3></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>Global automotive leaders required a more streamlined and reliable process for managing complex PPAP and Non-Conformity data from thousands of suppliers. Their existing workflows were prone to manual error, leading to delays and compliance risks.</p></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Led global discovery sessions to map workflows and identify critical data bottlenecks.</li><li>Authored 200+ precise, Gherkin-based user stories in Azure DevOps.</li><li>Facilitated all Agile ceremonies to ensure continuous alignment and remove blockers.</li></ul></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Accelerated feature delivery by 15%</strong> through disciplined backlog prioritization.</li><li><strong class="text-brand-gold-light">Reduced developer queries by 30%</strong>, minimizing rework and ambiguity.</li></ul></div>
-                    </div>
-                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
-                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">ESG & EHS Compliance</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Developing a Centralized EHS Platform to Meet Global Reporting Standards</h3></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>Enterprise clients faced burdensome audit preparations and lacked a centralized system to manage EHS data, creating significant risk and inefficiency in ensuring compliance with standards like GRI, SASB, and OSHA.</p></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Conducted end-to-end business analysis, translating dense regulations into clear software requirements.</li><li>Oversaw the entire SDLC compliance process, proactively mitigating risks.</li><li>Created and managed comprehensive UAT plans in Zephyr for critical modules.</li></ul></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Reduced client audit prep time by 40%</strong>, saving operational costs.</li><li><strong class="text-brand-gold-light">Delivered core modules 15% ahead of deadline</strong>, ensuring regulatory confidence.</li></ul></div>
-                    </div>
-                    <div class="case-study-card glass-card rounded-lg overflow-hidden md:grid md:grid-cols-12 gap-8 items-center p-8 md:p-12">
-                        <div class="md:col-span-12"><p class="text-sm font-bold uppercase tracking-wider text-brand-gold mb-2">API & Data Integration</p><h3 class="text-2xl md:text-3xl font-bold text-text-primary mb-6">Optimizing API Integration to Automate Product Lifecycle Data Syncing</h3></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4"><h4 class="font-bold text-lg text-text-primary">The Challenge</h4><p>OEM clients needed to automate the synchronization of critical data (PPAP, product lifecycle, lab results) between internal and third-party systems. Existing manual processes were slow and error-prone.</p></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">My Contribution</h4><ul class="list-disc list-inside space-y-2"><li>Authored and maintained detailed API requirements and documentation.</li><li>Utilized Postman for rigorous validation of REST API endpoints.</li><li>Built and deployed interactive dashboards in Power BI and Superset for real-time visibility.</li></ul></div>
-                        <div class="md:col-span-4 text-text-secondary space-y-4 mt-6 md:mt-0"><h4 class="font-bold text-lg text-text-primary">The Impact</h4><ul class="list-disc list-inside space-y-2"><li><strong class="text-brand-gold-light">Reduced API-related defects by 25%</strong> post-launch, improving system stability.</li><li><strong class="text-brand-gold-light">Improved customer satisfaction by 10%</strong> by delivering data-driven dashboards.</li></ul></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Part V: My Technical Blueprint -->
-        <section id="skills" class="py-20 md:py-32 bg-bg-secondary">
-            <div class="container mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Core Competencies & Skills</h2>
-                    <p class="section-subtitle text-lg text-text-secondary">The tools and methodologies I use to deliver business value at every stage of the product lifecycle.</p>
-                </div>
-                <div class="skills-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="skill-card glass-card p-8 rounded-lg">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">Business Analysis & Strategy</h3><ul class="text-text-secondary space-y-2"><li>Requirements Elicitation</li><li>Agile & Scrum Ceremonies</li><li>User Story & Gherkin Syntax</li><li>BPMN</li><li>SDLC Management</li><li>UAT Planning & Execution</li></ul>
-                    </div>
-                    <div class="skill-card glass-card p-8 rounded-lg">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">Data Analysis & Visualization</h3><ul class="text-text-secondary space-y-2"><li>SQL (MSSQL)</li><li>Power BI, Tableau, Superset</li><li>Advanced Excel</li><li>Predictive Analytics</li><li>ETL Processes</li></ul>
-                    </div>
-                    <div class="skill-card glass-card p-8 rounded-lg">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">Technical Integration & Design</h3><ul class="text-text-secondary space-y-2"><li>REST API Integration</li><li>Postman & Swagger/OpenAPI</li><li>Figma & Proto.io</li><li>UX Collaboration</li></ul>
-                    </div>
-                    <div class="skill-card glass-card p-8 rounded-lg">
-                        <h3 class="font-bold text-xl text-brand-gold mb-4">Platforms & Tools</h3><ul class="text-text-secondary space-y-2"><li>Azure DevOps, Jira</li><li>Zephyr, TestRail</li><li>MS Project, Smartsheet</li></ul>
-                    </div>
-                </div>
-                <div class="text-center mt-20">
-                     <h3 class="section-title text-2xl md:text-3xl font-playfair font-bold mb-8">Certifications & Continuous Learning</h3>
-                     <div class="certifications-list max-w-4xl mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4 text-text-secondary">
-                        <span><strong>Google:</strong> UX Design Professional (2025)</span><span><strong>Microsoft/LinkedIn:</strong> Business Analysis (2025)</span><span><strong>Atlassian:</strong> Agile Project Management (2025)</span><span><strong>IBM:</strong> Machine Learning with Python (2024)</span>
-                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Part VI: Contact & Next Steps -->
-        <section id="contact" class="py-20 md:py-32 bg-bg-primary">
-            <div class="container mx-auto px-6 text-center">
-                <div class="max-w-3xl mx-auto">
-                    <h2 class="section-title text-3xl md:text-4xl lg:text-5xl font-playfair font-bold mb-4">Interested in Collaborating?</h2>
-                    <p class="section-subtitle text-lg text-text-secondary mb-10">I am always open to discussing new opportunities, particularly in roles focused on ESG, automotive systems, and data-driven product development. If your team is looking for a strategic analyst who can effectively bridge the gap between complex business needs and robust technical solutions, I would be delighted to connect.</p>
-                    <div class="contact-cta">
-                        <a href="mailto:sumanthudupi858@gmail.com" class="cta-button font-bold text-xl px-12 py-5 rounded-full inline-block magnetic-element">Let's Build Together</a>
-                    </div>
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 lg:py-32 scroll-animate">
+            <div class="container mx-auto px-4 max-w-4xl text-center">
+                <h2 class="text-4xl lg:text-6xl font-bold text-center mb-4 uppercase tracking-wider text-glow">Get In Touch</h2>
+                <p class="text-lg text-gray-400 mb-8">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
+                <a href="mailto:hello@johndoe.com" class="inline-block bg-purple-600/50 text-white border border-purple-400 font-bold py-4 px-8 rounded-lg text-lg uppercase tracking-wider hover:bg-purple-500/80 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50">
+                    hello@johndoe.com
+                </a>
+                <div class="flex justify-center space-x-6 mt-12">
+                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">LinkedIn</a>
+                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">GitHub</a>
+                     <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300 nav-link">Twitter</a>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-bg-secondary py-8">
-        <div class="container mx-auto px-6 text-center text-text-secondary">
-            <div class="flex justify-center items-center space-x-6 mb-6">
-                <!-- Added magnetic-element class to social icons -->
-                <a href="https://linkedin.com/in/sumanth-udupi" target="_blank" rel="noopener noreferrer" class="hover:text-brand-gold transition-colors magnetic-element" aria-label="Sumanth Udupi's LinkedIn Profile">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                </a>
-                <a href="https://github.com/SumanthUdupi" target="_blank" rel="noopener noreferrer" class="hover:text-brand-gold transition-colors magnetic-element" aria-label="Sumanth Udupi's GitHub Profile">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                </a>
-            </div>
-            <p class="text-sm">Sumanth Udupi &copy; <span id="current-year"></span> | Bangalore, India</p>
-            <p class="text-xs mt-2">Email: sumanthudupi858@gmail.com | Phone: +91 9741712966</p>
-        </div>
+    <footer class="text-center py-8">
+        <p class="text-gray-500">&copy; 2024 John Doe. All Rights Reserved.</p>
     </footer>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        gsap.registerPlugin(ScrollTrigger);
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    <!-- Main JavaScript for 3D background and animations -->
+    <script type="module">
+        // --- 3D INTERACTIVE BACKGROUND ---
+        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
 
-        function initApp() {
-            initMobileMenu();
-            document.getElementById('current-year').textContent = new Date().getFullYear();
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 1000;
+
+            // Renderer setup
+            const canvas = document.getElementById('bg-canvas');
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Particle creation
+            const particleCount = 5000;
+            const particlesGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
             
-            if (!motionQuery.matches) {
-                initCustomCursor();
-                initLoaderAnimation();
-                initMagneticElements();
-                initInteractiveProjects();
-            } else {
-                const loadingScreen = document.querySelector('.loading-screen');
-                loadingScreen.style.display = 'none';
-                document.getElementById('main-content').style.opacity = 1;
-                document.getElementById('navbar').style.opacity = 1;
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 2000;
+            }
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                color: 0x8400ff,
+                size: 3,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+            
+            // Event Listeners
+            document.addEventListener('mousemove', onDocumentMouseMove, false);
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = event.clientX - windowHalfX;
+            mouseY = event.clientY - windowHalfY;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            const time = Date.now() * 0.00005;
+
+            // Animate camera and particles
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            particles.rotation.x = time * 0.2;
+            particles.rotation.y = time * 0.5;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- DNA SCROLL CAROUSEL ---
+        const projects = [
+            { title: 'Project Title One', category: 'Web Design / Development', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+One' },
+            { title: 'Project Title Two', category: '3D Visualization', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Two' },
+            { title: 'Project Title Three', category: 'Interactive Art', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Three' },
+            { title: 'Project Title Four', category: 'Mobile Application', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Four' },
+            { title: 'Project Title Five', category: 'Branding & Identity', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Five' },
+            { title: 'Project Title Six', category: 'E-commerce Platform', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Six' },
+        ];
+
+        function setupCarousel() {
+            const carousel = document.getElementById('dna-carousel');
+            const numProjects = projects.length;
+            const radius = 300; // How wide the helix is
+            const angleStep = 45; // degrees between items
+            const yStep = 100; // Vertical separation
+
+            projects.forEach((project, i) => {
+                const card = document.createElement('a');
+                card.href = '#';
+                card.className = 'dna-card group project-card glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/30';
+
+                card.innerHTML = `
+                    <div class="relative overflow-hidden w-full h-full">
+                        <img src="${project.imageUrl}" alt="${project.title}" class="w-full h-full object-cover project-image">
+                        <div class="absolute inset-0 project-overlay opacity-0"></div>
+                        <div class="absolute bottom-0 left-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
+                            <h3 class="text-2xl font-bold text-white">${project.title}</h3>
+                            <p class="text-gray-300 mt-1">${project.category}</p>
+                        </div>
+                    </div>
+                `;
+                carousel.appendChild(card);
+
+                // Position card in a scattered, layered helix
+                const angle = i * angleStep;
+                // Center the helix vertically
+                const yPos = (i * yStep) - ((numProjects-1) * yStep / 2) + (Math.random() - 0.5) * 50;
+                // Use a sine wave for Z and cosine for X for the circular path, add randomness
+                const xPos = Math.sin(THREE.MathUtils.degToRad(angle)) * radius + (Math.random() - 0.5) * 150;
+                const zPos = Math.cos(THREE.MathUtils.degToRad(angle)) * radius + (Math.random() - 0.5) * 250;
+
+                const randomXRot = (Math.random() - 0.5) * 20;
+                const randomZRot = (Math.random() - 0.5) * 10;
+
+
+                card.style.transform = `
+                    translate(-50%, -50%)
+                    translateX(${xPos}px)
+                    translateY(${yPos}px)
+                    translateZ(${zPos}px)
+                    rotateY(${angle + 90}deg)
+                    rotateX(${randomXRot}deg)
+                    rotateZ(${randomZRot}deg)
+                `;
+            });
+        }
+
+        function handleCarouselScroll() {
+            const wrapper = document.getElementById('carousel-wrapper');
+            const carousel = document.getElementById('dna-carousel');
+            if (!wrapper || !carousel) return;
+
+            const rect = wrapper.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const wrapperTop = wrapper.offsetTop;
+            const scrollHeight = wrapper.scrollHeight - window.innerHeight;
+
+            if (scrollTop > wrapperTop && scrollTop < wrapperTop + scrollHeight) {
+                const progress = (scrollTop - wrapperTop) / scrollHeight;
+                const rotation = -progress * 220; // Slower, less rotation
+                const zMove = -300 + progress * 200; // Move closer on scroll
+                carousel.style.transform = `translateZ(${zMove}px) rotateY(${rotation}deg)`;
             }
         }
 
-        function initCustomCursor() {
-            const cursorDot = document.querySelector('.cursor__dot');
-            const cursorCircle = document.querySelector('.cursor__circle');
-            
-            const mouse = { x: -100, y: -100 };
-            const pos = { x: 0, y: 0 };
-            // IMPROVEMENT: Increased speed for better responsiveness
-            const speed = 0.15;
 
-            window.addEventListener('mousemove', e => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
+        // --- SCROLL ANIMATIONS ---
+        const scrollElements = document.querySelectorAll('.scroll-animate');
+
+        const elementInView = (el, dividend = 1) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return (
+                elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+            );
+        };
+
+        const displayScrollElement = (element) => {
+            element.classList.add('visible');
+        };
+
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el, 1.25)) {
+                    displayScrollElement(el);
+                }
             });
-
-            const updateCursor = () => {
-                const dx = mouse.x - pos.x;
-                const dy = mouse.y - pos.y;
-                pos.x += dx * speed;
-                pos.y += dy * speed;
-
-                gsap.set(cursorDot, { x: mouse.x, y: mouse.y });
-                gsap.set(cursorCircle, { x: pos.x, y: pos.y });
-            };
-            gsap.ticker.add(updateCursor);
-            
-            const interactiveElements = document.querySelectorAll('a, button');
-            interactiveElements.forEach(el => {
-                el.addEventListener('mouseenter', () => cursorCircle.classList.add('cursor--hover'));
-                el.addEventListener('mouseleave', () => cursorCircle.classList.remove('cursor--hover'));
-            });
-        }
+        };
         
-        // --- IMPROVEMENT: Physics-Based Magnetic Effect ---
-        function initMagneticElements() {
-            const magneticElements = document.querySelectorAll('.magnetic-element');
-            
-            magneticElements.forEach(el => {
-                let pos = { x: 0, y: 0 };
-                let mouse = { x: 0, y: 0 };
-                let isHovering = false;
-                const strength = 0.4; // How strong the pull is
-                const dampening = 0.9; // How quickly it settles (higher is faster)
-
-                el.addEventListener('mouseenter', () => isHovering = true);
-                el.addEventListener('mouseleave', () => isHovering = false);
-
-                el.addEventListener('mousemove', e => {
-                    const rect = el.getBoundingClientRect();
-                    mouse.x = e.clientX - rect.left - rect.width / 2;
-                    mouse.y = e.clientY - rect.top - rect.height / 2;
-                });
-
-                function update() {
-                    let targetX = 0, targetY = 0;
-                    if (isHovering) {
-                        targetX = mouse.x * strength;
-                        targetY = mouse.y * strength;
-                    }
-                    
-                    // Linear interpolation for smooth movement
-                    pos.x += (targetX - pos.x) * (1 - dampening);
-                    pos.y += (targetY - pos.y) * (1 - dampening);
-
-                    gsap.set(el, { x: pos.x, y: pos.y });
-                }
-                gsap.ticker.add(update);
+        // Initialize everything
+        window.onload = function() {
+            init();
+            animate();
+            setupCarousel();
+            handleCarouselScroll(); // Initial check
+            handleScrollAnimation(); // Initial check
+            window.addEventListener('scroll', () => {
+                handleScrollAnimation();
+                handleCarouselScroll();
             });
         }
 
-        function initLoaderAnimation() {
-            const loadingScreen = document.querySelector('.loading-screen');
-            const loaderTextSpans = document.querySelectorAll('.loader-text span');
-            
-            const tlLoader = gsap.timeline({
-                onComplete: () => {
-                    loadingScreen.style.display = 'none';
-                    initPageAnimations();
-                }
-            });
-            
-            tlLoader.from(loaderTextSpans, { y: 100, opacity: 0, stagger: 0.05, ease: 'power3.out', duration: 0.8 })
-                    .to(loaderTextSpans, { y: -100, opacity: 0, stagger: 0.05, ease: 'power3.in', duration: 0.8 }, "+=0.5")
-                    .to(loadingScreen, { opacity: 0, duration: 0.8, onComplete: () => loadingScreen.style.pointerEvents = 'none' }, "-=0.5");
-        }
-
-        function initPageAnimations() {
-            gsap.to(['#main-content', '#navbar'], { opacity: 1, duration: 0.8 });
-            
-            gsap.from(['.hero-title', '.hero-subtitle', '.hero-ctas'], {
-                y: 50,
-                opacity: 0,
-                stagger: 0.2,
-                duration: 1,
-                ease: 'power3.out',
-                delay: 0.2
-            });
-
-            initScrollTriggers();
-        }
-
-        function initMobileMenu() {
-            const btn = document.getElementById('mobile-menu-button');
-            const menu = document.getElementById('mobile-menu');
-            const links = menu.querySelectorAll('a');
-            
-            const toggleMenu = () => {
-                const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-                btn.setAttribute('aria-expanded', !isExpanded);
-                btn.classList.toggle('is-active');
-                menu.classList.toggle('-translate-y-full');
-            };
-
-            btn.addEventListener('click', toggleMenu);
-            links.forEach(link => {
-                link.addEventListener('click', () => {
-                    if(btn.classList.contains('is-active')) {
-                        toggleMenu();
-                    }
-                });
-            });
-        }
-
-        function initScrollTriggers() {
-            ScrollTrigger.create({ 
-                start: 'top -80', 
-                end: 99999, 
-                toggleClass: { className: 'scrolled', targets: '#navbar' } 
-            });
-            const navbarStyle = document.createElement('style');
-            navbarStyle.innerHTML = `#navbar.scrolled { background-color: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px); }`;
-            document.head.appendChild(navbarStyle);
-
-            gsap.utils.toArray('.section-title, .section-subtitle, .contact-cta').forEach(el => {
-                gsap.from(el, {
-                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' },
-                    y: 40, opacity: 0, duration: 1, ease: 'power3.out'
-                });
-            });
-
-            gsap.from('.logo-grid > div', {
-                scrollTrigger: { trigger: '.logo-grid', start: 'top 85%' },
-                y: 30, opacity: 0, stagger: 0.1, ease: 'power3.out'
-            });
-            
-            gsap.from('.approach-card', {
-                scrollTrigger: { trigger: '.approach-content', start: 'top 80%' },
-                y: 50, opacity: 0, stagger: 0.2, ease: 'power3.out'
-            });
-
-            gsap.from('.case-study-card', {
-                scrollTrigger: { trigger: '#work', start: 'top 70%' },
-                y: 50, opacity: 0, stagger: 0.25, ease: 'power3.out'
-            });
-
-            gsap.from('.skill-card', {
-                scrollTrigger: { trigger: '.skills-grid', start: 'top 80%' },
-                y: 50, opacity: 0, stagger: 0.2, ease: 'power3.out'
-            });
-             gsap.from('.certifications-list span', {
-                scrollTrigger: { trigger: '.certifications-list', start: 'top 90%' },
-                y: 30, opacity: 0, stagger: 0.15, ease: 'power3.out'
-            });
-            
-            gsap.to('#hero::before', {
-                scrollTrigger: {
-                    trigger: '#hero',
-                    start: 'top top',
-                    end: 'bottom top',
-                    scrub: true
-                },
-                y: '50%',
-                ease: 'none'
-            });
-        }
-
-        function initInteractiveProjects() {
-            const projectItems = document.querySelectorAll('.project-item');
-            const projectVisuals = document.querySelector('.project-visuals');
-            let activeItem = null;
-
-            // 1. Create and append image elements
-            projectItems.forEach((item, index) => {
-                const imageUrl = item.dataset.image;
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.alt = item.querySelector('a').textContent;
-                img.classList.add('project-image');
-                img.dataset.index = index;
-                projectVisuals.appendChild(img);
-            });
-
-            const projectImages = document.querySelectorAll('.project-image');
-
-            // 2. Set initial state
-            function setInitialState() {
-                gsap.set(projectImages, { opacity: 0, scale: 1.05 });
-                if (projectItems.length > 0) {
-                    activeItem = projectItems[0];
-                    activeItem.classList.add('is-active');
-                    const initialImage = projectImages[0];
-                    gsap.to(initialImage, { opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out' });
-                }
-            }
-
-            // 3. Add hover event listeners
-            projectItems.forEach((item, index) => {
-                item.addEventListener('mouseenter', () => {
-                    if (activeItem === item) return;
-
-                    // Deactivate previous item
-                    if (activeItem) {
-                        activeItem.classList.remove('is-active');
-                        const oldImage = projectImages[Array.from(projectItems).indexOf(activeItem)];
-                        gsap.to(oldImage, { opacity: 0, duration: 0.5, ease: 'power2.inOut' });
-                    }
-
-                    // Activate new item
-                    activeItem = item;
-                    item.classList.add('is-active');
-                    const newImage = projectImages[index];
-                    gsap.to(newImage, { opacity: 1, duration: 0.5, ease: 'power2.inOut' });
-                });
-            });
-
-            setInitialState();
-        }
-        
-        initApp();
-    });
     </script>
 </body>
 </html>
