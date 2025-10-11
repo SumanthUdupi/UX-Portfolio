@@ -1,112 +1,43 @@
-import React, { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Introduction from "./components/Introduction";
-import ProjectShowcase from "./components/ProjectShowcase";
-import AboutMe from "./components/AboutMe";
-import Contact from "./components/Contact";
-import Header from "./components/Header";
-import SectionDivider from "./components/SectionDivider";
-import "./index.css";
-
-gsap.registerPlugin(ScrollTrigger);
+import React from 'react';
+import ThemeProvider from './components/ThemeProvider';
+import CustomCursor from './components/CustomCursor';
+import Header from './components/Header';
+import Introduction from './components/Introduction';
+import SectionDivider from './components/SectionDivider';
+import AboutMe from './components/AboutMe';
+import Experience from './components/Experience';
+import ProjectShowcase from './components/ProjectShowcase';
+import HorizontalGallery from './components/HorizontalGallery';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import BackToTopButton from './components/BackToTopButton';
+import experienceData from './experienceData';
+import projectsData from './projects';
 
 const App = () => {
-  const main = useRef();
-
-  useLayoutEffect(() => {
-    const mm = gsap.matchMedia();
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      // Animate sections on scroll
-      const sections = [".project-showcase", ".about-me", ".contact"];
-      sections.forEach((section) => {
-        gsap.from(section, {
-          y: 50,
-          opacity: 0,
-          duration: 1.5,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 80%",
-            toggleActions: "play none none none",
-          },
-        });
-      });
-
-      mm.add("(min-width: 768px)", () => {
-        // Background color transitions
-        ScrollTrigger.create({
-          trigger: ".project-showcase",
-          start: "top center",
-          end: "bottom center",
-          onEnter: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#2d3748",
-              duration: 1.0,
-            }),
-          onLeaveBack: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#1a202c",
-              duration: 1.0,
-            }),
-        });
-        ScrollTrigger.create({
-          trigger: ".about-me",
-          start: "top center",
-          end: "bottom center",
-          onEnter: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#4a5568",
-              duration: 1.0,
-            }),
-          onLeaveBack: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#2d3748",
-              duration: 1.0,
-            }),
-        });
-        ScrollTrigger.create({
-          trigger: ".contact",
-          start: "top center",
-          end: "bottom center",
-          onEnter: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#1a202c",
-              duration: 1.0,
-            }),
-          onLeaveBack: () =>
-            gsap.to(main.current, {
-              backgroundColor: "#4a5568",
-              duration: 1.0,
-            }),
-        });
-      });
-    }, main);
-    return () => {
-      ctx.revert();
-      mm.revert();
-    };
-  }, []);
-
-  return (
-    <div ref={main} className="bg-gray-900 text-white">
-      <Header />
-      <Introduction />
-      <ProjectShowcase className="project-showcase" />
-      <SectionDivider />
-      <AboutMe className="about-me" />
-      <SectionDivider />
-      <Contact className="contact" />
-    </div>
-  );
+    return (
+        <ThemeProvider>
+            <CustomCursor />
+            <Header />
+            <main>
+                <Introduction />
+                <div className="container mx-auto px-4">
+                    <SectionDivider title="About Me" />
+                    <AboutMe />
+                    <SectionDivider title="Experience" />
+                    <Experience experienceData={experienceData} />
+                    <SectionDivider title="Projects" />
+                    <ProjectShowcase projectsData={projectsData} />
+                    <SectionDivider title="More Projects" />
+                    <HorizontalGallery projectsData={projectsData} />
+                    <SectionDivider title="Get In Touch" />
+                    <Contact />
+                </div>
+            </main>
+            <Footer />
+            <BackToTopButton />
+        </ThemeProvider>
+    );
 };
 
 export default App;

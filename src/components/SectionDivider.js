@@ -1,68 +1,18 @@
-import React, { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const SectionDivider = ({ className }) => {
-  const svgRef = useRef(null);
-  const pathRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    const path = pathRef.current;
-    const length = path.getTotalLength();
-
-    gsap.set(path, {
-      strokeDasharray: length,
-      strokeDashoffset: length,
-    });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: svgRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        scrub: 1,
-      },
-    });
-
-    tl.to(path, {
-      strokeDashoffset: 0,
-      ease: "power1.inOut",
-    });
-
-    return () => {
-      tl.kill();
-    };
-  }, []);
-
-  return (
-    <div className={`w-full flex justify-center my-16 ${className}`}>
-      <svg
-        ref={svgRef}
-        width="80%"
-        height="20"
-        viewBox="0 0 400 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          ref={pathRef}
-          d="M0 10 C 100 0, 300 20, 400 10"
-          stroke="white"
-          strokeWidth="2"
-        />
-      </svg>
-    </div>
-  );
+const SectionDivider = ({ title }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.5 });
+    return (
+        <div ref={ref} className="flex items-center justify-center my-16 md:my-24">
+            <svg width="100%" height="50" className="max-w-lg">
+                <motion.line x1="0" y1="25" x2="40%" y2="25" stroke="currentColor" strokeWidth="1" initial={{ pathLength: 0 }} animate={{ pathLength: isInView ? 1 : 0 }} transition={{ duration: 1 }} />
+                <text x="50%" y="30" textAnchor="middle" className="font-semibold text-xl fill-current">{title}</text>
+                <motion.line x1="60%" y1="25" x2="100%" y2="25" stroke="currentColor" strokeWidth="1" initial={{ pathLength: 0 }} animate={{ pathLength: isInView ? 1 : 0 }} transition={{ duration: 1 }} />
+            </svg>
+        </div>
+    );
 };
 
 export default SectionDivider;

@@ -1,128 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useContext } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeContext } from './ThemeContext';
 
-const SunIcon = () => (
-  <motion.svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ scale: 0, rotate: -90 }}
-    animate={{ scale: 1, rotate: 0 }}
-    exit={{ scale: 0, rotate: 90 }}
-    transition={{ duration: 0.3 }}
-  >
-    <path
-      d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M12 1V3"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M12 21V23"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M4.21973 4.21973L5.63973 5.63973"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M18.3604 18.3604L19.7804 19.7804"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M1 12H3"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M21 12H23"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M4.21973 19.7804L5.63973 18.3604"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M18.3604 5.63973L19.7804 4.21973"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </motion.svg>
+const IconSun = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
 );
 
-const MoonIcon = () => (
-  <motion.svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    initial={{ scale: 0, rotate: 90 }}
-    animate={{ scale: 1, rotate: 0 }}
-    exit={{ scale: 0, rotate: -90 }}
-    transition={{ duration: 0.3 }}
-  >
-    <path
-      d="M21 12.79C21 17.05 17.05 21 12.79 21C10.24 21 7.9 20.01 6.24 18.35C4.33 16.44 3.5 13.88 3.5 11C3.5 6.58 7.08 3 11.5 3C12.32 3 13.12 3.12 13.88 3.34C13.5 4.89 13.79 6.5 14.68 7.9C15.91 9.77 18.06 10.89 20.32 10.89C20.59 10.89 20.85 10.87 21.11 10.84"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </motion.svg>
+const IconMoon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
 );
 
 const ThemeToggle = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
-  return (
-    <button onClick={toggleTheme} className="focus:outline-none">
-      <AnimatePresence mode="wait">
-        {isDarkMode ? <MoonIcon key="moon" /> : <SunIcon key="sun" />}
-      </AnimatePresence>
-    </button>
-  );
+    const { theme, toggleTheme } = useContext(ThemeContext);
+    return (
+        <button onClick={toggleTheme} className="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 bg-gray-200 dark:bg-gray-700">
+            <AnimatePresence mode="wait" initial={false}>
+                <motion.div key={theme} initial={{ y: -20, opacity: 0, rotate: -90 }} animate={{ y: 0, opacity: 1, rotate: 0 }} exit={{ y: 20, opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }}>
+                    {theme === 'dark' ? <IconSun className="text-yellow-300" /> : <IconMoon className="text-gray-800" />}
+                </motion.div>
+            </AnimatePresence>
+        </button>
+    );
 };
 
 export default ThemeToggle;
