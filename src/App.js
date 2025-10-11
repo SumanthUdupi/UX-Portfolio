@@ -5,6 +5,8 @@ import Introduction from "./components/Introduction";
 import ProjectShowcase from "./components/ProjectShowcase";
 import AboutMe from "./components/AboutMe";
 import Contact from "./components/Contact";
+import Header from "./components/Header";
+import SectionDivider from "./components/SectionDivider";
 import "./index.css";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +25,24 @@ const App = () => {
     }
 
     const ctx = gsap.context(() => {
+      // Animate sections on scroll
+      const sections = [".project-showcase", ".about-me", ".contact"];
+      sections.forEach((section) => {
+        gsap.from(section, {
+          y: 50,
+          opacity: 0,
+          duration: 1.5,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
       mm.add("(min-width: 768px)", () => {
+        // Background color transitions
         ScrollTrigger.create({
           trigger: ".project-showcase",
           start: "top center",
@@ -79,13 +98,16 @@ const App = () => {
 
   return (
     <div ref={main} className="bg-gray-900 text-white">
+      <Header />
       <Introduction />
       <div className="project-showcase">
         <ProjectShowcase />
       </div>
+      <SectionDivider />
       <div className="about-me">
         <AboutMe />
       </div>
+      <SectionDivider />
       <div className="contact">
         <Contact />
       </div>
