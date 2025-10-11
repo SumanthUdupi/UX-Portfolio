@@ -1,17 +1,8 @@
 import React, { useRef } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
 import { Text, Trail } from "@react-three/drei";
 
 const ProjectTile = ({ project, position }) => {
   const ref = useRef();
-  const { camera } = useThree();
-
-  useFrame(() => {
-    if (ref.current) {
-      // Make the tile always face the camera
-      ref.current.lookAt(camera.position);
-    }
-  });
 
   const openProjectLink = () => {
     window.open(project.link, "_blank");
