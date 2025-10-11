@@ -21,42 +21,55 @@ jest.mock('../../projects', () => ([
 
 // Mocking gsap and its plugins
 jest.mock('gsap', () => ({
-  registerPlugin: jest.fn(),
-  context: (fn) => {
-    fn();
-    return {
+  __esModule: true,
+  default: {
+    registerPlugin: jest.fn(),
+    context: (fn) => {
+      fn();
+      return {
+        revert: jest.fn(),
+      };
+    },
+    matchMedia: () => ({
+      add: jest.fn(),
       revert: jest.fn(),
-    };
-  },
-  matchMedia: () => ({
-    add: jest.fn(),
-    revert: jest.fn(),
-  }),
-  to: jest.fn(),
-  utils: {
-    toArray: jest.fn(() => []),
+    }),
+    to: jest.fn(),
+    fromTo: jest.fn(),
+    utils: {
+      toArray: jest.fn(() => [{ querySelector: jest.fn() }, { querySelector: jest.fn() }]),
+    },
   },
 }));
-
-jest.mock('gsap/ScrollTrigger', () => ({}));
-
+jest.mock('gsap/ScrollTrigger', () => ({
+  ScrollTrigger: {
+    create: jest.fn(),
+  },
+}));
 describe('HorizontalGallery Component', () => {
-    beforeEach(() => {
-        // Mock for window.matchMedia
-        Object.defineProperty(window, 'matchMedia', {
-          writable: true,
-          value: jest.fn().mockImplementation(query => ({
-            matches: false,
-            media: query,
-            onchange: null,
-            addListener: jest.fn(), // deprecated
-            removeListener: jest.fn(), // deprecated
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-          })),
-        });
-      });
+  beforeEach(() => {
+    // Mock for window.matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+    });
+
+    // Mock for IntersectionObserver
+    global.IntersectionObserver = jest.fn(() => ({
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }));
+  });
 
   test('renders the component without crashing', () => {
     render(<HorizontalGallery />);
