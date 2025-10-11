@@ -1,43 +1,84 @@
-import React from 'react';
-import ThemeProvider from './components/ThemeProvider';
-import CustomCursor from './components/CustomCursor';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Introduction from './components/Introduction';
-import SectionDivider from './components/SectionDivider';
 import AboutMe from './components/AboutMe';
-import Experience from './components/Experience';
 import ProjectShowcase from './components/ProjectShowcase';
-import HorizontalGallery from './components/HorizontalGallery';
+import Experience from './components/Experience';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import CustomCursor from './components/CustomCursor';
 import BackToTopButton from './components/BackToTopButton';
-import experienceData from './experienceData';
-import projectsData from './projects';
+import { ThemeProvider } from './components/ThemeContext';
+import './index.css';
 
-const App = () => {
+function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000); // Simulate loading time
+    return () => clearTimeout(timer);
+  }, []);
+
+  const logoVariants = {
+    hidden: { opacity: 0, scale: 0.5 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        type: 'spring',
+        damping: 10,
+        stiffness: 100,
+      },
+    },
+  };
+
+  if (loading) {
     return (
-        <ThemeProvider>
-            <CustomCursor />
-            <Header />
-            <main>
-                <Introduction />
-                <div className="container mx-auto px-4">
-                    <SectionDivider title="About Me" />
-                    <AboutMe />
-                    <SectionDivider title="Experience" />
-                    <Experience experienceData={experienceData} />
-                    <SectionDivider title="Projects" />
-                    <ProjectShowcase projectsData={projectsData} />
-                    <SectionDivider title="More Projects" />
-                    <HorizontalGallery projectsData={projectsData} />
-                    <SectionDivider title="Get In Touch" />
-                    <Contact />
-                </div>
-            </main>
-            <Footer />
-            <BackToTopButton />
-        </ThemeProvider>
+      <div className="loading-screen">
+        <motion.div
+          variants={logoVariants}
+          initial="hidden"
+          animate="visible"
+          className="animated-logo"
+        >
+          {/* Your SVG Logo or Initials Here */}
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <motion.path
+              d="M 20,50 L 50,80 L 80,50"
+              fill="transparent"
+              stroke="var(--text-color)"
+              strokeWidth="4"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1.5, ease: 'easeInOut' }}
+            />
+          </svg>
+        </motion.div>
+      </div>
     );
-};
+  }
+
+  return (
+    <ThemeProvider>
+      <CustomCursor />
+      <div className="App">
+        <Header />
+        <main>
+          <AnimatePresence>
+            <Introduction />
+            <AboutMe />
+            <ProjectShowcase />
+            <Experience />
+            <Contact />
+          </AnimatePresence>
+        </main>
+        <Footer />
+        <BackToTopButton />
+      </div>
+    </ThemeProvider>
+  );
+}
 
 export default App;
