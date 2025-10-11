@@ -25,12 +25,14 @@ const Contact = () => {
           I'm currently available for freelance work. If you have a project that
           you think I'd be a good fit for, please get in touch!
         </p>
-        <a
-          href="mailto:sumanthudupi@example.com"
-          className="text-lg md:text-2xl mt-4 text-blue-400 hover:underline"
-        >
-          sumanthudupi@example.com
-        </a>
+        <div className="mt-8">
+          <a
+            href="mailto:sumanthudupi@example.com"
+            className="connect-button bg-blue-500 text-white font-bold py-4 px-8 rounded-full transition-all duration-300"
+          >
+            Let's Connect
+          </a>
+        </div>
       </motion.div>
     </section>
   );
