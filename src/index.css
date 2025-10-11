@@ -117,3 +117,11 @@
   background-color: #4a90e2;
   z-index: 100;
 }
+
+:root { --background: #111; --text: #eee; }
+:root.light { --background: #f5f5f5; --text: #1a1a1a; }
+html { scroll-behavior: smooth; }
+body { background-color: var(--background); color: var(--text); cursor: none; }
+@media (max-width: 768px) { body { cursor: default; } }
+@keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.animate-gradient { background-size: 200% 200%; animation: gradient 15s ease infinite; }
