@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const Contact = () => {
+const Contact = ({ className }) => {
   const prefersReducedMotion =
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -15,7 +15,7 @@ const Contact = () => {
       };
 
   return (
-    <section className="py-20">
+    <section className={`py-20 ${className}`}>
       <motion.div
         className="container mx-auto text-center"
         {...animationProps}

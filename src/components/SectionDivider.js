@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SectionDivider = () => {
+const SectionDivider = ({ className }) => {
   const svgRef = useRef(null);
   const pathRef = useRef(null);
 
@@ -45,7 +45,7 @@ const SectionDivider = () => {
   }, []);
 
   return (
-    <div className="w-full flex justify-center my-16">
+    <div className={`w-full flex justify-center my-16 ${className}`}>
       <svg
         ref={svgRef}
         width="80%"

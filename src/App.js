@@ -100,17 +100,11 @@ const App = () => {
     <div ref={main} className="bg-gray-900 text-white">
       <Header />
       <Introduction />
-      <div className="project-showcase">
-        <ProjectShowcase />
-      </div>
+      <ProjectShowcase className="project-showcase" />
       <SectionDivider />
-      <div className="about-me">
-        <AboutMe />
-      </div>
+      <AboutMe className="about-me" />
       <SectionDivider />
-      <div className="contact">
-        <Contact />
-      </div>
+      <Contact className="contact" />
     </div>
   );
 };

@@ -19,34 +19,25 @@ jest.mock('../../projects', () => ([
   },
 ]));
 
+import gsap from 'gsap';
+
 // Mocking gsap and its plugins
-jest.mock('gsap', () => ({
-  __esModule: true,
-  default: {
-    registerPlugin: jest.fn(),
-    context: (fn) => {
-      fn();
-      return {
-        revert: jest.fn(),
-      };
-    },
-    matchMedia: () => ({
-      add: jest.fn(),
-      revert: jest.fn(),
-    }),
-    to: jest.fn(),
-    fromTo: jest.fn(),
-    utils: {
-      toArray: jest.fn(() => [{ querySelector: jest.fn() }, { querySelector: jest.fn() }]),
-    },
-  },
-}));
+jest.mock('gsap');
 jest.mock('gsap/ScrollTrigger', () => ({
   ScrollTrigger: {
     create: jest.fn(),
   },
 }));
+
 describe('HorizontalGallery Component', () => {
+  beforeAll(() => {
+    // Mock for lottie-player
+    if (window.customElements && !window.customElements.get('lottie-player')) {
+      class LottiePlayer extends HTMLElement {}
+      window.customElements.define('lottie-player', LottiePlayer);
+    }
+  });
+
   beforeEach(() => {
     // Mock for window.matchMedia
     Object.defineProperty(window, 'matchMedia', {
@@ -69,6 +60,28 @@ describe('HorizontalGallery Component', () => {
       unobserve: jest.fn(),
       disconnect: jest.fn(),
     }));
+
+    // Mock GSAP and its methods
+    gsap.registerPlugin = jest.fn();
+    gsap.context = jest.fn((fn) => {
+      fn();
+      return { revert: jest.fn() };
+    });
+    gsap.matchMedia = jest.fn(() => ({
+      add: jest.fn(),
+      revert: jest.fn(),
+    }));
+    gsap.to = jest.fn();
+    gsap.fromTo = jest.fn();
+    gsap.utils = {
+      toArray: jest.fn(selector => {
+        const elements = Array.from(document.querySelectorAll(selector));
+        return elements.map(el => ({
+          ...el,
+          querySelector: jest.fn(),
+        }));
+      }),
+    };
   });
 
   test('renders the component without crashing', () => {
