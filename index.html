@@ -231,12 +231,9 @@
 
         // --- PROJECTS SETUP ---
         const projects = [
-            { title: 'Project Title One', category: 'Web Design / Development', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+One' },
-            { title: 'Project Title Two', category: '3D Visualization', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Two' },
-            { title: 'Project Title Three', category: 'Interactive Art', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Three' },
-            { title: 'Project Title Four', category: 'Mobile Application', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Four' },
-            { title: 'Project Title Five', category: 'Branding & Identity', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Five' },
-            { title: 'Project Title Six', category: 'E-commerce Platform', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Project+Six' },
+            { title: 'Automobile Dashboard', category: 'Data Visualization', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Automobile+Dashboard', href: 'Automobile Dashboard.html' },
+            { title: 'F1 Analytics', category: 'Data Visualization', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=F1+Analytics', href: 'F1Analytics.html' },
+            { title: 'Pokedex', category: 'Web Application', imageUrl: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Pokedex', href: 'Pokedex.html' },
         ];
 
         function setupProjectsGrid() {
@@ -245,7 +242,9 @@
 
             projects.forEach((project) => {
                 const card = document.createElement('a');
-                card.href = '#';
+                card.href = project.href;
+                card.target = '_blank';
+                card.rel = 'noopener noreferrer';
                 // Assign classes for styling the project card
                 card.className = 'group project-card glass-card rounded-2xl overflow-hidden shadow-2xl shadow-black/30 block';
                 
