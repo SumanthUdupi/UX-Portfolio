@@ -26,12 +26,8 @@ const Introduction = () => {
           opacity: 0,
           y: 20,
           stagger: 0.1,
-          scrollTrigger: {
-            trigger: intro.current,
-            start: "top center",
-            end: "bottom center",
-            scrub: true,
-          },
+          duration: 0.8,
+          ease: "power3.out",
         });
 
         gsap.to(intro.current, {
