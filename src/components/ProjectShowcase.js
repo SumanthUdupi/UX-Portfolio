@@ -66,7 +66,7 @@ const ProjectCard = ({ project }) => {
               autoplay
               loop
               src={project.lottieIconUrl}
-              style={{ height: '50px', width: '50px' }}
+              className="project-lottie"
             />
           )}
         </div>
