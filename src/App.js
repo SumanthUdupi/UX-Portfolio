@@ -9,7 +9,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import BackToTopButton from './components/BackToTopButton';
-import { ThemeProvider } from './components/ThemeContext';
+import ThemeProvider from './components/ThemeProvider';
 import './index.css';
 
 function App() {
