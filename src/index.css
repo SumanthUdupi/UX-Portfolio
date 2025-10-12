@@ -198,6 +198,18 @@
   z-index: 3;
 }
 
+@media (max-width: 640px) {
+  .hero-actions {
+    gap: 1rem;
+  }
+
+  .scroll-indicator {
+    bottom: 1.5rem;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+  }
+}
+
 ::root { --background: #111; --text: #eee; }
 ::root.light { --background: #f5f5f5; --text: #1a1a1a; }
 html { scroll-behavior: smooth; }
