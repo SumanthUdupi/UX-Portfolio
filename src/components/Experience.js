@@ -1,7 +1,10 @@
 import React, { useRef } from 'react';
 import { motion, useScroll } from 'framer-motion';
 
+import fallbackExperience from '../experienceData';
+
 const Experience = ({ experienceData }) => {
+    const data = experienceData || fallbackExperience;
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end center"] });
     return (
