@@ -67,7 +67,7 @@ const MouseTrail = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }} />;
+  return <canvas ref={canvasRef} className="mouse-trail-canvas" />;
 };
 
 export default MouseTrail;
