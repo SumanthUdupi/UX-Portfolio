@@ -3,19 +3,32 @@ import { motion } from 'framer-motion';
 import { ThemeContext } from './ThemeContext';
 import useMousePosition from './useMousePosition';
 
+function debounce(fn, ms) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            timer = null;
+            fn.apply(this, args);
+        }, ms);
+    };
+}
+
 const CustomCursor = () => {
     const { theme } = useContext(ThemeContext);
     const { x, y } = useMousePosition();
     const [isHoveringLink, setIsHoveringLink] = useState(false);
     useEffect(() => {
-        const handleMouseEnter = () => setIsHoveringLink(true);
-        const handleMouseLeave = () => setIsHoveringLink(false);
-        document.querySelectorAll('a, button, [role="button"]').forEach(el => {
+        const handleMouseEnter = debounce(() => setIsHoveringLink(true), 20);
+        const handleMouseLeave = debounce(() => setIsHoveringLink(false), 20);
+
+        const interactiveElements = document.querySelectorAll('a, button, [role="button"]');
+        interactiveElements.forEach(el => {
             el.addEventListener('mouseenter', handleMouseEnter);
             el.addEventListener('mouseleave', handleMouseLeave);
         });
         return () => {
-            document.querySelectorAll('a, button, [role="button"]').forEach(el => {
+            interactiveElements.forEach(el => {
                 el.removeEventListener('mouseenter', handleMouseEnter);
                 el.removeEventListener('mouseleave', handleMouseLeave);
             });

@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Introduction from '../Introduction';
 
-// Mock the MouseTrail component
 jest.mock('../MouseTrail', () => () => <div data-testid="mouse-trail" />);
+jest.mock('../StarField', () => () => <div data-testid="star-field" />);
 
 describe('Introduction Component', () => {
     beforeEach(() => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
+import { navLinks } from '../navigation';
 
 const Header = () => {
     const { scrollY } = useScroll();
@@ -16,13 +17,15 @@ const Header = () => {
         visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }
     };
 
+    const LOGO_TEXT = "SU.";
+
     return (
         <motion.header className="fixed top-0 left-0 right-0 z-40 flex justify-between items-center px-4 md:px-8 py-4" animate={{ backgroundColor: scrolled ? "rgba(17, 17, 17, 0.8)" : "rgba(17, 17, 17, 0)", backdropFilter: scrolled ? "blur(10px)" : "blur(0px)", paddingTop: scrolled ? '1rem' : '1.5rem', paddingBottom: scrolled ? '1rem' : '1.5rem' }}>
             <motion.div className="text-2xl font-bold text-white flex overflow-hidden" variants={logoVariants} initial="hidden" animate="visible">
-                {"SU.".split("").map((char, i) => <motion.span key={i} variants={letterVariants}>{char}</motion.span>)}
+                {LOGO_TEXT.split("").map((char, i) => <motion.span key={i} variants={letterVariants}>{char}</motion.span>)}
             </motion.div>
             <nav className="flex items-center space-x-4">
-                {["About", "Projects", "Contact"].map((link, i) => <motion.a key={link} href={`#${link.toLowerCase()}`} className="text-gray-300 hover:text-cyan-400" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 * i + 0.5 }}>{link}</motion.a>)}
+                {navLinks.map((link, i) => <motion.a key={link.name} href={link.href} className="text-gray-300 hover:text-cyan-400" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 * i + 0.5 }}>{link.name}</motion.a>)}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.8 }}><ThemeToggle /></motion.div>
             </nav>
         </motion.header>
