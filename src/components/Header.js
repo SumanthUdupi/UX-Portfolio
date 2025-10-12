@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 
