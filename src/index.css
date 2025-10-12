@@ -132,6 +132,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 0;
 }
 
 .hero-background::after {
@@ -141,16 +142,18 @@
   background: radial-gradient(circle at top, rgba(79, 70, 229, 0.35), transparent 55%),
     radial-gradient(circle at bottom, rgba(14, 165, 233, 0.2), transparent 60%);
   opacity: 0.8;
+  z-index: 1;
 }
 
 .starfield-container {
   position: absolute;
   inset: 0;
+  z-index: 0;
 }
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   text-align: center;
   padding: 0 1.5rem;
 }
@@ -183,7 +186,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
 }
 
 ::root { --background: #111; --text: #eee; }
