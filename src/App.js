@@ -9,7 +9,8 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import BackToTopButton from './components/BackToTopButton';
-import { ThemeProvider } from './components/ThemeContext';
+import ThemeProvider from './components/ThemeProvider';
+import experienceData from './experienceData';
 import './index.css';
 
 function App() {
@@ -67,11 +68,11 @@ function App() {
         <Header />
         <main>
           <AnimatePresence>
-            <Introduction />
-            <AboutMe />
-            <ProjectShowcase />
-            <Experience />
-            <Contact />
+            <Introduction key="introduction" />
+            <AboutMe key="about" />
+            <ProjectShowcase key="projects" />
+            <Experience key="experience" experienceData={experienceData} />
+            <Contact key="contact" />
           </AnimatePresence>
         </main>
         <Footer />
