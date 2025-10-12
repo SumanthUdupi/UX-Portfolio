@@ -7,7 +7,7 @@ const BackToTopButton = () => {
     const [showButton, setShowButton] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = scrollY.on("change", (latest) => setShowButton(latest > 200));
+        const unsubscribe = scrollY.onChange((latest) => setShowButton(latest > 200));
         return () => unsubscribe();
     }, [scrollY]);
 
