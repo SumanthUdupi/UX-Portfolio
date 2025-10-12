@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/react';
 import ProjectShowcase from '../ProjectShowcase';
 import projectsData from '../../projects';
 
+jest.mock('@lottiefiles/react-lottie-player', () => ({
+    Player: () => <div data-testid="lottie-player" />,
+}));
+
 describe('ProjectShowcase Component', () => {
     beforeEach(() => {
         // Mock for IntersectionObserver
