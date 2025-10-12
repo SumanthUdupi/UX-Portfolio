@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import BackToTopButton from './components/BackToTopButton';
 import ThemeProvider from './components/ThemeProvider';
+import experienceData from './experienceData';
 import './index.css';
 
 function App() {
