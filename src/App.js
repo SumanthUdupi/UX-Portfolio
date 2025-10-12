@@ -68,11 +68,11 @@ function App() {
         <Header />
         <main>
           <AnimatePresence>
-            <Introduction />
-            <AboutMe />
-            <ProjectShowcase />
-            <Experience experienceData={experienceData} />
-            <Contact />
+            <Introduction key="introduction" />
+            <AboutMe key="about" />
+            <ProjectShowcase key="projects" />
+            <Experience key="experience" experienceData={experienceData} />
+            <Contact key="contact" />
           </AnimatePresence>
         </main>
         <Footer />
