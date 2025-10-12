@@ -26,7 +26,7 @@ const ProjectShowcase = () => {
       <div className="project-grid">
         {projects.map((project) => (
           <motion.div
-            key={project.id}
+            key={`project-${project.id}`}
             className="project-card"
             initial="offscreen"
             whileInView="onscreen"
@@ -51,6 +51,7 @@ const ProjectShowcase = () => {
                 <h3>{project.title}</h3>
                 {project.lottieIconUrl && (
                   <Player
+                    key={`lottie-${project.id}`}
                     autoplay
                     loop
                     src={project.lottieIconUrl}
