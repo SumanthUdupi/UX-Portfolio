@@ -8,8 +8,13 @@ const MouseTrail = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
 
     const handleMouseMove = (event) => {
       mouse.current.x = event.x;
@@ -20,6 +25,7 @@ const MouseTrail = () => {
     };
 
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', resizeCanvas);
 
     class Particle {
       constructor() {
@@ -64,6 +70,7 @@ const MouseTrail = () => {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', resizeCanvas);
     };
   }, []);
 
