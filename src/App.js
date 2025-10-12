@@ -71,7 +71,7 @@ function App() {
             <Introduction key="introduction" />
             <AboutMe key="about" />
             <ProjectShowcase key="projects" />
-            <Experience key="experience" experienceData={undefined} />
+            <Experience key="experience" experienceData={experienceData} />
             <Contact key="contact" />
           </AnimatePresence>
         </main>
