@@ -41,13 +41,14 @@ const Introduction = () => {
         animate="visible"
       >
         {title.split('').map((char, index) => (
-          <motion.span key={index} variants={letterVariants}>
+          <motion.span key={`${char}-${index}`} variants={letterVariants}>
             {char}
           </motion.span>
         ))}
       </motion.h1>
       <div className="social-icons">
         <motion.a
+          key="github"
           href="https://github.com"
           target="_blank"
           rel="noopener noreferrer"
@@ -57,6 +58,7 @@ const Introduction = () => {
           <FaGithub />
         </motion.a>
         <motion.a
+          key="linkedin"
           href="https://linkedin.com"
           target="_blank"
           rel="noopener noreferrer"
